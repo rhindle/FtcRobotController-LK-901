@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot.Tools;
 
 import android.graphics.Color;
 import android.util.Log;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
@@ -20,10 +21,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
+import static android.os.SystemClock.sleep;
+
 // This code adapted from https://github.com/w8wjb/ftc-neodriver
 
 @I2cDeviceType
-@DeviceProperties(name = "Adafruit NeoDriver", xmlTag = "AdafruitNeoDriver", description = "an Adafruit NeoDriver board", builtIn = false)
+@DeviceProperties(name = "Adafruit NeoDriver", xmlTag = "AdafruitNeoDriverDead", description = "an Adafruit NeoDriver board", builtIn = false)
 public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDeviceSynch, AdafruitNeoDriver.Parameters>
         implements I2cAddrConfig, OpModeManagerNotifier.Notifications {
 
@@ -32,14 +35,14 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
     private static final byte   BASE_REGISTER_ADDR = 0x0E;
 
     /**
-     * Number of the N
+     * Number of the Neopixel Pix - This is set in the device hardware, but for some reason needs to be specified
      */
     private static final byte NEOPIXEL_PIN = 15;
 
     /**
      * Maximum number of bytes that can be sent in one I2C frame
      */
-    private static final int MAX_TX_BYTES = 24;  // LK: Why not 32? (Actually 30; first two bytes are address; note 3 bytes per LED)
+    private static final int MAX_TX_BYTES = 30; //24;  // LK: Why not 32? (Actually 30; first two bytes are address; note 3 bytes per LED)
 
     private static final String TAG = "NeoDriver";
 
@@ -74,6 +77,9 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         this.deviceClient.setI2cAddress(I2CADDR_DEFAULT);
         this.deviceClient.setLogging(true);
         this.deviceClient.setLoggingTag("NeoDriverI2C");
+
+//        //lk
+//        super.registerArmingStateCallback(false); // Deals with USB cables getting unplugged
 
         this.deviceClient.engage();
     }
@@ -112,7 +118,7 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
     @Override
     public void onOpModePostStop(OpMode opMode) {
         // Turn all the lights off when the OpMode is stopped
-        fill(0);
+        fill(5);
         show();
     }
 
@@ -131,10 +137,23 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
             return false;
         }
 
+        // LK: I can't get this to work without a delay here.
+        // Is time needed for some kind of i2c handshake?
+        // The adafruit defaults to 800 kHz, but Rev hub supports 100/400 kHz.
+        sleep(350);
+
+//        byte[] byte0 = new byte[]{FunctionRegister.SPEED.bVal, 0};
+//        //deviceClient.write(BASE_REGISTER_ADDR, byte0, I2cWaitControl.WRITTEN);
+//        deviceClient.write(BASE_REGISTER_ADDR, byte0, I2cWaitControl.NONE);
+//        RobotLog.vv(TAG, "Wrote NEOPIXEL_SPEED");
+//        sleep(3);
+
         byte[] bytes = new byte[]{FunctionRegister.PIN.bVal, NEOPIXEL_PIN};
         this.deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
+        //this.deviceClient.write(BASE_REGISTER_ADDR, bytes);
 
         RobotLog.vv(TAG, "Wrote NEOPIXEL_PIN");
+        Log.v("NeoDriver", "NEOPIXEL_PIN " + toHex(bytes));
 
         return true;
     }
@@ -166,9 +185,22 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         buffer.putShort((short) bufferLength);
 
         byte[] bytes = buffer.array();
-        Log.v("NeoDriver", "BUF_LENGTH " + toHex(bytes));
-        deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
+        //deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
+        deviceClient.write(BASE_REGISTER_ADDR, bytes);
     }
+
+//    public void setPinAgain() {
+//        byte[] byte0 = new byte[]{FunctionRegister.SPEED.bVal, 0};
+//        //deviceClient.write(BASE_REGISTER_ADDR, byte0, I2cWaitControl.WRITTEN);
+//        deviceClient.write(BASE_REGISTER_ADDR, byte0, I2cWaitControl.NONE);
+//        Log.v("NeoDriver", "NEOPIXEL_SPEED " + toHex(byte0));
+//        sleep(3);
+//
+//        byte[] bytes = new byte[]{FunctionRegister.PIN.bVal, NEOPIXEL_PIN};
+//        deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.NONE);
+//        Log.v("NeoDriver", "NEOPIXEL_PIN " + toHex(bytes));
+//    }
+
 
     /**
      * Sets a specific pixel in a strand to a color
@@ -265,7 +297,8 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
     //@Override
     public void show() {
         byte[] bytes = new byte[]{FunctionRegister.SHOW.bVal};
-        deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
+        //deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
+        deviceClient.write(BASE_REGISTER_ADDR, bytes);
     }
 
     private static byte[] colorsToBytes(int bytesPerPixel, ColorOrder order, int... colors) {
