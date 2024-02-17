@@ -6,12 +6,15 @@ import android.util.Log;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
+import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
+import com.qualcomm.hardware.lynx.commands.core.LynxI2cConfigureChannelCommand;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerNotifier;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cAddrConfig;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDeviceWithParameters;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynchImplOnSimple;
 import com.qualcomm.robotcore.hardware.I2cWaitControl;
 import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
@@ -21,28 +24,28 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
+import java.lang.reflect.Field;
+
 import static android.os.SystemClock.sleep;
 
 // This code adapted from https://github.com/w8wjb/ftc-neodriver
 
 @I2cDeviceType
-@DeviceProperties(name = "Adafruit NeoDriver", xmlTag = "AdafruitNeoDriverDead", description = "an Adafruit NeoDriver board", builtIn = false)
+@DeviceProperties(name = "Adafruit NeoDriver", xmlTag = "AdafruitNeoDriver", description = "an Adafruit NeoDriver board", builtIn = false)
 public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDeviceSynch, AdafruitNeoDriver.Parameters>
         implements I2cAddrConfig, OpModeManagerNotifier.Notifications {
 
     public static final I2cAddr I2CADDR_DEFAULT = I2cAddr.create7bit(0x60);
 
-    private static final byte   BASE_REGISTER_ADDR = 0x0E;
+    private static final byte BASE_REGISTER_ADDR = 0x0E;
 
-    /**
-     * Number of the Neopixel Pix - This is set in the device hardware, but for some reason needs to be specified
-     */
+    /* Number of the Neopixel Pin - This is set in the device hardware, but for some reason needs to be specified */
     private static final byte NEOPIXEL_PIN = 15;
 
-    /**
-     * Maximum number of bytes that can be sent in one I2C frame
-     */
-    private static final int MAX_TX_BYTES = 30; //24;  // LK: Why not 32? (Actually 30; first two bytes are address; note 3 bytes per LED)
+    /* Maximum number of bytes that can be sent in one I2C frame */
+    /* LK: I was wondering why not 30? The NeoDriver board supports 32 (2 address, 30 data). [https://learn.adafruit.com/adafruit-seesaw-atsamd09-breakout/neopixel]
+        However, I now see in I2cDeviceSynch that WRITE_REGISTER_COUNT_MAX = 26. I suppose that is why we have 24 here. */
+    private static final int MAX_TX_BYTES = 24;
 
     private static final String TAG = "NeoDriver";
 
@@ -62,7 +65,6 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         }
     }
 
-    // LK added this constructor
     public AdafruitNeoDriver(I2cDeviceSynch deviceClient) {
         this(deviceClient, true, new Parameters());
     }
@@ -78,12 +80,8 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         this.deviceClient.setLogging(true);
         this.deviceClient.setLoggingTag("NeoDriverI2C");
 
-//        //lk
-//        super.registerArmingStateCallback(false); // Deals with USB cables getting unplugged
-
         this.deviceClient.engage();
     }
-
 
     @Override
     public Manufacturer getManufacturer() {
@@ -117,43 +115,72 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
 
     @Override
     public void onOpModePostStop(OpMode opMode) {
-        // Turn all the lights off when the OpMode is stopped
-        fill(5);
+        /* Turn all the lights off when the OpMode is stopped */
+        fill(5);  //LK return this to 0; was useful during debugging
         show();
     }
+
+    //!!!!!
+//    public enum I2cBusSpeed
+//    {
+//        STANDARD_100K,
+//        FAST_400K,
+//        FASTPLUS_1M,
+//        HIGH_3_4M
+//    }
 
     @Override
     protected boolean internalInitialize(@NonNull Parameters parameters) {
 
         RobotLog.vv(TAG, "internalInitialize()...");
 
-
-        // Make sure we're talking to the correct I2c address
+        /* Make sure we're talking to the correct I2c address */
         this.deviceClient.setI2cAddress(parameters.i2cAddr);
 
-        // Can't do anything if we're not really talking to the hardware
+        /* Attempt to set the I2C speed for this channel to 400 kHz */
+        //LynxI2cDeviceSynch device1 = null;
+        try {
+            Field field = ReflectionUtils.getField(this.getClass(), "deviceClient");
+            field.setAccessible(true);
+            I2cDeviceSynchImplOnSimple simple = (I2cDeviceSynchImplOnSimple) field.get(this);
+
+            field = ReflectionUtils.getField(simple.getClass(), "i2cDeviceSynchSimple");
+            field.setAccessible(true);
+            LynxI2cDeviceSynch device1 = (LynxI2cDeviceSynch) field.get(simple);
+
+            device1.setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+            RobotLog.vv(TAG, device1.getDeviceName()+" > "+device1.getUserConfiguredName()+" > "+device1.getConnectionInfo());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        /* Can't do anything if we're not really talking to the hardware */
         if (!this.deviceClient.isArmed()) {
             Log.d(TAG, "not armed");
             return false;
         }
 
-        // LK: I can't get this to work without a delay here.
-        // Is time needed for some kind of i2c handshake?
-        // The adafruit defaults to 800 kHz, but Rev hub supports 100/400 kHz.
-        sleep(350);
+//        LynxI2cConfigureChannelCommand.SpeedCode speedCode = LynxI2cConfigureChannelCommand.SpeedCode.FAST_400K;
+//        LynxI2cConfigureChannelCommand command = new LynxI2cConfigureChannelCommand(expansionHub);
+//        LynxI2cConfigureChannelCommand command2 = new LynxI2cConfigureChannelCommand(expansionHub, bus, speedCode);
 
-//        byte[] byte0 = new byte[]{FunctionRegister.SPEED.bVal, 0};
-//        //deviceClient.write(BASE_REGISTER_ADDR, byte0, I2cWaitControl.WRITTEN);
-//        deviceClient.write(BASE_REGISTER_ADDR, byte0, I2cWaitControl.NONE);
-//        RobotLog.vv(TAG, "Wrote NEOPIXEL_SPEED");
-//        sleep(3);
+        /* LK: I can't get this to work without a delay here, even setting the bus speed to 400 kHz
+            I2C Nack, then nothing works with errors in the log every transaction.
+            But the red light on the board is blinking, indicating it's doing something?
+            Is time needed for some kind of i2c handshake?
+            The adafruit board defaults to 800 kHz, but Rev hub supports 100/400 kHz */
+        sleep(200);
+
+        /* LK  tried writing the speed here to see if it helps, but same difference */
+        byte[] byte0 = new byte[]{FunctionRegister.SPEED.bVal, 0};
+        deviceClient.write(BASE_REGISTER_ADDR, byte0, I2cWaitControl.WRITTEN);
+        RobotLog.vv(TAG, "Wrote NEOPIXEL_SPEED " + toHex(byte0) + " (400 MHz)");
 
         byte[] bytes = new byte[]{FunctionRegister.PIN.bVal, NEOPIXEL_PIN};
-        this.deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
-        //this.deviceClient.write(BASE_REGISTER_ADDR, bytes);
+        deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
 
-        RobotLog.vv(TAG, "Wrote NEOPIXEL_PIN");
-        Log.v("NeoDriver", "NEOPIXEL_PIN " + toHex(bytes));
+        RobotLog.vv(TAG, "Wrote NEOPIXEL_PIN " + toHex(bytes));
+        //Log.v("NeoDriver", "NEOPIXEL_PIN " + toHex(bytes));
 
         return true;
     }
