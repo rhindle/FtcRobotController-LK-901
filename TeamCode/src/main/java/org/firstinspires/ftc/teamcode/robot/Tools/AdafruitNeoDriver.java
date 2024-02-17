@@ -294,6 +294,33 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         }
     }
 
+    // LK new method for single i2c transaction incremental updates, standalone
+    public void transmitPixelUpdateA(@ColorInt int[] colors, int startPos) {
+        if (colors.length != 8) return;  // MAX_TX_BYTES/3 = 8
+        if (startPos < 0 || startPos > parameters.numPixels - 8 ) return;
+
+        byte[] colorData = colorsToBytes(parameters.bytesPerPixel, parameters.colorOrder, colors);
+
+        int bufferSize = 3 + 24;
+
+        ByteBuffer buffer = ByteBuffer.allocate(bufferSize).order(ByteOrder.BIG_ENDIAN);
+        buffer.put(FunctionRegister.BUF.bVal);
+        buffer.putShort((short)(startPos*3));
+        //buffer.put(colorData, 0, 24);
+        buffer.put(colorData);
+
+        byte[] bytes = buffer.array();
+        deviceClient.write(BASE_REGISTER_ADDR, bytes);
+    }
+
+    // LK new method for single i2c transaction incremental updates, using existing method sendPixelData
+    public void transmitPixelUpdateB(@ColorInt int[] colors, int startPos) {
+        if (colors.length != 8) return;  // MAX_TX_BYTES/3 = 8
+        if (startPos < 0 || startPos > parameters.numPixels - 8 ) return;
+        byte[] colorData = colorsToBytes(parameters.bytesPerPixel, parameters.colorOrder, colors);
+        sendPixelData((short)(startPos*3), colorData, 0, 24);
+    }
+
     private void sendPixelData(short memOffset, byte[] colorData, int offset, int length) {
         int bufferSize = 3 + length;
 
