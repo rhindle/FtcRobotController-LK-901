@@ -288,7 +288,67 @@ public class NeoMatrix {
       }
    }
 
-   public int[][] shiftPixelMap (int[][] pMap, int xDir, int yDir, boolean rotate) {
+   public void applyPixelMapToBuffer (int[][] pMap, int colStart, int colEnd, int mapStart, boolean opaque) {
+      // assuming that the height of the pixel map is the same as the panel because lazy
+      if (colEnd == 0) colEnd = ledCols;
+      int pMapX = mapStart;
+      for (int c = colStart; c <= colEnd; c++) {
+         for (int r = 0; r < ledRows; r++) {
+            int px = pMap[pMapX][r];
+            if (opaque || px != 0) matrixBuffer[c][r] = px;
+         }
+         pMapX++;
+      }
+   }
+
+   public int[][] buildPixelMapFromString (String text, char[][] charSet, int foreColor, int backColor ) {
+      char[] charArray = text.toCharArray();
+      int[][] pMap = new int[0][];
+      for (char c : charArray) {
+         pMap = appendPixelMap(pMap, convertBitMap(getBitMap(charSet, c), foreColor, backColor));
+      }
+      return pMap;
+   }
+
+   public int[][] appendPixelMap (int[][] pixMap1, int[][] pixMap2) {
+      int[][] pMap1 = cloneArray(pixMap1);
+      int[][] pMap2 = cloneArray(pixMap2);
+      if (pMap1 == null && pMap2 == null) return null;
+      if (pMap1 == null || pMap1.length == 0) return pMap2;
+      if (pMap2 == null || pMap2.length == 0) return pMap1;
+      // assume the 2nd dimension (rows) is the same across (should be 8)
+      int[][] newMap = new int[pMap1.length + pMap2.length][pMap1[0].length];
+      // Note: the following copies references rather than making a new array, which is why I cloned the arrays first
+      System.arraycopy(pMap1, 0, newMap, 0, pMap1.length);
+      System.arraycopy(pMap2, 0, newMap, pMap1.length, pMap2.length);
+      return newMap;
+   }
+
+//   public int[][] cloneArray(int[][] src) {
+//      int length = src.length;
+//      int[][] target = new int[length][src[0].length];
+//      for (int i = 0; i < length; i++) {
+//         System.arraycopy(src[i], 0, target[i], 0, src[i].length);
+//      }
+//      return target;
+//   }
+
+   public int[][] cloneArray(final int[][] array) {
+      // This works for 2D int arrays, which is what we have.
+      if (array != null) {
+         final int[][] copy = new int[array.length][];
+         for (int i = 0; i < array.length; i++) {
+            final int[] row = array[i];
+            copy[i] = new int[row.length];
+            System.arraycopy(row, 0, copy[i], 0, row.length);
+         }
+         return copy;
+      }
+      return null;
+   }
+
+   public int[][] shiftPixelMap (int[][] pixMap, int xDir, int yDir, boolean rotate) {
+      int[][] pMap = cloneArray(pixMap);
       int width = pMap.length - 1;
       int height = pMap[0].length - 1;
       boolean right = (xDir > 0);
@@ -326,7 +386,7 @@ public class NeoMatrix {
             // bitMap is a binary representation of 8 pixels high, simply on or off.
             // Here, we bitwise shift the bitmap, bitwise AND it with 1 to clear the other bits,
             // and compare it with "1" to see if it's set to determine if the pixelMap should be
-            // foreground color or backgroudn color.
+            // foreground color or background color.
             pixelMap[i][j] = ((bitMap[i] >> j) & 1) == 1 ? foreColor : backColor;
          }
       }
