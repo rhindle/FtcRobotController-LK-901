@@ -2,13 +2,9 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import android.graphics.Color;
 
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.robot.Om.Vector3;
+
 import org.firstinspires.ftc.teamcode.robot.Tools.AdafruitNeoDriver;
 
 import java.util.Arrays;
@@ -84,21 +80,6 @@ public class NeoMatrix {
          }
       }
    }
-
-//   void dimBuffer(){
-//
-//      for (int c = 0; c < ledCols; c++) {
-//         for (int r = 0; r < ledRows; r++) {
-//            int intColor = matrixBuffer[c][r];
-//            int red = (int)(Color.red(intColor) * dimMax/255.0);
-//            int green = (int)(Color.green(intColor) * dimMax/255.0);
-//            int blue = (int)(Color.blue(intColor) * dimMax/255.0);
-//            dimmedBuffer[c][r] = Color.rgb(red,green,blue);
-//         }
-//      }
-//
-//
-//   }
 
    private int dimColor(int color0, int dmax) {
       // Simple linear dimming. Perhaps should upgrade to perceived dimming?
@@ -273,62 +254,65 @@ public class NeoMatrix {
    }
 
    public void scrollRegion (int startColumn, int endColumn, int startRow, int endRow, int xDir, int yDir, boolean rotate) {
-
-   }
-
-//   public int[][] shiftPixelMapVert (int[][] pMap, boolean rotate, boolean up) {
-//      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
-//      for (int x=0; x < pMap.length; x++) {
-//         int save = pMap[x][height];
-//         for (int y=0; y < height; y++) {
-//            pMap[x][y+1] = pMap[x][y];
-//         }
-//         if (rotate) pMap[x][0] = save; else pMap[x][0] = 0;
-//      }
-//      return pMap;
-//   }
-
-   public int[][] shiftPixelMapDown (int[][] pMap, boolean rotate) {
-      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
-      for (int x=0; x < pMap.length; x++) {
-         int save = pMap[x][height];
-         for (int y=0; y < height; y++) {
-            pMap[x][y+1] = pMap[x][y];
+      if (startColumn < 0 || startColumn >= ledCols) return;
+      if (endColumn < startColumn || endColumn >= ledCols) return;
+      if (startRow < 0 || startRow >= ledRows) return;
+      if (endRow < startRow || endRow >= ledRows) return;
+      if (endColumn==startColumn) xDir = 0;
+      if (endRow==startRow) yDir = 0;
+      boolean right = (xDir > 0);
+      boolean up = (yDir < 0);
+      // Do the x (columns) first
+      if (xDir != 0) {
+         for (int y = startRow; y <= endRow; y++) {
+            int save = right ? matrixBuffer[endColumn][y] : matrixBuffer[startColumn][y];
+            for (int x = startColumn; x < endColumn; x++) {
+               if (right) matrixBuffer[x+1][y] = matrixBuffer[x][y];
+               else matrixBuffer[x][y] = matrixBuffer[x+1][y];
+            }
+            if (right) matrixBuffer[startColumn][y] = rotate ? save : 0;
+            else matrixBuffer[endColumn][y] = rotate ? save : 0;
          }
-         if (rotate) pMap[x][0] = save; else pMap[x][0] = 0;
       }
-      return pMap;
-   }
-
-   public int[][] shiftPixelMapUp (int[][] pMap, boolean rotate) {
-      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
-      for (int x=0; x < pMap.length; x++) {
-         int save = pMap[x][0];
-         for (int y=0; y < height; y++) {
-            pMap[x][y] = pMap[x][y+1];
+      // Then do the y (rows)
+      if (yDir != 0) {
+         for (int x = startColumn; x <= endColumn; x++) {
+            int save = !up ? matrixBuffer[x][endRow] : matrixBuffer[x][startRow];
+            for (int y = startRow; y < endRow; y++) {
+               if (!up) matrixBuffer[x][y+1] = matrixBuffer[x][y];
+               else matrixBuffer[x][y] = matrixBuffer[x][y+1];
+            }
+            if (!up) matrixBuffer[x][startRow] = rotate ? save : 0;
+            else matrixBuffer[x][endRow] = rotate ? save : 0;
          }
-         if (rotate) pMap[x][height] = save; else pMap[x][height] = 0;
       }
-      return pMap;
    }
 
-   public int[][] shiftPixelMapLeft (int[][] pMap, boolean rotate) {
+   public int[][] shiftPixelMap (int[][] pMap, int xDir, int yDir, boolean rotate) {
       int width = pMap.length - 1;
-      int[] save = pMap[0];
-      for (int x=0; x < width; x++) {
-         pMap[x]=pMap[x+1];
+      int height = pMap[0].length - 1;
+      boolean right = (xDir > 0);
+      boolean up = (yDir < 0);
+      if (xDir != 0) {
+         int[] save = right ? pMap[width] : pMap[0];
+         for (int x = 0; x < width; x++) {
+            if (right) pMap[x + 1] = pMap[x];
+            else pMap[x] = pMap[x + 1];
+         }
+         if (right) pMap[0] = rotate ? save : new int[save.length];
+         else pMap[width] = rotate ? save : new int[save.length];
       }
-      if (rotate) pMap[width] = save; else pMap[width] = new int[save.length];
-      return pMap;
-   }
-
-   public int[][] shiftPixelMapRight (int[][] pMap, boolean rotate) {
-      int width = pMap.length - 1;
-      int[] save = pMap[width];
-      for (int x=0; x < width; x++) {
-         pMap[x+1]=pMap[x];
+      if (yDir != 0) {
+         for (int x = 0; x < pMap.length; x++) {
+            int save = !up ? pMap[x][height] : pMap[x][0];
+            for (int y = 0; y < height; y++) {
+               if (!up) pMap[x][y + 1] = pMap[x][y];
+               else pMap[x][y] = pMap[x][y + 1];
+            }
+            if (!up) pMap[x][0] = rotate ? save : 0;
+            else pMap[x][height] = rotate ? save : 0;
+         }
       }
-      if (rotate) pMap[0] = save; else pMap[0] = new int[save.length];
       return pMap;
    }
 
@@ -507,3 +491,95 @@ public class NeoMatrix {
 }
 
 
+
+//   void dimBuffer(){
+//
+//      for (int c = 0; c < ledCols; c++) {
+//         for (int r = 0; r < ledRows; r++) {
+//            int intColor = matrixBuffer[c][r];
+//            int red = (int)(Color.red(intColor) * dimMax/255.0);
+//            int green = (int)(Color.green(intColor) * dimMax/255.0);
+//            int blue = (int)(Color.blue(intColor) * dimMax/255.0);
+//            dimmedBuffer[c][r] = Color.rgb(red,green,blue);
+//         }
+//      }
+//
+//
+//   }
+
+
+//   public int[][] shiftPixelMapVert (int[][] pMap, boolean rotate, boolean up) {
+//      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
+//      for (int x=0; x < pMap.length; x++) {
+//         int save = !up ? pMap[x][height] : pMap[x][0];
+//         for (int y=0; y < height; y++) {
+//            if (!up) pMap[x][y+1] = pMap[x][y]; else pMap[x][y] = pMap[x][y+1];
+//         }
+//         if (!up) {
+//            if (rotate) pMap[x][0] = save; else pMap[x][0] = 0;
+//         }
+//         else {
+//            if (rotate) pMap[x][height] = save; else pMap[x][height] = 0;
+//         }
+//      }
+//      return pMap;
+//   }
+
+//   public int[][] shiftPixelMapDown (int[][] pMap, boolean rotate) {
+//      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
+//      for (int x=0; x < pMap.length; x++) {
+//         int save = pMap[x][height];
+//         for (int y=0; y < height; y++) {
+//            pMap[x][y+1] = pMap[x][y];
+//         }
+//         if (rotate) pMap[x][0] = save; else pMap[x][0] = 0;
+//      }
+//      return pMap;
+//   }
+//
+//   public int[][] shiftPixelMapUp (int[][] pMap, boolean rotate) {
+//      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
+//      for (int x=0; x < pMap.length; x++) {
+//         int save = pMap[x][0];
+//         for (int y=0; y < height; y++) {
+//            pMap[x][y] = pMap[x][y+1];
+//         }
+//         if (rotate) pMap[x][height] = save; else pMap[x][height] = 0;
+//      }
+//      return pMap;
+//   }
+
+//   public int[][] shiftPixelMapHoriz (int[][] pMap, boolean rotate, boolean right) {
+//      int width = pMap.length - 1;
+//      int[] save = right ? pMap[width] : pMap[0];
+//      for (int x=0; x < width; x++) {
+//         if (right) pMap[x+1]=pMap[x]; else pMap[x]=pMap[x+1];
+//      }
+//      if (right) {
+//         if (rotate) pMap[0] = save; else pMap[0] = new int[save.length];
+//      }
+//      else {
+//         if (rotate) pMap[width] = save; else pMap[width] = new int[save.length];
+//      }
+//      return pMap;
+//   }
+
+//   public int[][] shiftPixelMapLeft (int[][] pMap, boolean rotate) {
+//      int width = pMap.length - 1;
+//      int[] save = pMap[0];
+//      for (int x=0; x < width; x++) {
+//         pMap[x]=pMap[x+1];
+//      }
+//      if (rotate) pMap[width] = save; else pMap[width] = new int[save.length];
+//      return pMap;
+//   }
+//
+//   public int[][] shiftPixelMapRight (int[][] pMap, boolean rotate) {
+//      int width = pMap.length - 1;
+//      int[] save = pMap[width];
+//      for (int x=0; x < width; x++) {
+//         pMap[x+1]=pMap[x];
+//      }
+//      if (rotate) pMap[0] = save; else pMap[0] = new int[save.length];
+//      return pMap;
+//   }
