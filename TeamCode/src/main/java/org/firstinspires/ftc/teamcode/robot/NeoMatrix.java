@@ -200,6 +200,62 @@ public class NeoMatrix {
       }
    }
 
+   public void drawLine(int startX, int startY, int endX, int endY, int lineColor) {
+      // To assure the line is unbroken, take the lazy approach of drawing it both x and y directions
+      int xStep = (startX <= endX) ? 1 : -1;
+      int yStep = (startY <= endY) ? 1 : -1;
+      for (int x = startX; x != endX; x += xStep) {
+         matrixBuffer[x][interpolate(startX,startY,endX,endY,x)] = lineColor;
+      }
+      for (int y = startY; y != endY; y += yStep) {
+         matrixBuffer[interpolate(startY,startX,endY,endX,y)][y] = lineColor;
+      }
+      // the last point is missed because both loops stop before reaching the end
+      matrixBuffer[endX][endY] = lineColor;
+   }
+
+   int interpolate (int X1, int Y1, int X2, int Y2, int XX) {
+      return (int)(0.5 + Y1 + ((XX - X1) / (X2 - X1)) * (Y2 - Y1));
+   }
+   float interpolate (float X1, float Y1, float X2, float Y2, float XX) {
+      //y = y1 + ((x - x1) / (x2 - x1)) * (y2 - y1)
+      return Y1 + ((XX - X1) / (X2 - X1)) * (Y2 - Y1);
+   }
+
+   public void drawRectangle(int startColumn, int endColumn, int startRow, int endRow, int lineColor) {
+      drawRectangle(startColumn, endColumn, startRow, endRow, lineColor, false,0);
+   }
+   public void drawRectangle(int startColumn, int endColumn, int startRow, int endRow, int lineColor, boolean fill, int fillColor) {
+      // Part 1: The outer rectangle
+      if (startColumn < 0 || startColumn >= ledCols) return;
+      if (endColumn < startColumn || endColumn >= ledCols) return;
+      if (startRow < 0 || startRow >= ledRows) return;
+      if (endRow < startRow || endRow >= ledRows) return;
+      // a. make the lines across
+      for (int c = startColumn; c <= endColumn; c++) {
+         matrixBuffer[c][startRow]=lineColor;
+         matrixBuffer[c][endRow]=lineColor;
+      }
+      // b. make the lines down
+      startRow++;
+      endRow--;
+      for (int r = startRow; r <= endRow; r++) {
+         matrixBuffer[startColumn][r] = lineColor;
+         matrixBuffer[endColumn][r] = lineColor;
+      }
+      if (!fill) return;
+      // Part 2: The fill
+      startColumn++;
+      endColumn--;
+      //if (startColumn >= ledCols || endColumn < startColumn) return;
+      //if (startRow >= ledRows || endRow < startRow) return;
+      for (int c = startColumn; c <= endColumn; c++) {
+         for (int r = startRow; r <= endRow; r++) {
+            matrixBuffer[c][r] = fillColor;
+         }
+      }
+   }
+
    public void forceClearMatrix() {
       // This will make for a long loop time
       ledMatrix.fill(1280);
@@ -216,7 +272,86 @@ public class NeoMatrix {
        updatePanel = boo;
    }
 
+   public void scrollRegion (int startColumn, int endColumn, int startRow, int endRow, int xDir, int yDir, boolean rotate) {
+
+   }
+
+//   public int[][] shiftPixelMapVert (int[][] pMap, boolean rotate, boolean up) {
+//      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
+//      for (int x=0; x < pMap.length; x++) {
+//         int save = pMap[x][height];
+//         for (int y=0; y < height; y++) {
+//            pMap[x][y+1] = pMap[x][y];
+//         }
+//         if (rotate) pMap[x][0] = save; else pMap[x][0] = 0;
+//      }
+//      return pMap;
+//   }
+
+   public int[][] shiftPixelMapDown (int[][] pMap, boolean rotate) {
+      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
+      for (int x=0; x < pMap.length; x++) {
+         int save = pMap[x][height];
+         for (int y=0; y < height; y++) {
+            pMap[x][y+1] = pMap[x][y];
+         }
+         if (rotate) pMap[x][0] = save; else pMap[x][0] = 0;
+      }
+      return pMap;
+   }
+
+   public int[][] shiftPixelMapUp (int[][] pMap, boolean rotate) {
+      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
+      for (int x=0; x < pMap.length; x++) {
+         int save = pMap[x][0];
+         for (int y=0; y < height; y++) {
+            pMap[x][y] = pMap[x][y+1];
+         }
+         if (rotate) pMap[x][height] = save; else pMap[x][height] = 0;
+      }
+      return pMap;
+   }
+
+   public int[][] shiftPixelMapLeft (int[][] pMap, boolean rotate) {
+      int width = pMap.length - 1;
+      int[] save = pMap[0];
+      for (int x=0; x < width; x++) {
+         pMap[x]=pMap[x+1];
+      }
+      if (rotate) pMap[width] = save; else pMap[width] = new int[save.length];
+      return pMap;
+   }
+
+   public int[][] shiftPixelMapRight (int[][] pMap, boolean rotate) {
+      int width = pMap.length - 1;
+      int[] save = pMap[width];
+      for (int x=0; x < width; x++) {
+         pMap[x+1]=pMap[x];
+      }
+      if (rotate) pMap[0] = save; else pMap[0] = new int[save.length];
+      return pMap;
+   }
+
+   public int[][] convertBitMap (char[] bitMap, int foreColor, int backColor) {
+      // this will create an array [x][y] with y being 8.
+      // If this doesn't match the matrix height, will need to do additional manipulation somewhere.
+      if (bitMap.length == 0) return null;
+      int[][] pixelMap = new int[bitMap.length][8];
+      for (int i=0; i < bitMap.length; i++) {
+         for (int j=0; j<8; j++) {
+            // bitMap is a binary representation of 8 pixels high, simply on or off.
+            // Here, we bitwise shift the bitmap, bitwise AND it with 1 to clear the other bits,
+            // and compare it with "1" to see if it's set to determine if the pixelMap should be
+            // foreground color or backgroudn color.
+            pixelMap[i][j] = ((bitMap[i] >> j) & 1) == 1 ? foreColor : backColor;
+         }
+      }
+      return pixelMap;
+   }
+
    public char[] getBitMap (char[][] charSet, char letter) {
+      // note: all the bitmaps are based on a byte, therefore represent 8 pixels high.
+      // This function simply returns the 8 bit bitmap for the character wanted from a "charSet" array of bitmaps
       for (int i=0; i < charSet.length; i++) {
          if (letter == charSet[i][0]) {
             return Arrays.copyOfRange(charSet[i], 1, charSet[i].length);
