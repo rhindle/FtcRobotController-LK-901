@@ -24,7 +24,7 @@ public class NeoMatrix {
    private int dimMax = 255;   // for initial debugging, let's not changethe max
 
    final int ledRows = 8;
-   final int ledCols = 32;
+   final int ledCols = 31; //32
    final int ledQty = ledCols * ledRows;
    final boolean flipVert = false;
    final boolean flipHoriz = false;
@@ -82,10 +82,11 @@ public class NeoMatrix {
    }
 
    private int dimColor(int color0, int dmax) {
+      return color0;  //temp disable during debug
       // Simple linear dimming. Perhaps should upgrade to perceived dimming?
-      return Color.rgb( (int)(Color.red(color0) * dmax/255.0),
-                        (int)(Color.green(color0) * dmax/255.0),
-                        (int)(Color.blue(color0) * dmax/255.0) );
+//      return Color.rgb( (int)(Color.red(color0) * dmax/255.0),
+//                        (int)(Color.green(color0) * dmax/255.0),
+//                        (int)(Color.blue(color0) * dmax/255.0) );
    }
 
    void updateBlock(int start) {
@@ -112,7 +113,7 @@ public class NeoMatrix {
       for (int x=0; x < ledQty; x++) {
          if (stringBuffer[x] != stringActual[x]) {
             updateBlock(x);
-            x += updateSize; // no need to check the next 8 pixels
+            x += updateSize - 1; // no need to check the next 8 pixels
          }
       }
       updatePosition=0;
@@ -291,6 +292,7 @@ public class NeoMatrix {
    public void applyPixelMapToBuffer (int[][] pMap, int colStart, int colEnd, int mapStart, boolean opaque) {
       // assuming that the height of the pixel map is the same as the panel because lazy
       if (colEnd == 0) colEnd = ledCols;
+      if (colEnd-colStart+1 > pMap.length) colEnd = colStart+pMap.length-1;
       int pMapX = mapStart;
       for (int c = colStart; c <= colEnd; c++) {
          for (int r = 0; r < ledRows; r++) {
@@ -404,7 +406,7 @@ public class NeoMatrix {
       return new char[] {0};
    }
 
-   final char[][] blockNumerals = {
+   public final char[][] blockNumerals = {
                               {'0', 127, 65, 65, 65, 127, 0},
                               {'1', 0, 0, 127, 0, 0, 0},
                               {'2', 121, 73, 73, 73, 79, 0},
@@ -416,7 +418,7 @@ public class NeoMatrix {
                               {'8', 127, 73, 73, 73, 127, 0},
                               {'9', 79, 73, 73, 73, 127,0} };
 
-   final char[][] specialChar = {
+   public final char[][] specialChar = {
                               {'a', 6, 15, 15, 6},
                               {'b', 96, 240, 240, 96},
                               {'c', 0, 14, 31, 31, 14},
@@ -425,7 +427,7 @@ public class NeoMatrix {
                               {'f', 64, 96, 80, 79, 77, 85, 85, 85, 117, 21, 23, 24},
                               {'g', 128, 192, 160, 159, 153, 169, 169, 165, 229, 37, 39, 56} };
 
-   final char[][] bigLetters =  {
+   public final char[][] bigLetters =  {
                               {'0', 62, 81, 73, 69, 62, 0},
                               {'1', 0, 66, 127, 64, 0, 0},
                               {'2', 114, 73, 73, 73, 70, 0},
@@ -487,7 +489,7 @@ public class NeoMatrix {
                               {',', 0, 128, 96, 0, 0, 0},
                               {'~', 4, 2, 4, 4, 2, 0} };
 
-   final char[][] littleLetters = {
+   public final char[][] littleLetters = {
                               {'0', 31, 17, 31, 0},
                               {'1', 0, 31, 0, 0},
                               {'2', 29, 21, 23, 0},

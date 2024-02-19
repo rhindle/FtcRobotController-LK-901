@@ -212,8 +212,9 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         buffer.putShort((short) bufferLength);
 
         byte[] bytes = buffer.array();
-        //deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
-        deviceClient.write(BASE_REGISTER_ADDR, bytes);
+        deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
+        //deviceClient.write(BASE_REGISTER_ADDR, bytes);
+        RobotLog.vv(TAG, "Wrote NEOPIXEL_BUF_LENGTH " + toHex(bytes));
     }
 
 //    public void setPinAgain() {
