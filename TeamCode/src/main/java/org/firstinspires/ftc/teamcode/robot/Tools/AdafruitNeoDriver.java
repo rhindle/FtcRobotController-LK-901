@@ -7,7 +7,6 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
-import com.qualcomm.hardware.lynx.commands.core.LynxI2cConfigureChannelCommand;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerNotifier;
 import com.qualcomm.robotcore.hardware.I2cAddr;
@@ -116,7 +115,8 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
     @Override
     public void onOpModePostStop(OpMode opMode) {
         /* Turn all the lights off when the OpMode is stopped */
-        fill(5);  //LK return this to 0; was useful during debugging
+        //fill(0);  //LK return this to 0; was useful during debugging
+        fill(Color.rgb(0,0,1));
         show();
     }
 
@@ -298,7 +298,7 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
     // LK new method for single i2c transaction incremental updates, standalone
     public void transmitPixelUpdateA(@ColorInt int[] colors, int startPos) {
         if (colors.length != 8) return;  // MAX_TX_BYTES/3 = 8
-        if (startPos < 0 || startPos > parameters.numPixels - 8 ) return;
+        //^^ temp  if (startPos < 0 || startPos > parameters.numPixels - 8 ) return;
 
         byte[] colorData = colorsToBytes(parameters.bytesPerPixel, parameters.colorOrder, colors);
 
@@ -352,8 +352,8 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
     //@Override
     public void show() {
         byte[] bytes = new byte[]{FunctionRegister.SHOW.bVal};
-        //deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
-        deviceClient.write(BASE_REGISTER_ADDR, bytes);
+        deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
+        //deviceClient.write(BASE_REGISTER_ADDR, bytes);
     }
 
     private static byte[] colorsToBytes(int bytesPerPixel, ColorOrder order, int... colors) {
@@ -437,33 +437,3 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         }
     }
 }
-
-/* LK Future work:
-
-Maintain a list of the colors of each pixel at the NeoDriver (actual display)
-
-//Maintain a list of changes requested (to Prioritize)?
-//    -What if the list gets too long and never catches up?
-//
-//or Maintain a list of colors to be sent (pixel order not priority)?
-//    -What if the changes keep happening early in the array so only that side gets updated regularly?
-//    -Better idea might be to step through the list a little further every loop
-
-Maintain a list of the colors of each pixel that we want to be displayed (local, future display)
-
-Current concept:
-0. Start at index 0
-
-1. Look for the first LED needing a change
-    a. Send over that LED plus the next x pixels (for a total of MAX_TX_BYTES bytes)
-    b. Update the local list of the displayed LEDs
-    b. Advance the counter by x pixels - exit to next loop
-
-2. If reached the end, Execute show
-    Assuming 320 pixels, and 10 per update, this would be 32 sends.  At 20ms per loop, that's a 640ms update.
-    Another option would be to "show" periodically, every so many writes, for a higher refresh but with tearing
-
-In this scenario, only one I2C transaction happens per loop.
-However, if the robot is idle (no user input or sensitive state machines), you could update more than one transaction.
-
-*/

@@ -49,9 +49,15 @@ public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
 
         ElapsedTime loopElapsedTime = new ElapsedTime();
 
-        neo.drawRectangle(0,7,0,7, Color.rgb(20,0,0), true, Color.rgb(0,2,0));
-        textMatrix = neo.buildPixelMapFromString("14273", neo.littleLetters, Color.rgb(50,50,50), 0);
-        neo.applyPixelMapToBuffer(textMatrix,8,30, 0, true);
+//        neo.drawRectangle(0,7,0,7, Color.rgb(5,0,0), true, Color.rgb(0,1,0));
+        neo.drawRectangle(0,3,0,3, Color.rgb(0,4,0), true, Color.rgb(0,4,0));
+        neo.drawRectangle(0,3,4,7, Color.rgb(3,3,0), true, Color.rgb(3,3,0));
+        neo.drawRectangle(28,31,0,3, Color.rgb(2,2,2), true, Color.rgb(2,2,2));
+        neo.drawRectangle(28,31,4,7, Color.rgb(0,0,4), true, Color.rgb(0,0,4));
+        textMatrix = neo.buildPixelMapFromString("14273", neo.littleLetters, Color.rgb(5,5,5), 0);
+        textMatrix = neo.shiftPixelMap(textMatrix,0,1, true);
+        textMatrix = neo.shiftPixelMap(textMatrix,0,1, true);
+        neo.applyPixelMapToBuffer(textMatrix,7,32, 0, true);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -59,7 +65,7 @@ public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
             buttonMgr.updateAll();
             neo.loop();
 
-            neo.scrollRegion(0,30,0,7, -1, 0, true);  // 19,16
+            neo.scrollRegion(4,27,0,7, -1, 0, true);  // 19,16
 
             //sleep(100);
 

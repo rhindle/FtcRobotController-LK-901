@@ -24,8 +24,9 @@ public class NeoMatrix {
    private int dimMax = 255;   // for initial debugging, let's not changethe max
 
    final int ledRows = 8;
-   final int ledCols = 31; //32
+   final int ledCols = 33; //32
    final int ledQty = ledCols * ledRows;
+   final int hwLedQty = Math.min(255, ledQty); // the board doesn't work at more than 255 pixels
    final boolean flipVert = false;
    final boolean flipHoriz = false;
    final int updateSize = 8;   // i2c driver limit is 24 bytes, or 8 pixels * 3 RGB bytes
@@ -50,7 +51,8 @@ public class NeoMatrix {
 
    public void init() {
       ledMatrix = hardwareMap.get(AdafruitNeoDriver.class, "neo");
-      ledMatrix.setNumberOfPixels(ledQty);
+//      ledMatrix.setNumberOfPixels(ledQty);
+      ledMatrix.setNumberOfPixels(hwLedQty);
    }
 
    public void loop(){
@@ -64,7 +66,7 @@ public class NeoMatrix {
       // Here, I am assuming a short zig zag layout.
       // Also, apply dimming.
       boolean flipFlop = flipVert;
-      int zigCount = 0;
+//      int zigCount = 0;
       int stringPos;
       for (int c = 0; c < ledCols; c++) {
          for (int r = 0; r < ledRows; r++) {
@@ -72,12 +74,13 @@ public class NeoMatrix {
             if (flipHoriz) stringPos = ledQty-1 - stringPos;
             stringBuffer[stringPos] = !flipFlop ? dimColor(matrixBuffer[c][r], dimMax) : dimColor(matrixBuffer[c][ledRows-1-r], dimMax);
 
-            zigCount++;
-            if (zigCount == ledCols) {
-               zigCount = 0;
-               flipFlop = !flipFlop;
-            }
+//            zigCount++;
+//            if (zigCount == ledCols) {
+//               zigCount = 0;
+//               flipFlop = !flipFlop;
+//            }
          }
+         flipFlop = !flipFlop;
       }
    }
 
@@ -92,6 +95,7 @@ public class NeoMatrix {
    void updateBlock(int start) {
       // first make sure we won't be longer than the string
       if (start + updateSize - 1 >= ledQty) start = ledQty - updateSize;
+//^^temp      if (start + updateSize - 1 >= hwLedQty) start = hwLedQty - updateSize;
       // build the update array and update the stored "actual"
       for (int i=0; i<updateSize; i++) {
          stringActual[start+i] = stringBuffer[start+i];
@@ -268,7 +272,9 @@ public class NeoMatrix {
          for (int y = startRow; y <= endRow; y++) {
             int save = right ? matrixBuffer[endColumn][y] : matrixBuffer[startColumn][y];
             for (int x = startColumn; x < endColumn; x++) {
-               if (right) matrixBuffer[x+1][y] = matrixBuffer[x][y];
+//               if (right) matrixBuffer[x+1][y] = matrixBuffer[x][y];   //wrong?
+//               if (right) pMap[width-x] = pMap[width-x-1];
+               if (right) matrixBuffer[endColumn-x][y] = matrixBuffer[endColumn-x-1][y];
                else matrixBuffer[x][y] = matrixBuffer[x+1][y];
             }
             if (right) matrixBuffer[startColumn][y] = rotate ? save : 0;
@@ -280,7 +286,9 @@ public class NeoMatrix {
          for (int x = startColumn; x <= endColumn; x++) {
             int save = !up ? matrixBuffer[x][endRow] : matrixBuffer[x][startRow];
             for (int y = startRow; y < endRow; y++) {
-               if (!up) matrixBuffer[x][y+1] = matrixBuffer[x][y];
+//               if (!up) matrixBuffer[x][y+1] = matrixBuffer[x][y];    //wrong?
+//               if (!up) pMap[x][height-y] = pMap[x][height-y-1];
+               if (!up) matrixBuffer[x][endRow-y] = matrixBuffer[x][endRow-y-1];
                else matrixBuffer[x][y] = matrixBuffer[x][y+1];
             }
             if (!up) matrixBuffer[x][startRow] = rotate ? save : 0;
@@ -358,7 +366,8 @@ public class NeoMatrix {
       if (xDir != 0) {
          int[] save = right ? pMap[width] : pMap[0];
          for (int x = 0; x < width; x++) {
-            if (right) pMap[x + 1] = pMap[x];
+//            if (right) pMap[x + 1] = pMap[x];   // wrong
+            if (right) pMap[width-x] = pMap[width-x-1];
             else pMap[x] = pMap[x + 1];
          }
          if (right) pMap[0] = rotate ? save : new int[save.length];
@@ -368,7 +377,8 @@ public class NeoMatrix {
          for (int x = 0; x < pMap.length; x++) {
             int save = !up ? pMap[x][height] : pMap[x][0];
             for (int y = 0; y < height; y++) {
-               if (!up) pMap[x][y + 1] = pMap[x][y];
+//               if (!up) pMap[x][y + 1] = pMap[x][y];   // wrong
+               if (!up) pMap[x][height-y] = pMap[x][height-y-1];
                else pMap[x][y] = pMap[x][y + 1];
             }
             if (!up) pMap[x][0] = rotate ? save : 0;
@@ -491,7 +501,8 @@ public class NeoMatrix {
 
    public final char[][] littleLetters = {
                               {'0', 31, 17, 31, 0},
-                              {'1', 0, 31, 0, 0},
+//                              {'1', 0, 31, 0, 0},
+                              {'1', 31, 0},
                               {'2', 29, 21, 23, 0},
                               {'3', 21, 21, 31, 0},
                               {'4', 7, 4, 31, 0},
@@ -645,3 +656,36 @@ public class NeoMatrix {
 //      if (rotate) pMap[0] = save; else pMap[0] = new int[save.length];
 //      return pMap;
 //   }
+
+
+//moved from AdafruitNeoDriver
+
+/* LK Future work:
+
+Maintain a list of the colors of each pixel at the NeoDriver (actual display)
+
+//Maintain a list of changes requested (to Prioritize)?
+//    -What if the list gets too long and never catches up?
+//
+//or Maintain a list of colors to be sent (pixel order not priority)?
+//    -What if the changes keep happening early in the array so only that side gets updated regularly?
+//    -Better idea might be to step through the list a little further every loop
+
+Maintain a list of the colors of each pixel that we want to be displayed (local, future display)
+
+Current concept:
+0. Start at index 0
+
+1. Look for the first LED needing a change
+    a. Send over that LED plus the next x pixels (for a total of MAX_TX_BYTES bytes)
+    b. Update the local list of the displayed LEDs
+    b. Advance the counter by x pixels - exit to next loop
+
+2. If reached the end, Execute show
+    Assuming 320 pixels, and 10 per update, this would be 32 sends.  At 20ms per loop, that's a 640ms update.
+    Another option would be to "show" periodically, every so many writes, for a higher refresh but with tearing
+
+In this scenario, only one I2C transaction happens per loop.
+However, if the robot is idle (no user input or sensitive state machines), you could update more than one transaction.
+
+*/
