@@ -24,7 +24,7 @@ public class NeoMatrix {
    private int dimMax = 255;   // for initial debugging, let's not changethe max
 
    final int ledRows = 8;
-   final int ledCols = 33; //32
+   final int ledCols = 32; //32
    final int ledQty = ledCols * ledRows;
    final int hwLedQty = Math.min(255, ledQty); // the board doesn't work at more than 255 pixels
    final boolean flipVert = false;
@@ -53,6 +53,8 @@ public class NeoMatrix {
       ledMatrix = hardwareMap.get(AdafruitNeoDriver.class, "neo");
 //      ledMatrix.setNumberOfPixels(ledQty);
       ledMatrix.setNumberOfPixels(hwLedQty);
+      ledMatrix.fill(0);
+      ledMatrix.show();
    }
 
    public void loop(){
@@ -299,6 +301,7 @@ public class NeoMatrix {
 
    public void applyPixelMapToBuffer (int[][] pMap, int colStart, int colEnd, int mapStart, boolean opaque) {
       // assuming that the height of the pixel map is the same as the panel because lazy
+      if (colStart < 0) colStart = 0;
       if (colEnd == 0) colEnd = ledCols;
       if (colEnd-colStart+1 > pMap.length) colEnd = colStart+pMap.length-1;
       int pMapX = mapStart;
@@ -429,6 +432,7 @@ public class NeoMatrix {
                               {'9', 79, 73, 73, 73, 127,0} };
 
    public final char[][] specialChar = {
+                              {' ', 0, 0, 0},
                               {'a', 6, 15, 15, 6},
                               {'b', 96, 240, 240, 96},
                               {'c', 0, 14, 31, 31, 14},
@@ -500,6 +504,7 @@ public class NeoMatrix {
                               {'~', 4, 2, 4, 4, 2, 0} };
 
    public final char[][] littleLetters = {
+                              {' ', 0, 0, 0},
                               {'0', 31, 17, 31, 0},
 //                              {'1', 0, 31, 0, 0},
                               {'1', 31, 0},
@@ -561,6 +566,29 @@ public class NeoMatrix {
                               {'.', 16, 0, 0, 0},
                               {',', 16, 8, 0, 0},
                               {'~', 2, 4, 2, 0} };
+
+   public final char[][] littleNumbers = {
+                              //{' ', 0, 0, 0, 0},
+                              {'0', 31, 17, 31, 0},
+                              {'1', 0, 31, 0, 0},
+                              {'2', 29, 21, 23, 0},
+                              {'3', 21, 21, 31, 0},
+                              {'4', 7, 4, 31, 0},
+                              {'5', 23, 21, 29, 0},
+                              {'6', 31, 21, 29, 0},
+                              {'7', 1, 1, 31, 0},
+                              {'8', 31, 21, 31, 0},
+                              {'9', 23, 21, 31, 0} };
+
+   public final char[][] faces = {
+                              {'1', 16, 38, 66, 64, 70, 34, 16},
+                              {'2', 16, 34, 70, 64, 66, 38, 16},
+                              {'3', 16, 36, 70, 64, 68, 38, 16},
+                              {'4', 16, 38, 68, 64, 70, 36, 16},
+                              {'5', 32, 70, 130, 144, 134, 66, 32},
+                              {'6', 32, 66, 134, 144, 130, 70, 32},
+                              {'7', 32, 68, 134, 144, 132, 70, 32},
+                              {'8', 32, 70, 132, 144, 134, 68, 32} };
 }
 
 

@@ -116,7 +116,7 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
     public void onOpModePostStop(OpMode opMode) {
         /* Turn all the lights off when the OpMode is stopped */
         //fill(0);  //LK return this to 0; was useful during debugging
-        fill(Color.rgb(0,0,1));
+        fill(Color.rgb(1,0,0));
         show();
     }
 

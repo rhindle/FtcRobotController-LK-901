@@ -4,21 +4,15 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.NeoMatrix;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.Tools.AdafruitNeoDriver;
-import org.firstinspires.ftc.teamcode.robot.Tools.QwiicLEDStick;
 
-@TeleOp (name="AA_Adafruit_Neo_1", group="Test")
+@TeleOp (name="AA_Adafruit_Neo_2", group="Test")
 //@Disabled
-public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
+public class ZZ_Adafruit_Neo_2 extends LinearOpMode {
 
     Robot robot;
     ButtonMgr buttonMgr;
@@ -30,7 +24,7 @@ public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
     int[][] textMatrix;
     int[][] textMatrix1;
     long lastAnimUpdate;
-    int animUpdateInterval = 500;  //250
+    int animUpdateInterval = 300;  //250
 
     //AdafruitNeoDriver neo = null;
 
@@ -42,7 +36,7 @@ public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
 
         robot.init();
         neo.init();
-        neo.setUpdateLimit(1);
+        neo.setUpdateLimit(2);
 
 
 
@@ -60,12 +54,15 @@ public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
         neo.drawRectangle(0,3,4,7, Color.rgb(3,3,0), true, Color.rgb(3,3,0));
         neo.drawRectangle(28,31,0,3, Color.rgb(2,2,2), true, Color.rgb(2,2,2));
         neo.drawRectangle(28,31,4,7, Color.rgb(0,0,4), true, Color.rgb(0,0,4));
-        textMatrix = neo.buildPixelMapFromString("   14273 ", neo.littleLetters, Color.rgb(10,10,10), 0);
-        textMatrix = neo.shiftPixelMap(textMatrix,0,1, true);
-        textMatrix = neo.shiftPixelMap(textMatrix,0,1, true);
+        textMatrix1 = neo.buildPixelMapFromString("     f ", neo.specialChar, Color.rgb(10,5,0), 0);
+        textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
+        textMatrix1 = neo.buildPixelMapFromString("14273 ", neo.littleLetters, Color.rgb(10,10,10), 0);
+        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
+        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
+        textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
         textMatrix1 = neo.buildPixelMapFromString("SENSE", neo.littleLetters, Color.rgb(10,0,0), 0);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
-        textMatrix1 = neo.buildPixelMapFromString("&", neo.littleLetters, Color.rgb(5,5,5), 0);
+        textMatrix1 = neo.buildPixelMapFromString("+", neo.littleLetters, Color.rgb(5,5,5), 0);
         //textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
         textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
