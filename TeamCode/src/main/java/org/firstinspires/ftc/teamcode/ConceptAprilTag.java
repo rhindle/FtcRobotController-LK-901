@@ -27,7 +27,6 @@ package org.firstinspires.ftc.teamcode;/* Copyright (c) 2023 FIRST. All rights r
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -202,21 +201,56 @@ public class ConceptAprilTag extends LinearOpMode {
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
 
+                Vector3 camOffset = new Vector3(-8,0.5,0);
+
+                // raw camera values (ftcPose in it's native coordinate system) of XY
+                Vector3 camRaw = new Vector3(detection.ftcPose.x, detection.ftcPose.y, 0);
+                telemetry.addLine(String.format("camRaw   XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camRaw.X, camRaw.Y, camRaw.Z));
+
+                // transform the camera raw position using the yaw to align with field
+                Vector3 camTrans = transPos(new Vector3(0, 0, -detection.ftcPose.yaw), camRaw);
+                telemetry.addLine(String.format("camTrans XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camTrans.X, camTrans.Y, camTrans.Z));
+
+                // rotate the camera XY 90deg to match the field by switching axes
+                Vector3 camRot = new Vector3(-camTrans.Y, camTrans.X, camTrans.Z);
+                telemetry.addLine(String.format("camRot   XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camRot.X, camRot.Y, camRot.Z));
+
+                // Do everything in one step: Switch ftcPose to field XY and transform by yaw to align with field
+                Vector3 camTry2 = transPos(new Vector3(0,0, -detection.ftcPose.yaw),
+                                            new Vector3(-detection.ftcPose.y, detection.ftcPose.x, 0 ));
+                telemetry.addLine(String.format("camTry2  XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camTry2.X, camTry2.Y, camTry2.Z));
+
+                // Switch ftcPose to field XY relative to tag, add robot offset, and transform by yaw to align with field
+                Vector3 camPos = transPos(new Vector3(0,0, -detection.ftcPose.yaw),
+                        new Vector3(-detection.ftcPose.y + camOffset.X, detection.ftcPose.x + camOffset.Y, 0 ));
+                telemetry.addLine(String.format("camPos   XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camPos.X, camPos.Y, camPos.Z));
+
+                // Get the tag's field position
                 float[] fieldPos = detection.metadata.fieldPosition.getData();
                 telemetry.addLine(String.format("field XYZ %6.1f %6.1f %6.1f  (inch)", fieldPos[0], fieldPos[1], fieldPos[2]));
-                //Vector3 camRaw = new Vector3(fieldPos[0] - detection.ftcPose.y, fieldPos[1] + detection.ftcPose.x, -detection.ftcPose.yaw);
-                Vector3 camRaw = new Vector3(fieldPos[0] - detection.ftcPose.y, fieldPos[1] + detection.ftcPose.x, 0);
-//                double camX = fieldPos[0] - detection.ftcPose.y;
-//                double camY = fieldPos[1] + detection.ftcPose.x;
-//                double camR = -detection.ftcPose.yaw;
-//                telemetry.addLine(String.format("cam XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camX, camY, camR));
-                telemetry.addLine(String.format("camraw XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camRaw.X, camRaw.Y, camRaw.Z));
-                Vector3 camPos = lkTransformPosition(new Vector3(0,0, -detection.ftcPose.yaw), camRaw);
-                telemetry.addLine(String.format("campos XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camPos.X, camPos.Y, camPos.Z));
-                Vector3 camOffset = new Vector3(-8,0,0);
-                telemetry.addLine(String.format("offset XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camOffset.X, camOffset.Y, camOffset.Z));
-                Vector3 finalPos = lkTransformPosition(camPos, camOffset);
-                telemetry.addLine(String.format("final  XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", finalPos.X, finalPos.Y, finalPos.Z));
+                Vector3 tagPos = new Vector3(detection.metadata.fieldPosition.get(0), detection.metadata.fieldPosition.get(1),0);
+                telemetry.addLine(String.format("tagPos   XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", tagPos.X, tagPos.Y, tagPos.Z));
+
+                // Calculate the robot position based on camera position and tag position
+                Vector3 robotPos = new Vector3(tagPos.X+camPos.X, tagPos.Y+camPos.Y, camPos.Z);
+                telemetry.addLine(String.format("robotPos XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", robotPos.X, robotPos.Y, robotPos.Z));
+
+
+//                Vector3 camRaw = new Vector3()
+
+//                //Vector3 camRaw = new Vector3(fieldPos[0] - detection.ftcPose.y, fieldPos[1] + detection.ftcPose.x, -detection.ftcPose.yaw);
+//                Vector3 camRaw = new Vector3(fieldPos[0] - detection.ftcPose.y, fieldPos[1] + detection.ftcPose.x, 0);
+////                double camX = fieldPos[0] - detection.ftcPose.y;
+////                double camY = fieldPos[1] + detection.ftcPose.x;
+////                double camR = -detection.ftcPose.yaw;
+////                telemetry.addLine(String.format("cam XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camX, camY, camR));
+//                telemetry.addLine(String.format("camraw XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camRaw.X, camRaw.Y, camRaw.Z));
+//                Vector3 camPos = lkTransformPosition(new Vector3(0,0, -detection.ftcPose.yaw), camRaw);
+//                telemetry.addLine(String.format("campos XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camPos.X, camPos.Y, camPos.Z));
+//                Vector3 camOffset = new Vector3(-8,0,0);
+//                telemetry.addLine(String.format("offset XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camOffset.X, camOffset.Y, camOffset.Z));
+//                Vector3 finalPos = lkTransformPosition(camPos, camOffset);
+//                telemetry.addLine(String.format("final  XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", finalPos.X, finalPos.Y, finalPos.Z));
 
 
             } else {
@@ -224,6 +258,19 @@ public class ConceptAprilTag extends LinearOpMode {
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
         }   // end for() loop
+
+        if (currentDetections.size() == 0) {
+            telemetry.addLine("X");
+            telemetry.addLine("X");
+            telemetry.addLine("X");
+            telemetry.addLine("X");
+            telemetry.addLine("X");
+            telemetry.addLine("X");
+            telemetry.addLine("X");
+            telemetry.addLine("X");
+            telemetry.addLine("X");
+            telemetry.addLine("X");
+        }
 
         // Add "key" information to telemetry
         telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
@@ -237,7 +284,7 @@ public class ConceptAprilTag extends LinearOpMode {
 //        lkOdoRobotPose = lkTransformPosition(lkOdoRawPose, lkOdoRobotOffset);
 //    }
 
-    Vector3 lkTransformPosition(Vector3 pos1, Vector3 pos2) {
+    Vector3 transPos(Vector3 pos1, Vector3 pos2) {
         return new Vector3(
                 (pos1.X + (pos2.X*Math.cos(Math.toRadians(pos1.Z)) - pos2.Y*Math.sin(Math.toRadians(pos1.Z)))),
                 (pos1.Y + (pos2.X*Math.sin(Math.toRadians(pos1.Z)) + pos2.Y*Math.cos(Math.toRadians(pos1.Z)))),
