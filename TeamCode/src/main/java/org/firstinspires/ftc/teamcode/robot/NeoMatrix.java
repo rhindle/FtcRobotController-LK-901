@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import org.firstinspires.ftc.teamcode.robot.Tools.AdafruitNeoDriver;
+import org.opencv.core.Mat;
 
 import java.util.Arrays;
 
@@ -19,14 +20,17 @@ public class NeoMatrix {
 
    private boolean updatePanel = true;
    private boolean pendingUpdate = false;
+   private boolean preventTearing = false;
+//   private boolean clearToUpdate = true;
+
    private int updateLimit = 1;
    private int updatePosition = 0;
-   private int dimMax = 255;   // for initial debugging, let's not changethe max
+   private int dimMax = 255;     // for initial debugging, let's not change the max
 
    final int ledRows = 8;
    final int ledCols = 32; //32
    final int ledQty = ledCols * ledRows;
-   final int hwLedQty = Math.min(255, ledQty); // the board doesn't work at more than 255 pixels
+   final int hwLedQty = Math.min(255, ledQty); // the board doesn't work at more than 255 pixels? A problem with documentation?
    final boolean flipVert = false;
    final boolean flipHoriz = false;
    final int updateSize = 8;   // i2c driver limit is 24 bytes, or 8 pixels * 3 RGB bytes
@@ -67,6 +71,7 @@ public class NeoMatrix {
       // The purpose of this function is to convert the rows and columns of the buffer into the topology of the matrix.
       // Here, I am assuming a short zig zag layout.
       // Also, apply dimming.
+      if (preventTearing && pendingUpdate) return;
       boolean flipFlop = flipVert;
 //      int zigCount = 0;
       int stringPos;
@@ -87,11 +92,11 @@ public class NeoMatrix {
    }
 
    private int dimColor(int color0, int dmax) {
-      return color0;  //temp disable during debug
+      //return color0;  //temp disable during debug
       // Simple linear dimming. Perhaps should upgrade to perceived dimming?
-//      return Color.rgb( (int)(Color.red(color0) * dmax/255.0),
-//                        (int)(Color.green(color0) * dmax/255.0),
-//                        (int)(Color.blue(color0) * dmax/255.0) );
+      return Color.rgb( (int)(0.5 + Color.red(color0) * dmax/255.0),
+                        (int)(0.5 + Color.green(color0) * dmax/255.0),
+                        (int)(0.5 + Color.blue(color0) * dmax/255.0) );
    }
 
    void updateBlock(int start) {
@@ -111,6 +116,12 @@ public class NeoMatrix {
    void showMatrix() {
       ledMatrix.show();
       pendingUpdate = false;
+   }
+
+   public void forceUpdateMatrix() {
+      pendingUpdate = false;
+      convertMatrix();
+      updateMatrixNoLimit();
    }
 
    void updateMatrixNoLimit() {
@@ -203,7 +214,7 @@ public class NeoMatrix {
    }
 
    int interpolate (int X1, int Y1, int X2, int Y2, int XX) {
-      return (int)(0.5 + Y1 + ((XX - X1) / (X2 - X1)) * (Y2 - Y1));
+      return (int)(0.5 + Y1 + (1.0* (XX - X1) / (X2 - X1)) * (Y2 - Y1));
    }
    float interpolate (float X1, float Y1, float X2, float Y2, float XX) {
       //y = y1 + ((x - x1) / (x2 - x1)) * (y2 - y1)
@@ -256,6 +267,15 @@ public class NeoMatrix {
       }
    }
 
+   public void setPreventTearing(boolean boo) {
+      preventTearing = boo;
+   }
+
+   public void setDimmingValue(int dmax) {
+      if (dmax < 0 || dmax > 255) return;
+      dimMax = dmax;
+   }
+
    public void setUpdatePanel(boolean boo) {
        updatePanel = boo;
    }
@@ -270,7 +290,8 @@ public class NeoMatrix {
       boolean right = (xDir > 0);
       boolean up = (yDir < 0);
       // Do the x (columns) first
-      if (xDir != 0) {
+//      if (xDir != 0) {
+      for (int i = 0; i < Math.abs(xDir); i++) {
          for (int y = startRow; y <= endRow; y++) {
             int save = right ? matrixBuffer[endColumn][y] : matrixBuffer[startColumn][y];
             for (int x = startColumn; x < endColumn; x++) {
@@ -284,7 +305,8 @@ public class NeoMatrix {
          }
       }
       // Then do the y (rows)
-      if (yDir != 0) {
+//      if (yDir != 0) {
+      for (int i = 0; i < Math.abs(yDir); i++) {
          for (int x = startColumn; x <= endColumn; x++) {
             int save = !up ? matrixBuffer[x][endRow] : matrixBuffer[x][startRow];
             for (int y = startRow; y < endRow; y++) {
@@ -361,33 +383,38 @@ public class NeoMatrix {
    }
 
    public int[][] shiftPixelMap (int[][] pixMap, int xDir, int yDir, boolean rotate) {
+      // Should add checking for magnitude of xDir and yDir
       int[][] pMap = cloneArray(pixMap);
       int width = pMap.length - 1;
       int height = pMap[0].length - 1;
       boolean right = (xDir > 0);
       boolean up = (yDir < 0);
-      if (xDir != 0) {
-         int[] save = right ? pMap[width] : pMap[0];
-         for (int x = 0; x < width; x++) {
+      //if (xDir != 0) {
+         for (int i = 0; i < Math.abs(xDir); i++) {
+            int[] save = right ? pMap[width] : pMap[0];
+            for (int x = 0; x < width; x++) {
 //            if (right) pMap[x + 1] = pMap[x];   // wrong
-            if (right) pMap[width-x] = pMap[width-x-1];
-            else pMap[x] = pMap[x + 1];
-         }
-         if (right) pMap[0] = rotate ? save : new int[save.length];
-         else pMap[width] = rotate ? save : new int[save.length];
-      }
-      if (yDir != 0) {
-         for (int x = 0; x < pMap.length; x++) {
-            int save = !up ? pMap[x][height] : pMap[x][0];
-            for (int y = 0; y < height; y++) {
-//               if (!up) pMap[x][y + 1] = pMap[x][y];   // wrong
-               if (!up) pMap[x][height-y] = pMap[x][height-y-1];
-               else pMap[x][y] = pMap[x][y + 1];
+               if (right) pMap[width-x] = pMap[width-x-1];
+               else pMap[x] = pMap[x + 1];
             }
-            if (!up) pMap[x][0] = rotate ? save : 0;
-            else pMap[x][height] = rotate ? save : 0;
+            if (right) pMap[0] = rotate ? save : new int[save.length];
+            else pMap[width] = rotate ? save : new int[save.length];
          }
-      }
+      //}
+      //if (yDir != 0) {
+         for (int i = 0; i < Math.abs(yDir); i++) {
+            for (int x = 0; x < pMap.length; x++) {
+               int save = !up ? pMap[x][height] : pMap[x][0];
+               for (int y = 0; y < height; y++) {
+//               if (!up) pMap[x][y + 1] = pMap[x][y];   // wrong
+                  if (!up) pMap[x][height-y] = pMap[x][height-y-1];
+                  else pMap[x][y] = pMap[x][y + 1];
+               }
+               if (!up) pMap[x][0] = rotate ? save : 0;
+               else pMap[x][height] = rotate ? save : 0;
+            }
+         }
+      //}
       return pMap;
    }
 
@@ -438,7 +465,7 @@ public class NeoMatrix {
                               {'c', 0, 14, 31, 31, 14},
                               {'d', 32, 112, 32, 0, 0},
                               {'e', 192, 240, 236, 211, 169, 149, 147, 137, 253, 5, 3, 1},
-                              {'f', 64, 96, 80, 79, 77, 85, 85, 85, 117, 21, 23, 24},
+                              {'f', 64, 96, 80, 79, 77, 85, 85, 85, 117, 21, 23, 24, 16},
                               {'g', 128, 192, 160, 159, 153, 169, 169, 165, 229, 37, 39, 56} };
 
    public final char[][] bigLetters =  {
@@ -567,8 +594,71 @@ public class NeoMatrix {
                               {',', 16, 8, 0, 0},
                               {'~', 2, 4, 2, 0} };
 
+   public final char[][] littleLettersSq = {
+                              {' ', 0, 0, 0},
+                              {'0', 31, 17, 31, 0},
+                              {'1', 18, 31, 16, 0},
+                              {'2', 29, 21, 23, 0},
+                              {'3', 21, 21, 31, 0},
+                              {'4', 7, 4, 31, 0},
+                              {'5', 23, 21, 29, 0},
+                              {'6', 31, 21, 29, 0},
+                              {'7', 1, 1, 31, 0},
+                              {'8', 31, 21, 31, 0},
+                              {'9', 23, 21, 31, 0},
+                              {'A', 31, 5, 31, 0},
+                              {'B', 31, 21, 27, 0},
+                              {'C', 31, 17, 17, 0},
+                              {'D', 31, 17, 14, 0},
+                              {'E', 31, 21, 17, 0},
+                              {'F', 31, 5, 1, 0},
+                              {'G', 31, 17, 29, 0},
+                              {'H', 31, 4, 31, 0},
+                              {'I', 17, 31, 17, 0},
+                              {'J', 17, 17, 15, 0},
+                              {'K', 31, 4, 27, 0},
+                              {'L', 31, 16, 16, 0},
+                              {'M', 31, 1, 31, 1, 30, 0},
+                              {'N', 31, 2, 4, 31, 0},
+                              {'O', 31, 17, 31, 0},
+                              {'P', 31, 5, 7, 0},
+                              {'Q', 31, 25, 31, 0},
+                              {'R', 31, 5, 27, 0},
+                              {'S', 23, 21, 29, 0},
+                              {'T', 1, 31, 1, 0},
+                              {'U', 31, 16, 31, 0},
+                              {'V', 15, 16, 15, 0},
+                              {'W', 31, 16, 31, 16, 15, 0},
+                              {'X', 27, 4, 27, 0},
+                              {'Y', 7, 28, 7, 0},
+                              {'Z', 25, 21, 19, 0},
+                              {'*', 21, 14, 21, 0},
+                              {'(', 14, 17, 0, 0},
+                              {')', 17, 14, 0, 0},
+                              {'#', 10, 31, 10, 0},
+                              {'-', 4, 4, 4, 0},
+                              {'+', 4, 14, 4, 0},
+                              {'"', 3, 0, 3, 0},
+                              {'\'', 3, 0, 0, 0},
+                              {'!', 23, 0, 0, 0},
+                              {'&', 14, 31, 10, 0},
+                              {'=', 10, 10, 10, 0},
+                              {'$', 23, 31, 29, 0},
+                              {':', 10, 0, 0, 0},
+                              {';', 16, 10, 0, 0},
+                              {'>', 17, 10, 4, 0},
+                              {'<', 4, 10, 17, 0},
+                              {'?', 1, 21, 3, 0},
+                              {'/', 24, 4, 3, 0},
+                              {'%', 25, 4, 19, 0},
+                              {'^', 2, 0, 2, 0},
+                              {'@', 15, 17, 23, 0},
+                              {'.', 16, 0, 0, 0},
+                              {',', 16, 8, 0, 0},
+                              {'~', 2, 4, 2, 0} };
+
    public final char[][] littleNumbers = {
-                              //{' ', 0, 0, 0, 0},
+                              {' ', 0, 0, 0, 0},
                               {'0', 31, 17, 31, 0},
                               {'1', 0, 31, 0, 0},
                               {'2', 29, 21, 23, 0},
@@ -580,6 +670,45 @@ public class NeoMatrix {
                               {'8', 31, 21, 31, 0},
                               {'9', 23, 21, 31, 0} };
 
+   public final char[][] bigNumbers7H = {
+                              {' ', 0, 0, 0, 0, 0, 0},
+                              {'0', 62, 81, 73, 69, 62, 0},
+                              {'1', 0, 66, 127, 64, 0, 0},
+                              {'2', 114, 73, 73, 73, 70, 0},
+                              {'3', 34, 65, 73, 73, 54, 0},
+                              {'4', 14, 8, 8, 8, 127, 0},
+                              {'5', 79, 73, 73, 73, 49, 0},
+                              {'6', 62, 73, 73, 73, 50, 0},
+                              {'7', 1, 1, 113, 9, 7, 0},
+                              {'8', 54, 73, 73, 73, 54, 0},
+                              {'9', 38, 73, 73, 73, 62, 0} };
+
+   public final char[][] bigNumbers7HT = {
+                              {' ', 0, 0, 0, 0, 0, 0},
+                              {'0', 62, 127, 65, 127, 62, 0},
+                              {'1', 0, 68, 126, 127, 64, 0},
+                              {'2', 114, 123, 73, 79, 70, 0},
+                              {'3', 34, 99, 73, 127, 54, 0},
+                              {'4', 15, 15, 8, 127, 127, 0},
+                              {'5', 79, 79, 73, 121, 49, 0},
+                              {'6', 62, 127, 73, 123, 50, 0},
+                              {'7', 1, 113, 121, 15, 7, 0},
+                              {'8', 54, 127, 73, 127, 54, 0},
+                              {'9', 38, 111, 73, 127, 62, 0} };
+
+   public final char[][] bigNumbers8H = {
+                              {' ', 0, 0, 0, 0, 0, 0},
+                              {'0', 126, 129, 153, 129, 126, 0},
+                              {'1', 0, 130, 255, 128, 0, 0},
+                              {'2', 194, 161, 145, 137, 134, 0},
+                              {'3', 66, 129, 137, 137, 118, 0},
+                              {'4', 30, 16, 16, 16, 255, 0},
+                              {'5', 143, 137, 137, 137, 113, 0},
+                              {'6', 126, 137, 137, 137, 114, 0},
+                              {'7', 1, 193, 49, 13, 3, 0},
+                              {'8', 118, 137, 137, 137, 118, 0},
+                              {'9', 78, 145, 145, 145, 126, 0} };
+
    public final char[][] faces = {
                               {'1', 16, 38, 66, 64, 70, 34, 16},
                               {'2', 16, 34, 70, 64, 66, 38, 16},
@@ -588,7 +717,14 @@ public class NeoMatrix {
                               {'5', 32, 70, 130, 144, 134, 66, 32},
                               {'6', 32, 66, 134, 144, 130, 70, 32},
                               {'7', 32, 68, 134, 144, 132, 70, 32},
-                              {'8', 32, 70, 132, 144, 134, 68, 32} };
+                              {'8', 32, 70, 132, 144, 134, 68, 32},
+                              {'a', 60, 66, 149, 161, 161, 149, 66, 60},
+                              {'b', 60, 66, 165, 145, 145, 165, 66, 60},
+                              {'c', 60, 66, 129, 129, 129, 129, 66, 60},
+                              {'d', 0, 0, 20, 32, 32, 20, 0, 0},
+                              {'e', 0, 0, 36, 16, 16, 36, 0, 0},
+                              {'A', 96, 134, 134, 128, 134, 134, 96},
+                              {'B', 32, 70, 134, 128, 134, 70, 32} };
 }
 
 

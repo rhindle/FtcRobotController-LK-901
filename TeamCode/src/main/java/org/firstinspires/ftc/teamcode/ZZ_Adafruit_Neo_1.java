@@ -30,7 +30,8 @@ public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
     int[][] textMatrix;
     int[][] textMatrix1;
     long lastAnimUpdate;
-    int animUpdateInterval = 500;  //250
+    int updateCount = 0;
+    int animUpdateInterval = 200;  //250
 
     //AdafruitNeoDriver neo = null;
 
@@ -43,8 +44,15 @@ public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
         robot.init();
         neo.init();
         neo.setUpdateLimit(1);
+        neo.setPreventTearing(true);
+        neo.setDimmingValue(192);
 
+        //sleep(250);
 
+        neo.drawLine(0,0,31,7, Color.rgb(50,0,0));
+        neo.drawLine(31,0,0,7, Color.rgb(0,0,50));
+        neo.drawLine(0,0,3,7, Color.rgb(0,50,0));
+        neo.forceUpdateMatrix();
 
         while (!isStarted()) {
             telemetry.addData(">", "Waiting to start...");
@@ -56,27 +64,27 @@ public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
         lastAnimUpdate = System.currentTimeMillis();
 
 //        neo.drawRectangle(0,7,0,7, Color.rgb(5,0,0), true, Color.rgb(0,1,0));
-        neo.drawRectangle(0,3,0,3, Color.rgb(0,4,0), true, Color.rgb(0,4,0));
-        neo.drawRectangle(0,3,4,7, Color.rgb(3,3,0), true, Color.rgb(3,3,0));
-        neo.drawRectangle(28,31,0,3, Color.rgb(2,2,2), true, Color.rgb(2,2,2));
-        neo.drawRectangle(28,31,4,7, Color.rgb(0,0,4), true, Color.rgb(0,0,4));
-        textMatrix = neo.buildPixelMapFromString("   14273 ", neo.littleLetters, Color.rgb(10,10,10), 0);
+        neo.drawRectangle(0,3,0,3, Color.rgb(0,8,0), true, Color.rgb(0,8,0));
+        neo.drawRectangle(0,3,4,7, Color.rgb(6,6,0), true, Color.rgb(6,6,0));
+        neo.drawRectangle(28,31,0,3, Color.rgb(4,4,4), true, Color.rgb(4,4,4));
+        neo.drawRectangle(28,31,4,7, Color.rgb(0,0,8), true, Color.rgb(0,0,8));
+        textMatrix = neo.buildPixelMapFromString("  14273 ", neo.bigNumbers7HT, Color.rgb(20,20,20), 0);
         textMatrix = neo.shiftPixelMap(textMatrix,0,1, true);
-        textMatrix = neo.shiftPixelMap(textMatrix,0,1, true);
-        textMatrix1 = neo.buildPixelMapFromString("SENSE", neo.littleLetters, Color.rgb(10,0,0), 0);
+        //textMatrix = neo.shiftPixelMap(textMatrix,0,1, true);
+        textMatrix1 = neo.buildPixelMapFromString("SENSE", neo.littleLettersSq, Color.rgb(20,0,0), 0);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
-        textMatrix1 = neo.buildPixelMapFromString("&", neo.littleLetters, Color.rgb(5,5,5), 0);
+        textMatrix1 = neo.buildPixelMapFromString("+", neo.littleLettersSq, Color.rgb(10,10,10), 0);
         //textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
         textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
-        textMatrix1 = neo.buildPixelMapFromString("SOUND ", neo.littleLetters, Color.rgb(0,10,0), 0);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
+        textMatrix1 = neo.buildPixelMapFromString("SOUND ", neo.littleLettersSq, Color.rgb(0,20,0), 0);
+        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,3, true);
+//        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
+//        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
-        textMatrix1 = neo.buildPixelMapFromString("ROBOTICS", neo.littleLetters, Color.rgb(0,0,10), 0);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
+        textMatrix1 = neo.buildPixelMapFromString("ROBOTICS", neo.littleLettersSq, Color.rgb(0,0,20), 0);
+        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,2, true);
+//        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
         neo.applyPixelMapToBuffer(textMatrix,4,27, 0, true);
 //        neo.applyPixelMapToBuffer(textMatrix,7,31, 0, true);
@@ -91,8 +99,13 @@ public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
                 lastAnimUpdate = System.currentTimeMillis();
                 //neo.scrollRegion(4, 27, 0, 7, -1, 0, true);  // 19,16
                 textMatrix = neo.shiftPixelMap(textMatrix,-1,0,true);
-                textMatrix = neo.shiftPixelMap(textMatrix,-1,0,true);
+                //textMatrix = neo.shiftPixelMap(textMatrix,-1,0,true);
+                if (++updateCount > 4) {
+                    updateCount = 0;
+                    //textMatrix = neo.shiftPixelMap(textMatrix,0,-1,true);
+                }
                 neo.applyPixelMapToBuffer(textMatrix,4,27, 0, true);
+
             }
 
             sleep(8);

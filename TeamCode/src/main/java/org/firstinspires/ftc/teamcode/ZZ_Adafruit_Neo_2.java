@@ -57,8 +57,8 @@ public class ZZ_Adafruit_Neo_2 extends LinearOpMode {
         textMatrix1 = neo.buildPixelMapFromString("     f ", neo.specialChar, Color.rgb(10,5,0), 0);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
         textMatrix1 = neo.buildPixelMapFromString("14273 ", neo.littleLetters, Color.rgb(10,10,10), 0);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
+        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,2, true);
+//        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
         textMatrix1 = neo.buildPixelMapFromString("SENSE", neo.littleLetters, Color.rgb(10,0,0), 0);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
@@ -67,13 +67,13 @@ public class ZZ_Adafruit_Neo_2 extends LinearOpMode {
         textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
         textMatrix1 = neo.buildPixelMapFromString("SOUND ", neo.littleLetters, Color.rgb(0,10,0), 0);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
+        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,3, true);
+//        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
+//        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
         textMatrix1 = neo.buildPixelMapFromString("ROBOTICS", neo.littleLetters, Color.rgb(0,0,10), 0);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
-        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
+        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,2, true);
+//        textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
         textMatrix = neo.appendPixelMap(textMatrix, textMatrix1);
         neo.applyPixelMapToBuffer(textMatrix,4,27, 0, true);
 //        neo.applyPixelMapToBuffer(textMatrix,7,31, 0, true);
@@ -87,8 +87,8 @@ public class ZZ_Adafruit_Neo_2 extends LinearOpMode {
             if (System.currentTimeMillis() >= lastAnimUpdate + animUpdateInterval) {
                 lastAnimUpdate = System.currentTimeMillis();
                 //neo.scrollRegion(4, 27, 0, 7, -1, 0, true);  // 19,16
-                textMatrix = neo.shiftPixelMap(textMatrix,-1,0,true);
-                textMatrix = neo.shiftPixelMap(textMatrix,-1,0,true);
+                textMatrix = neo.shiftPixelMap(textMatrix,-2,0,true);
+//                textMatrix = neo.shiftPixelMap(textMatrix,-1,0,true);
                 neo.applyPixelMapToBuffer(textMatrix,4,27, 0, true);
             }
 

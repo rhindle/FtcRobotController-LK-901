@@ -74,8 +74,8 @@ public class ZZ_Adafruit_Neo_3 extends LinearOpMode {
             timeRemaining = Math.max(0, 120-(int)gameTime.seconds());
             timeColor = timeRemaining < 31 ? Color.rgb(10,0,0) : timeRemaining < 46 ? Color.rgb(10,5,0) : Color.rgb(0,10,0);
             textMatrix1 = neo.buildPixelMapFromString(String.valueOf(timeRemaining),neo.littleNumbers, timeColor,0);
-            textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
-            textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
+            textMatrix1 = neo.shiftPixelMap(textMatrix1,0,2, true);
+//            textMatrix1 = neo.shiftPixelMap(textMatrix1,0,1, true);
             neo.clearCols(5, 12);
             neo.applyPixelMapToBuffer(textMatrix1,17-textMatrix1.length,16,0, true);
 
