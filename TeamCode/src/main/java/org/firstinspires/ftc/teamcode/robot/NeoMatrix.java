@@ -30,7 +30,7 @@ public class NeoMatrix {
    final int ledRows = 8;
    final int ledCols = 32; //32
    final int ledQty = ledCols * ledRows;
-   final int hwLedQty = Math.min(255, ledQty); // the board doesn't work at more than 255 pixels? A problem with documentation?
+   final int hwLedQty = Math.min(1536, ledQty); // the board doesn't work at more than 255 pixels? A problem with documentation?
    final boolean flipVert = false;
    final boolean flipHoriz = false;
    final int updateSize = 8;   // i2c driver limit is 24 bytes, or 8 pixels * 3 RGB bytes

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.Tools;
 import java.lang.reflect.Field;
 
 public class ReflectionUtils {
-   public static Field getField(Class clazz, String fieldName) {
+   public static Field getFieldX(Class clazz, String fieldName) {
       try {
          Field f = clazz.getDeclaredField(fieldName);
          f.setAccessible(true);
@@ -11,7 +11,7 @@ public class ReflectionUtils {
       } catch (NoSuchFieldException e) {
          Class superClass = clazz.getSuperclass();
          if (superClass != null) {
-            return getField(superClass, fieldName);
+            return getFieldX(superClass, fieldName);
          }
       }
       return null;

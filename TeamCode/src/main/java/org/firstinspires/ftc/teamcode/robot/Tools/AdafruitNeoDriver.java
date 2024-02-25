@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
+import com.qualcomm.hardware.broadcom.BroadcomColorSensorImpl;
 import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerNotifier;
@@ -36,7 +37,8 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
 
     public static final I2cAddr I2CADDR_DEFAULT = I2cAddr.create7bit(0x60);
 
-    private static final byte BASE_REGISTER_ADDR = 0x0E;
+    private static final byte SEESAW_BASE_REGISTER_ADDR = 0x00;
+    private static final byte NEO_BASE_REGISTER_ADDR = 0x0E;
 
     /* Number of the Neopixel Pin - This is set in the device hardware, but for some reason needs to be specified */
     private static final byte NEOPIXEL_PIN = 15;
@@ -47,6 +49,8 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
     private static final int MAX_TX_BYTES = 24;
 
     private static final String TAG = "NeoDriver";
+
+    private boolean didInit = false;
 
     private enum FunctionRegister {
 
@@ -79,6 +83,9 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         this.deviceClient.setLogging(true);
         this.deviceClient.setLoggingTag("NeoDriverI2C");
 
+        // We ask for an initial call back here; that will eventually call internalInitialize()
+        this.registerArmingStateCallback(true);
+
         this.deviceClient.engage();
     }
 
@@ -99,70 +106,54 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
 
     @Override
     public void resetDeviceConfigurationForOpMode() {
-        // no-op
+        RobotLog.vv(TAG, "resetDeviceConfigurationForOpMode()...");
+        if (didInit) {
+            setBusSpeed400();
+            sendSeesawReset();
+            sleep(250);
+            setNeopixelSpeed();  // LK: The first write after the reset usually fails if the board was disconnected
+            sleep(250);
+            setNeopixelSpeed();
+            setNeopixelPin();
+        }
     }
 
     @Override
     public void onOpModePreInit(OpMode opMode) {
+        RobotLog.vv(TAG, "onOpModePreInit()...");
         // no-op
     }
 
     @Override
     public void onOpModePreStart(OpMode opMode) {
+        RobotLog.vv(TAG, "onOpModePreStart()...");
         // no-op
     }
 
     @Override
     public void onOpModePostStop(OpMode opMode) {
+        RobotLog.vv(TAG, "onOpModePostStop()...");
         /* Turn all the lights off when the OpMode is stopped */
         //fill(0);  //LK return this to 0; was useful during debugging
-        fill(Color.rgb(1,0,0));
+        fill(Color.rgb(0,1,0));
         show();
     }
 
-    //!!!!!
-//    public enum I2cBusSpeed
-//    {
-//        STANDARD_100K,
-//        FAST_400K,
-//        FASTPLUS_1M,
-//        HIGH_3_4M
-//    }
-
     @Override
-    protected boolean internalInitialize(@NonNull Parameters parameters) {
+    protected boolean internalInitialize(@NonNull Parameters parameters) { /* ### */
 
         RobotLog.vv(TAG, "internalInitialize()...");
 
         /* Make sure we're talking to the correct I2c address */
         this.deviceClient.setI2cAddress(parameters.i2cAddr);
 
-        /* Attempt to set the I2C speed for this channel to 400 kHz */
-        //LynxI2cDeviceSynch device1 = null;
-        try {
-            Field field = ReflectionUtils.getField(this.getClass(), "deviceClient");
-            field.setAccessible(true);
-            I2cDeviceSynchImplOnSimple simple = (I2cDeviceSynchImplOnSimple) field.get(this);
-
-            field = ReflectionUtils.getField(simple.getClass(), "i2cDeviceSynchSimple");
-            field.setAccessible(true);
-            LynxI2cDeviceSynch device1 = (LynxI2cDeviceSynch) field.get(simple);
-
-            device1.setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
-            RobotLog.vv(TAG, device1.getDeviceName()+" > "+device1.getUserConfiguredName()+" > "+device1.getConnectionInfo());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        setBusSpeed400();
 
         /* Can't do anything if we're not really talking to the hardware */
         if (!this.deviceClient.isArmed()) {
             Log.d(TAG, "not armed");
             return false;
         }
-
-//        LynxI2cConfigureChannelCommand.SpeedCode speedCode = LynxI2cConfigureChannelCommand.SpeedCode.FAST_400K;
-//        LynxI2cConfigureChannelCommand command = new LynxI2cConfigureChannelCommand(expansionHub);
-//        LynxI2cConfigureChannelCommand command2 = new LynxI2cConfigureChannelCommand(expansionHub, bus, speedCode);
 
         /* LK: I can't get this to work without a delay here, even setting the bus speed to 400 kHz
             I2C Nack, then nothing works with errors in the log every transaction.
@@ -172,17 +163,36 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         sleep(200);
 
         /* LK  tried writing the speed here to see if it helps, but same difference */
-        byte[] byte0 = new byte[]{FunctionRegister.SPEED.bVal, 0};
-        deviceClient.write(BASE_REGISTER_ADDR, byte0, I2cWaitControl.WRITTEN);
-        RobotLog.vv(TAG, "Wrote NEOPIXEL_SPEED " + toHex(byte0) + " (400 MHz)");
+        setNeopixelSpeed();
+        setNeopixelPin();
 
-        byte[] bytes = new byte[]{FunctionRegister.PIN.bVal, NEOPIXEL_PIN};
-        deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
-
-        RobotLog.vv(TAG, "Wrote NEOPIXEL_PIN " + toHex(bytes));
-        //Log.v("NeoDriver", "NEOPIXEL_PIN " + toHex(bytes));
-
+        didInit = true;
         return true;
+    }
+
+    private void sendSeesawReset() {
+        byte[] bytes = new byte[]{SEESAW_BASE_REGISTER_ADDR, 0x7F, (byte) 0xFF};
+        RobotLog.vv(TAG, "Resetting Seesaw " + toHex(bytes));
+        this.deviceClient.write(NEO_BASE_REGISTER_ADDR, bytes, I2cWaitControl.ATOMIC);
+    }
+
+    private void setBusSpeed400(){
+        /* Attempt to set the I2C speed for this channel to 400 kHz */
+        //LynxI2cDeviceSynch device1 = null;
+        try {
+            Field field = getField(this.getClass(), "deviceClient");
+            field.setAccessible(true);
+            I2cDeviceSynchImplOnSimple simple = (I2cDeviceSynchImplOnSimple) field.get(this);
+
+            field = getField(simple.getClass(), "i2cDeviceSynchSimple");
+            field.setAccessible(true);
+            LynxI2cDeviceSynch device1 = (LynxI2cDeviceSynch) field.get(simple);
+
+            device1.setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+            RobotLog.vv(TAG, "Tried to set bus speed to 400 kHz @ "+device1.getDeviceName()+" > "+device1.getUserConfiguredName()+" > "+device1.getConnectionInfo());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -207,28 +217,27 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
 
         int bufferLength = parameters.numPixels * parameters.bytesPerPixel;
 
-        ByteBuffer buffer = ByteBuffer.allocate(3).order(ByteOrder.LITTLE_ENDIAN);
+        //ByteBuffer buffer = ByteBuffer.allocate(3).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer buffer = ByteBuffer.allocate(3).order(ByteOrder.BIG_ENDIAN);  // LK Documentation is wrong: not little endian
         buffer.put(FunctionRegister.BUF_LENGTH.bVal);
         buffer.putShort((short) bufferLength);
 
         byte[] bytes = buffer.array();
-        deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
-        //deviceClient.write(BASE_REGISTER_ADDR, bytes);
-        RobotLog.vv(TAG, "Wrote NEOPIXEL_BUF_LENGTH " + toHex(bytes));
+        RobotLog.vv(TAG, "Writing NEOPIXEL_BUF_LENGTH " + toHex(bytes));
+        deviceClient.write(NEO_BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
     }
 
-//    public void setPinAgain() {
-//        byte[] byte0 = new byte[]{FunctionRegister.SPEED.bVal, 0};
-//        //deviceClient.write(BASE_REGISTER_ADDR, byte0, I2cWaitControl.WRITTEN);
-//        deviceClient.write(BASE_REGISTER_ADDR, byte0, I2cWaitControl.NONE);
-//        Log.v("NeoDriver", "NEOPIXEL_SPEED " + toHex(byte0));
-//        sleep(3);
-//
-//        byte[] bytes = new byte[]{FunctionRegister.PIN.bVal, NEOPIXEL_PIN};
-//        deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.NONE);
-//        Log.v("NeoDriver", "NEOPIXEL_PIN " + toHex(bytes));
-//    }
+    public void setNeopixelPin() {
+        byte[] bytes = new byte[]{FunctionRegister.PIN.bVal, NEOPIXEL_PIN};
+        RobotLog.vv(TAG, "Writing NEOPIXEL_PIN " + toHex(bytes));
+        this.deviceClient.write(NEO_BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
+    }
 
+    public void setNeopixelSpeed() {
+        byte[] byte0 = new byte[]{FunctionRegister.SPEED.bVal, 0};
+        RobotLog.vv(TAG, "Writing NEOPIXEL_SPEED " + toHex(byte0) + " (400 MHz)");
+        deviceClient.write(NEO_BASE_REGISTER_ADDR, byte0, I2cWaitControl.WRITTEN);
+    }
 
     /**
      * Sets a specific pixel in a strand to a color
@@ -260,7 +269,7 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         buffer.put(colorsToBytes(parameters.bytesPerPixel, parameters.colorOrder, color));
 
         byte[] bytes = buffer.array();
-        deviceClient.write(BASE_REGISTER_ADDR, bytes);
+        deviceClient.write(NEO_BASE_REGISTER_ADDR, bytes);
     }
 
     /**
@@ -311,7 +320,7 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         buffer.put(colorData);
 
         byte[] bytes = buffer.array();
-        deviceClient.write(BASE_REGISTER_ADDR, bytes);
+        deviceClient.write(NEO_BASE_REGISTER_ADDR, bytes);
     }
 
     // LK new method for single i2c transaction incremental updates, using existing method sendPixelData
@@ -331,7 +340,7 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         buffer.put(colorData, offset, length);
 
         byte[] bytes = buffer.array();
-        deviceClient.write(BASE_REGISTER_ADDR, bytes);
+        deviceClient.write(NEO_BASE_REGISTER_ADDR, bytes);
     }
 
     //@Override
@@ -352,8 +361,7 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
     //@Override
     public void show() {
         byte[] bytes = new byte[]{FunctionRegister.SHOW.bVal};
-        deviceClient.write(BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
-        //deviceClient.write(BASE_REGISTER_ADDR, bytes);
+        deviceClient.write(NEO_BASE_REGISTER_ADDR, bytes, I2cWaitControl.WRITTEN);
     }
 
     private static byte[] colorsToBytes(int bytesPerPixel, ColorOrder order, int... colors) {
@@ -384,7 +392,6 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
 
         return builder.toString();
     }
-
 
     enum ColorOrder {
         RGB(0, 1, 2),
@@ -435,5 +442,19 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
                 throw new AssertionError();
             }
         }
+    }
+
+    public static Field getField(Class clazz, String fieldName) {
+        try {
+            Field f = clazz.getDeclaredField(fieldName);
+            f.setAccessible(true);
+            return f;
+        } catch (NoSuchFieldException e) {
+            Class superClass = clazz.getSuperclass();
+            if (superClass != null) {
+                return getField(superClass, fieldName);
+            }
+        }
+        return null;
     }
 }

@@ -263,15 +263,9 @@ public class QwiicLEDStick extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> im
 
         /* Attempt to set the I2C speed for this channel to 400 kHz */
         try {
-            Field field = ReflectionUtils.getField(this.getClass(), "deviceClient");
+            Field field = getField(this.getClass(), "deviceClient");
             field.setAccessible(true);
             LynxI2cDeviceSynch device1 = (LynxI2cDeviceSynch) field.get(this);
-//            I2cDeviceSynchImplOnSimple simple = (I2cDeviceSynchImplOnSimple) field.get(this);
-//
-//            field = ReflectionUtils.getField(simple.getClass(), "i2cDeviceSynchSimple");
-//            field.setAccessible(true);
-//            LynxI2cDeviceSynch device1 = (LynxI2cDeviceSynch) field.get(simple);
-
             device1.setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
             RobotLog.vv(TAG, device1.getDeviceName()+" > "+device1.getUserConfiguredName()+" > "+device1.getConnectionInfo());
         } catch (IllegalAccessException e) {
@@ -294,6 +288,20 @@ public class QwiicLEDStick extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> im
     @Override
     public void onOpModePostStop(OpMode opMode) {
         turnAllOff();
+    }
+
+    public static Field getField(Class clazz, String fieldName) {
+        try {
+            Field f = clazz.getDeclaredField(fieldName);
+            f.setAccessible(true);
+            return f;
+        } catch (NoSuchFieldException e) {
+            Class superClass = clazz.getSuperclass();
+            if (superClass != null) {
+                return getField(superClass, fieldName);
+            }
+        }
+        return null;
     }
 
 }
