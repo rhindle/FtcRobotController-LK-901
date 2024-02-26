@@ -23,7 +23,7 @@ public class ZZ_Adafruit_Neo_P extends LinearOpMode {
     int loopyTimeCounter = 0;
     int[][] textMatrix;
     int[][] textMatrix1;
-    int[][][] pacman = new int[4][7][8];
+    int[][][] pacman = new int[6][8][8];
     int[][][][] ghosts = new int[5][2][7][8];
     long lastAnimUpdate;
     int updateCount = 0;
@@ -72,17 +72,19 @@ public class ZZ_Adafruit_Neo_P extends LinearOpMode {
         pacman[0] = neo.buildPixelMapFromString("a", neo.pacFont, Color.rgb(10,10,0));
         pacman[1] = neo.buildPixelMapFromString("b", neo.pacFont, Color.rgb(10,10,0));
         pacman[2] = neo.buildPixelMapFromString("c", neo.pacFont, Color.rgb(10,10,0));
-        pacman[3] = neo.buildPixelMapFromString("b", neo.pacFont, Color.rgb(10,10,0));
+        pacman[3] = neo.buildPixelMapFromString("d", neo.pacFont, Color.rgb(10,10,0));
+        pacman[4] = pacman[2];
+        pacman[5] = pacman[1];
         ghosts[0][0] = neo.buildPixelMapFromString("G", neo.pacFont, Color.rgb(15,0,0));
         ghosts[0][1] = neo.buildPixelMapFromString("g", neo.pacFont, Color.rgb(15,0,0));
-        ghosts[1][0] = neo.buildPixelMapFromString("G", neo.pacFont, Color.rgb(0,10,10));
-        ghosts[1][1] = neo.buildPixelMapFromString("g", neo.pacFont, Color.rgb(0,10,10));
-        ghosts[2][0] = neo.buildPixelMapFromString("G", neo.pacFont, Color.rgb(10,5,5));
-        ghosts[2][1] = neo.buildPixelMapFromString("g", neo.pacFont, Color.rgb(10,5,5));
+        ghosts[1][0] = neo.buildPixelMapFromString("G", neo.pacFont, Color.rgb(10,5,5));
+        ghosts[1][1] = neo.buildPixelMapFromString("g", neo.pacFont, Color.rgb(10,5,5));
+        ghosts[2][0] = neo.buildPixelMapFromString("G", neo.pacFont, Color.rgb(0,10,10));
+        ghosts[2][1] = neo.buildPixelMapFromString("g", neo.pacFont, Color.rgb(0,10,10));
         ghosts[3][0] = neo.buildPixelMapFromString("G", neo.pacFont, Color.rgb(10,5,0));
         ghosts[3][1] = neo.buildPixelMapFromString("g", neo.pacFont, Color.rgb(10,5,0));
 
-        textMatrix = neo.buildPixelMapFromString("E", neo.pacFont, Color.rgb(5,5,5));
+        textMatrix = neo.buildPixelMapFromString("E", neo.pacFont, Color.rgb(10,10,10));
         textMatrix1 = neo.buildPixelMapFromString("e", neo.pacFont, Color.rgb(0,0,5));
 
         for (int i=0; i<4; i++) {
@@ -151,7 +153,7 @@ public class ZZ_Adafruit_Neo_P extends LinearOpMode {
                 neo.applyPixelMapToBuffer(textMatrix1,0,31, 0, true);
 
                 if (++updateCount >= mLen) updateCount = 0;
-                if (++pacCount > 3) pacCount = 0;
+                if (++pacCount > 5) pacCount = 0;
                 if (++ghostCount > 1) ghostCount = 0;
 
             }
