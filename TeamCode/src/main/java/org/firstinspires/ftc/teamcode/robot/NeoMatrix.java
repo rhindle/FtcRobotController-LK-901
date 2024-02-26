@@ -330,7 +330,7 @@ public class NeoMatrix {
       for (int c = colStart; c <= colEnd; c++) {
          for (int r = 0; r < ledRows; r++) {
             int px = pMap[pMapX][r];
-            if (opaque || px != 0) matrixBuffer[c][r] = px;
+            if (opaque || (px & 0xFFFFFF) != 0) matrixBuffer[c][r] = px;
          }
          pMapX++;
       }
@@ -343,6 +343,33 @@ public class NeoMatrix {
          pMap = appendPixelMap(pMap, convertBitMap(getBitMap(charSet, c), foreColor, backColor));
       }
       return pMap;
+   }
+
+   public int[][] overlayPixelMap (int[][] pixMapTop, int[][] pixMapBottom, int index) {
+      if (index < 0) index = 0;
+      if (index > pixMapBottom.length-1) return pixMapBottom;
+      int[][] newMap = cloneArray(pixMapBottom); //new int[pixMapBottom.length][ledRows];
+      for (int c = index; c < pixMapBottom.length; c++) {
+         if (c-index >= pixMapTop.length) break;
+         for (int r = 0; r < ledRows; r++) {
+            int px = pixMapTop[c-index][r];
+            if ((px & 0xFFFFFF) != 0) newMap[c][r] = px;
+         }
+      }
+      return newMap;
+   }
+
+   public int[][] underlayPixelMap (int[][] pixMapBottom, int[][] pixMapTop, int index) {
+      if (index < 0) index = 0;
+      if (index > pixMapTop.length-1) return pixMapTop;
+      int[][] newMap = cloneArray(pixMapTop); //new int[pixMapBottom.length][ledRows];
+      for (int c = index; c < pixMapTop.length; c++) {
+         if (c-index >= pixMapBottom.length) break;
+         for (int r = 0; r < ledRows; r++) {
+            if ((pixMapTop[c][r] & 0xFFFFFF) == 0) newMap[c][r] = pixMapBottom[c-index][r];
+         }
+      }
+      return newMap;
    }
 
    public int[][] appendPixelMap (int[][] pixMap1, int[][] pixMap2) {
@@ -725,6 +752,19 @@ public class NeoMatrix {
                               {'e', 0, 0, 36, 16, 16, 36, 0, 0},
                               {'A', 96, 134, 134, 128, 134, 134, 96},
                               {'B', 32, 70, 134, 128, 134, 70, 32} };
+
+   public final char[][] compactFull = {
+           {'0', 126, 66, 126, 0}, {'1', 126, 0}, {'2', 114, 74, 68, 0}, {'3', 66, 74, 52, 0}, {'4', 30, 16, 126, 0}, {'5', 78, 74, 50, 0}, {'6', 60, 74, 50, 0}, {'7', 2, 2, 126, 0}, {'8', 52, 74, 52, 0}, {'9', 76, 82, 60, 0},
+           {'A', 124, 18, 124, 0}, {'B', 126, 74, 52, 0}, {'C', 60, 66, 66, 0}, {'D', 126, 66, 60, 0}, {'E', 126, 74, 66, 0}, {'F', 126, 10, 2, 0}, {'G', 60, 66, 114, 0}, {'H', 126, 8, 126, 0}, {'I', 126, 0}, {'J', 32, 64, 62, 0},
+           {'K', 126, 8, 118, 0}, {'L', 126, 64, 64, 0}, {'M', 126, 4, 8, 4, 126}, {'N', 126, 8, 16, 126, 0}, {'O', 60, 66, 60, 0}, {'P', 126, 18, 12, 0}, {'Q', 60, 66, 124, 0}, {'R', 126, 18, 108, 0}, {'S', 68, 74, 50, 0}, {'T', 2, 126, 2, 0},
+           {'U', 126, 64, 126, 0}, {'V', 62, 64, 62, 0}, {'W', 126, 64, 126, 64, 62, 0}, {'X', 118, 8, 118, 0}, {'Y', 14, 112, 14, 0}, {'Z', 98, 90, 70, 0},
+           {'a', 56, 68, 124, 0}, {'b', 126, 72, 48, 0}, {'c', 56, 68, 68, 0}, {'d', 48, 72, 126, 0}, {'e', 56, 84, 88, 0}, {'f', 124, 18, 2, 0}, {'g', 152, 164, 120, 0}, {'h', 126, 8, 112, 0}, {'i', 122, 0}, {'j', 128, 128, 122, 0},
+           {'k', 126, 16, 108, 0}, {'l', 126, 0}, {'m', 124, 4, 124, 4, 120, 0}, {'n', 124, 4, 120, 0}, {'o', 56, 68, 56, 0}, {'p', 252, 36, 24, 0}, {'q', 24, 36, 252, 0}, {'r', 120, 4, 4, 0}, {'s', 72, 84, 36, 0}, {'t', 4, 62, 68, 0},
+           {'u', 60, 64, 124, 0}, {'v', 60, 64, 60, 0}, {'w', 124, 64, 124, 64, 60, 0}, {'x', 108, 16, 108, 0}, {'y', 188, 160, 124, 0}, {'z', 100, 84, 76, 0},
+           {' ', 0, 0, 0}, {'*', 20, 6, 20, 0}, {'(', 6, 66, 0}, {')', 66, 60, 0}, {'#', 20, 62, 62, 20, 0}, {'-', 16, 16, 16, 0}, {'+', 16, 56, 16, 0}, {'"', 7, 0, 7, 0}, {'\'', 7, 0}, {'!', 94, 0},
+           {'&', 52, 74, 52, 64, 0}, {'=', 40, 40, 40, 0}, {'$', 44, 126, 52, 0}, {':', 40, 0}, {';', 64, 40, 0}, {'>', 68, 40, 16, 0}, {'<', 16, 40, 68, 0}, {'?', 2, 82, 12, 0}, {'/', 96, 24, 6, 0}, {'%', 98, 24, 70, 0, 0},
+           {'^', 4, 2, 4, 0}, {'@', 60, 66, 82, 92, 0}, {'.', 96, 96, 0}, {',', 128, 96, 0}, {'~', 4, 2, 4, 2, 0}
+   };
 }
 
 
