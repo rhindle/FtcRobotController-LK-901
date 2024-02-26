@@ -336,6 +336,9 @@ public class NeoMatrix {
       }
    }
 
+   public int[][] buildPixelMapFromString (String text, char[][] charSet, int foreColor) {
+      return buildPixelMapFromString(text, charSet, foreColor, 0);
+   }
    public int[][] buildPixelMapFromString (String text, char[][] charSet, int foreColor, int backColor ) {
       char[] charArray = text.toCharArray();
       int[][] pMap = new int[0][];
@@ -383,6 +386,38 @@ public class NeoMatrix {
       // Note: the following copies references rather than making a new array, which is why I cloned the arrays first
       System.arraycopy(pMap1, 0, newMap, 0, pMap1.length);
       System.arraycopy(pMap2, 0, newMap, pMap1.length, pMap2.length);
+      return newMap;
+   }
+
+   public int[][] reversePixelMap (int[][] pMap) {
+      int[][] newMap = new int[pMap.length][ledRows];
+      for (int c = 0; c < pMap.length; c++) {
+         for (int r = 0; r < ledRows; r++) {
+            newMap[pMap.length - c - 1][r] = pMap [c][r];
+         }
+      }
+      return newMap;
+   }
+
+   public int[][] flipPixelMap (int[][] pMap) {
+      int[][] newMap = new int[pMap.length][ledRows];
+      for (int c = 0; c < pMap.length; c++) {
+         for (int r = 0; r < ledRows; r++) {
+            newMap[c][ledRows - r - 1] = pMap [c][r];
+         }
+      }
+      return newMap;
+   }
+
+   public int[][] getPixelMapFromBuffer (int startCol, int endCol) {
+      if (startCol < 0 || startCol >= ledCols) startCol = 0;
+      if (endCol < 0 || endCol >= ledCols || endCol < startCol) endCol = ledCols - 1;
+      int[][] newMap = new int[endCol-startCol+1][ledRows];
+      for (int c = startCol; c <= endCol; c++) {
+         for (int r = 0; r < ledRows; r++) {
+            newMap[c-startCol][r]=matrixBuffer[c][r];
+         }
+      }
       return newMap;
    }
 
@@ -764,6 +799,22 @@ public class NeoMatrix {
            {' ', 0, 0, 0}, {'*', 20, 6, 20, 0}, {'(', 6, 66, 0}, {')', 66, 60, 0}, {'#', 20, 62, 62, 20, 0}, {'-', 16, 16, 16, 0}, {'+', 16, 56, 16, 0}, {'"', 7, 0, 7, 0}, {'\'', 7, 0}, {'!', 94, 0},
            {'&', 52, 74, 52, 64, 0}, {'=', 40, 40, 40, 0}, {'$', 44, 126, 52, 0}, {':', 40, 0}, {';', 64, 40, 0}, {'>', 68, 40, 16, 0}, {'<', 16, 40, 68, 0}, {'?', 2, 82, 12, 0}, {'/', 96, 24, 6, 0}, {'%', 98, 24, 70, 0, 0},
            {'^', 4, 2, 4, 0}, {'@', 60, 66, 82, 92, 0}, {'.', 96, 96, 0}, {',', 128, 96, 0}, {'~', 4, 2, 4, 2, 0}
+   };
+
+   public final char[][] pacFont = {
+           {'a', 56, 124, 254, 254, 254, 124, 56},  // pac ball
+           {'b', 56, 124, 254, 238, 238, 108, 40},  // pac slit
+           {'c', 56, 124, 254, 238, 198, 68, 0},    // pac wide
+           {'H', 252, 94, 235, 95, 235, 94, 252},   // blueghost1
+           {'h', 124, 238, 91, 239, 91, 238, 124},  // blueghost2
+           {'I', 0, 32, 20, 32, 20, 32, 0},         // blueghostdetail1
+           {'i', 0, 16, 36, 16, 36, 16, 0},         // blueghostdetail2
+           {'G', 252, 114, 243, 127, 243, 114, 252},// ghost1
+           {'g', 124, 242, 243, 127, 243, 242, 124},// ghost2
+           {'E', 0, 12, 12, 0, 12, 12, 0},          // eyewhite
+           {'e', 0, 0, 8, 0, 0, 8, 0},              // pupil-right
+           {'f', 0, 8, 0, 0, 8, 0, 0},              // pupil-left
+           {'`', 0}
    };
 }
 
