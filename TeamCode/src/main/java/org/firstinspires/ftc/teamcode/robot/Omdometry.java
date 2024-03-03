@@ -1,16 +1,12 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.arcrobotics.ftclib.kinematics.Odometry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.Om.AngleMath;
-import org.firstinspires.ftc.teamcode.robot.Om.Vector2;
-import org.firstinspires.ftc.teamcode.robot.Om.Vector3;
-import org.firstinspires.ftc.teamcode.robot.Om.VectorMath;
-import org.firstinspires.ftc.teamcode.robot.Tools.Functions;
-import org.firstinspires.ftc.teamcode.robot.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Universal.Om.AngleMath;
+import org.firstinspires.ftc.teamcode.robot.Universal.Om.Vector3;
+import org.firstinspires.ftc.teamcode.robot.Universal.Om.VectorMath;
 
 public class Omdometry {
    int lastLeftYPos, lastRightYPos, lastXPos;

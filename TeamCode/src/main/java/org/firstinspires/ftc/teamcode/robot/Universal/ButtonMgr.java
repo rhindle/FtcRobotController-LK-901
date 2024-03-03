@@ -1,18 +1,14 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot.Universal;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class ButtonMgr {
 
     public LinearOpMode opMode;
     public Gamepad gamepad1;
     public Gamepad gamepad2;
-//    private Telemetry telemetry;
 
-    public Object[] controlList = {};  //Object
     public ControlData[] controlData;
 
     ////////////////
@@ -26,16 +22,14 @@ public class ButtonMgr {
         this.opMode = opMode;
         this.gamepad1 = opMode.gamepad1;
         this.gamepad2 = opMode.gamepad2;
-//        this.telemetry = opMode.telemetry;
 
         //allocate for # objects based on GPbuttons enum
         controlData = new ControlData[Buttons.values().length * 2];
-        //create objects and assign a index numbers
+        //create objects and assign index numbers
         for (int i = 0; i < Buttons.values().length * 2; i++) {
             controlData[i] = new ControlData();
             controlData[i].initData(i);
         }
-
     }
 
     public void loop() {
@@ -76,20 +70,20 @@ public class ButtonMgr {
     }
 
     public enum Buttons {  //must match what is in getReading's switch block
-        dpadUP,
-        dpadDOWN,
-        dpadLEFT,
-        dpadRIGHT,
-        A,
-        B,
-        X,
-        Y,
-        START,
-        BACK,
-        leftBUMPER,
-        rightBUMPER,
-        leftJoyStickBUTTON,
-        rightJoyStickBUTTON;
+        dpad_up,
+        dpad_down,
+        dpad_left,
+        dpad_right,
+        a,
+        b,
+        x,
+        y,
+        start,
+        back,
+        left_bumper,
+        right_bumper,
+        left_stick_button,
+        right_stick_button;
     }
 
     class ControlData {
@@ -127,20 +121,20 @@ public class ButtonMgr {
             }
             switch (Buttons.values()[index]) {
                 //must match the elements in the GPbuttons enum
-                case dpadUP:              return gpad.dpad_up;
-                case dpadDOWN:            return gpad.dpad_down;
-                case dpadLEFT:            return gpad.dpad_left;
-                case dpadRIGHT:           return gpad.dpad_right;
-                case A:                   return gpad.a;
-                case B:                   return gpad.b;
-                case X:                   return gpad.x;
-                case Y:                   return gpad.y;
-                case START:               return gpad.start;
-                case BACK:                return gpad.back;
-                case leftBUMPER:          return gpad.left_bumper;
-                case rightBUMPER:         return gpad.right_bumper;
-                case leftJoyStickBUTTON:  return gpad.left_stick_button;
-                case rightJoyStickBUTTON: return gpad.right_stick_button;
+                case dpad_up:             return gpad.dpad_up;
+                case dpad_down:           return gpad.dpad_down;
+                case dpad_left:           return gpad.dpad_left;
+                case dpad_right:          return gpad.dpad_right;
+                case a:                   return gpad.a;
+                case b:                   return gpad.b;
+                case x:                   return gpad.x;
+                case y:                   return gpad.y;
+                case start:               return gpad.start;
+                case back:                return gpad.back;
+                case left_bumper:         return gpad.left_bumper;
+                case right_bumper:        return gpad.right_bumper;
+                case left_stick_button:   return gpad.left_stick_button;
+                case right_stick_button:  return gpad.right_stick_button;
                 default:                  return false;//something bad happened
             }
         }
@@ -150,7 +144,7 @@ public class ButtonMgr {
             long currentTime = System.currentTimeMillis();
             long deltaTime = currentTime - lastTime;
             boolean currentState = getReading(index);
-            if (lastStatus == false && currentState == true) {  // change from not pressed to pressed
+            if (!lastStatus && currentState) {  // change from not pressed to pressed
                 pressed = true;          // this will last for one loop!
                 held = false;
                 tapped = false;
@@ -158,7 +152,7 @@ public class ButtonMgr {
             } else {
                 pressed = false;
             }
-            if (lastStatus == true && currentState == false) {  // change from pressed to not pressed
+            if (lastStatus && !currentState) {  // change from pressed to not pressed
                 released = true;         // this will last for one loop!
                 held = false;
                 if (deltaTime < 500) {
@@ -168,13 +162,13 @@ public class ButtonMgr {
             } else {
                 released = false;
             }
-            if (lastStatus == true && currentState == true) {   // still held
+            if (lastStatus && currentState) {   // still held
                 tapped = false;
                 if (deltaTime >= 500) {
                     held = true;
                 }
             }
-            if (lastStatus == false && currentState == false) {  // still not held
+            if (!lastStatus && !currentState) {  // still not held
                 tapped = false;
                 held = false;
             }

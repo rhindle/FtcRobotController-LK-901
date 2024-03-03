@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.Om;
+package org.firstinspires.ftc.teamcode.robot.Universal.Om;
 
 public class VectorMath {
     public static Vector3 add(Vector3 v1, Vector3 v2){

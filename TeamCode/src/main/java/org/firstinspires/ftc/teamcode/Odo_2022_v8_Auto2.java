@@ -5,12 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Auto;
-import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Navigator2;
+import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Navigator3;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.Tools.Position;
-import org.firstinspires.ftc.teamcode.robot.Tools.Functions;
+import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Functions;
 
 @Autonomous(name = "3Odo_2022_v8_Auto2", group = "")
 //@Disabled
@@ -45,17 +44,17 @@ public class Odo_2022_v8_Auto2 extends LinearOpMode {
         while (!isStarted()) {
             // Prompt user to press start button.
             robot.buttonMgr.loop();
-            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.A))
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.a))
                 robot.localizer.toggleUseFusedHeading();
-            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.Y))
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.y))
                 home = !home;
-            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadLEFT))
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_left))
                 isRightSide = false;
-            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadRIGHT))
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_right))
                 isRightSide = true;
-            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.X))
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.x))
                 isBlueAlliance = true;
-            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.B))
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.b))
                 isBlueAlliance = false;
 
 

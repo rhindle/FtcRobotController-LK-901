@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
 
 //import com.qualcomm.robotcore.util.Range;
 //import java.util.Locale;
@@ -108,7 +108,7 @@ public class ZZ_TestBot_02_V2 extends LinearOpMode {
             /* Check for button presses to switch test motor & servo */
             // Left bumper switches motors
             //if (gamepad1.left_bumper && !toggleLB) {
-            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.leftBUMPER)) {
+            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.left_bumper)) {
                 stopAllMotors();
                 tgtMotor++;
                 if (tgtMotor>3) tgtMotor=0;
@@ -116,7 +116,7 @@ public class ZZ_TestBot_02_V2 extends LinearOpMode {
             }
             // Right bumper switches servos
             //if (gamepad1.right_bumper && !toggleRB) {
-            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.rightBUMPER)) {
+            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.right_bumper)) {
                     tgtServo++;
                 if (tgtServo>5) tgtServo=0;
                 //toggleRB=true;
@@ -144,7 +144,7 @@ public class ZZ_TestBot_02_V2 extends LinearOpMode {
             }
             // A button toggles whether the servo position will be applied "Live"
             //if (gamepad1.a & !toggleA) {
-            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.A)) {
+            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.a)) {
                 tgtServoLive=!tgtServoLive;
             //    toggleA = true;
             }

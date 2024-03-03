@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.Tools;
+package org.firstinspires.ftc.teamcode.robot.Universal.i2c;
 
 import com.qualcomm.robotcore.hardware.ControlSystem;
 import com.qualcomm.robotcore.hardware.I2cAddr;

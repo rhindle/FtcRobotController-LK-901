@@ -4,17 +4,11 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.NeoMatrix;
+import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Universal.NeoMatrix;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.Tools.AdafruitNeoDriver;
-import org.firstinspires.ftc.teamcode.robot.Tools.QwiicLEDStick;
 
 @TeleOp (name="AA_Adafruit_Neo_1", group="Test")
 //@Disabled
@@ -39,7 +33,7 @@ public class ZZ_Adafruit_Neo_1 extends LinearOpMode {
     public void runOpMode() {
         robot = new Robot(this);
         buttonMgr = new ButtonMgr(this);
-        neo = new NeoMatrix(robot);
+        neo = new NeoMatrix(this, "neo");
 
         robot.init();
         neo.init();

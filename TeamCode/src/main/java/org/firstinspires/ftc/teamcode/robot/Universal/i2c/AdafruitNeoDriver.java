@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.Tools;
+package org.firstinspires.ftc.teamcode.robot.Universal.i2c;
 
 import android.graphics.Color;
 import android.util.Log;
@@ -6,7 +6,6 @@ import android.util.Log;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
-import com.qualcomm.hardware.broadcom.BroadcomColorSensorImpl;
 import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManagerNotifier;

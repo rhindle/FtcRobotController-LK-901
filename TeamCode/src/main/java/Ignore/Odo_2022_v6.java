@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 
 @TeleOp(name = "3Odo_2022_v6", group = "")
@@ -445,15 +445,15 @@ public class Odo_2022_v6 extends LinearOpMode {
         //if (lkController.isPressed(1, LKControllerBad.GPbuttons.BACK)) {
         //    telemetry.addData("BACK IS PRESSED", 0);
         //};
-        telemetry.addData("BACK PRESSED", buttonMgr.isPressed(1, ButtonMgr.Buttons.BACK));
-        if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.BACK)) {
+        telemetry.addData("BACK PRESSED", buttonMgr.isPressed(1, ButtonMgr.Buttons.back));
+        if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.back)) {
             countTap++;
         };
         //if (lkController.isHeld(1, LKControllerBad.GPbuttons.BACK)) {
         //    telemetry.addData("BACK HELD", 0);
         //};
-        telemetry.addData("BACK HELD", buttonMgr.isHeld(1, ButtonMgr.Buttons.BACK));
-        if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.BACK)) {
+        telemetry.addData("BACK HELD", buttonMgr.isHeld(1, ButtonMgr.Buttons.back));
+        if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.back)) {
             countRelease++;
         };
         telemetry.addData("BACK TAP COUNT", countTap);
@@ -520,22 +520,22 @@ public class Odo_2022_v6 extends LinearOpMode {
             last_y = true;
         } */
 
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_up)) {
             targetX = targetX + (gamepad2.back ? 1 : 11.75);
         }
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_down)) {
             targetX = targetX - (gamepad2.back ? 1 : 11.75);
         }
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadLEFT)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_left)) {
             targetY = targetY + (gamepad2.back ? 1 : 11.75);
         }
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_right)) {
             targetY = targetY - (gamepad2.back ? 1 : 11.75);
         }
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x)) {
             targetRot = targetRot + (gamepad2.back ? 2 : 45);
         }
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y)) {
             targetRot = targetRot - (gamepad2.back ? 2 : 45);
         }
 

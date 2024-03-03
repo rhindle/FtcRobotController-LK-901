@@ -11,11 +11,9 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.Tools.QwiicLEDStick;
-
-import androidx.annotation.ColorInt;
+import org.firstinspires.ftc.teamcode.robot.Universal.i2c.QwiicLEDStick;
 
 @TeleOp (name="ZZ_TestBot_LoopTime", group="Test")
 //@Disabled
@@ -115,49 +113,49 @@ public class ZZ_TestBot_LoopTime extends LinearOpMode {
             robot.loop();  // this will take care of clearing out the bulk reads
             buttonMgr.updateAll();
 
-            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.A)) {
-                if(buttonMgr.isPressed(1, ButtonMgr.Buttons.leftBUMPER)) motorMode = 2;
+            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.a)) {
+                if(buttonMgr.isPressed(1, ButtonMgr.Buttons.left_bumper)) motorMode = 2;
                 else motorMode = 1;
             }
 
-            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.B)) {
+            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.b)) {
                 motorMode = 0;
                 stopAllMotors();
             }
 
-            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.X)) {
-                if(buttonMgr.isPressed(1, ButtonMgr.Buttons.leftBUMPER)) servoMode = 2;
+            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.x)) {
+                if(buttonMgr.isPressed(1, ButtonMgr.Buttons.left_bumper)) servoMode = 2;
                 else servoMode = 1;
             }
 
-            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.Y)) {
+            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.y)) {
                 servoMode = 0;
                 centerAllServos();
             }
 
-            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadLEFT)) {
+            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_left)) {
                 robot.disableIMUupdate = IMUmode;
                 IMUmode = !IMUmode;
             }
 
-            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadRIGHT)) {
+            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_right)) {
                 UpdateLED = !UpdateLED;
                 if (!UpdateLED) qled.turnAllOff();
             }
 
-            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadUP)) {
+            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_up)) {
                 readColorSensor = !readColorSensor;
             }
 
-            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadDOWN)) {
+            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_down)) {
                 readColorSensorDistance = !readColorSensorDistance;
             }
 
-            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.rightBUMPER)) {
+            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.right_bumper)) {
                 readEncoders = !readEncoders;
             }
 
-            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.BACK)) {
+            if(buttonMgr.wasTapped(1, ButtonMgr.Buttons.back)) {
                 hubMode = (hubMode==3) ? 0 : hubMode+1;
             }
 

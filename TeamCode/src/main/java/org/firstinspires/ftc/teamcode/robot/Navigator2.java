@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.Tools.Functions;
-import org.firstinspires.ftc.teamcode.robot.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Functions;
+import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Position;
 
 public class Navigator2 {
 

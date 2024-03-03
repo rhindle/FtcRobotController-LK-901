@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot.goCanum;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,32 +17,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Universal.i2c.QwiicLEDStick;
 
 import java.util.List;
 
 public class Robot {
     /* Public OpMode members. */
-//    public LinearOpMode opMode;
-//    public HardwareMap hardwareMap;
-//    public Gamepad gamepad1;
-//    public Gamepad gamepad2;
-//    private Telemetry telemetry;
-
-    public boolean useODO = true;
-    public boolean reverseDrive = false;
-    public boolean useDistanceSensors = true;
-    public boolean useDriveEncoders = true;
     public boolean disableIMUupdate = false;
-
-    public ButtonMgr buttonMgr;
-    public Localizer localizer;
-    public Drivetrain drivetrain;
-    public Navigator3 navigator;
-    public Sensors sensors;
-//    public Controls controls;
 
     public DcMotorEx    motor0   = null;
     public DcMotorEx    motor1   = null;
@@ -68,10 +49,9 @@ public class Robot {
 
     public ColorSensor sensorColor    = null;
 
-//    public DistanceSensor sensor2MLeft = null;
-//    public DistanceSensor sensor2MMiddle = null;
-//    public DistanceSensor sensor2MRight = null;
-
+    public DistanceSensor sensor2MLeft = null;
+    public DistanceSensor sensor2MMiddle = null;
+    public DistanceSensor sensor2MRight = null;
     public QwiicLEDStick qled = null;
 
     public DigitalChannel   digital0 = null;
@@ -95,42 +75,26 @@ public class Robot {
     // Bulk Reads - Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
     List<LynxModule> allHubs = null;
 
-//    public Orientation    angles;
-
     /* local OpMode members. */
-//   HardwareMap hardwareMap =  null;
     private ElapsedTime period  = new ElapsedTime();
 
     LinearOpMode opMode;
     HardwareMap hardwareMap;
-//    Gamepad gamepad1;
-//    Gamepad gamepad2;
     Telemetry telemetry;
 
     Orientation angles;
     double imuHeading;
 
-//    public double distL, distM, distR;
-//    private int distCounter = 0;
-//    private boolean readDistSensors = false;
-
     /* Constructor */
-    public Robot(LinearOpMode opMode){
-        construct(opMode);
-        buttonMgr = new ButtonMgr(opMode);
-        localizer = new Localizer(this);
-        drivetrain = new Drivetrain(this);
-        navigator = new Navigator3(this);//, localizer, drivetrain);
-        sensors = new Sensors(this);
-//        controls = new Controls(this);//buttonMgr, navigator);
+    public Robot(Parts parts){
+        construct(parts);
+//        buttonMgr = new ButtonMgr(opMode);
     }
 
-    void construct(LinearOpMode opMode){
-        this.opMode = opMode;
-        this.hardwareMap = opMode.hardwareMap;
-//        this.gamepad1 = opMode.gamepad1;
-//        this.gamepad2 = opMode.gamepad2;
-        this.telemetry = opMode.telemetry;
+    void construct(Parts parts){
+        this.opMode = parts.opMode;
+        this.hardwareMap = parts.opMode.hardwareMap;
+        this.telemetry = parts.opMode.telemetry;
 
         // Bulk Reads - Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -142,9 +106,7 @@ public class Robot {
             module.clearBulkCache();
         }
         // Read IMU - once per cycle!
-        //angles = sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         if (!disableIMUupdate) updateImuHeading();
-//        updateDistanceSensors();
     }
 
     private void updateImuHeading() {
@@ -154,7 +116,6 @@ public class Robot {
     private double imuHeading() {
         return imuHeading(false);
     }
-
     private double imuHeading(boolean readme) {
         if (readme) angles = sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return angles.firstAngle;
@@ -163,16 +124,13 @@ public class Robot {
     public double returnImuHeading() {
         return imuHeading;
     }
-
-    public double returnImuHeading(boolean forceread) {
-        if (forceread) updateImuHeading();
+    public double returnImuHeading(boolean forceRead) {
+        if (forceRead) updateImuHeading();
         return imuHeading;
     }
 
     /* Initialize standard Hardware interfaces */
     public void init() {
-        // Save reference to Hardware map
-        //hardwareMap = ahwMap;
 
         // Define and Initialize Motors
         // Bulk Reads - Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
@@ -186,30 +144,18 @@ public class Robot {
         motor3B = hardwareMap.get(DcMotorEx.class, "motor3B");
 
         // Bulk Reads - Important Step 3: Option B. Set all Expansion hubs to use the MANUAL Bulk Caching mode
-        // Bug info https://github.com/FIRST-Tech-Challenge/SkyStone/issues/232
         for (LynxModule module : allHubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-        /*for(LynxModule module : allHubs){
-            module.clearBulkCache();
-            try {
-                Class<LynxModule> LynxModuleClass = LynxModule.class;
-                Field lynxModuleField = LynxModuleClass.getDeclaredField("lastBulkData");
-                lynxModuleField.setAccessible(true);
-                lynxModuleField.set(module,module.getBulkData());
-            }catch(NoSuchFieldException|IllegalAccessException e){
-                e.printStackTrace();
-            }
-        }*/
 
-        motor0.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor1.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor2.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor3.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor0B.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor1B.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor2B.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor3B.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        motor0.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        motor1.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        motor2.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        motor3.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        motor0B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        motor1B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        motor2B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        motor3B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
 
         motor0.setPower(0);
         motor1.setPower(0);
@@ -222,14 +168,14 @@ public class Robot {
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        motor0.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor3.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor0B.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor1B.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor2B.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor3B.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor0.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        motor1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        motor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        motor3.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        motor0B.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        motor1B.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        motor2B.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        motor3B.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
         // Define and initialize ALL installed servos.
         servo0 = hardwareMap.get(Servo.class,"servo0");
@@ -276,12 +222,12 @@ public class Robot {
         parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
         sensorIMU.initialize(parameters);
 
+        //i2c sensors
 //        sensorColor = hwMap.get(ColorSensor.class, "sensorColorRange");
 //        sensorDistance = hwMap.get(DistanceSensor.class, "sensorColorRange");
-
-//        sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
-//        sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
-//        sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
+        sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
+        sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
+        sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
         qled = hardwareMap.get(QwiicLEDStick.class, "led");
     }
 }

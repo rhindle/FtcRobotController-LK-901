@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot.goCanum;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -6,10 +6,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Position;
 
-public class Localizer2 {
+public class LocalizerOdo {
 
+   Parts parts;
    Telemetry telemetry;
-   Robot robot;
 
    DcMotorEx odoXL, odoY, odoXR;
    public long encoderY, encoderXL, encoderXR;
@@ -20,39 +20,42 @@ public class Localizer2 {
    public double yPos, xPos;
    public boolean useFusedHeading = true;
 
-   Position odoRobotOffset = new Position (2.25,0,0);          // map odo to robot (so it holds turn position better)
+   public Position odoRobotOffset = new Position (2.25,0,0);          // map odo to robot (so it holds turn position better)
    public Position odoFieldStart = new Position (-36,63,-90);  // field start position [blue right slot]
 
    Position odoRawPose = new Position (0,0,0);                 // original calculation of position before transforms applied
    Position odoRobotPose = new Position ();                             // odo mapped to robot position (minor change)
    Position odoFinalPose = new Position ();                             // odo mapped to field
    Position odoFieldOffset = new Position ();                           // transform from initial position (more relevant for slamra!)
-   public Position robotPosition = new Position ();
+   public Position robotPosition; // = odoFieldStart.clone();
 
    private static final double eTicksPerInch = 82300 / 48.0;
    private static final double eTicksPerRotate = 169619;
-
    //2022-12-22 Measured 10 rot: 846684,850800; 845875,851775; 845127,845543; 848073,850867
    //                            169748.4		169765		169067		169894		==>  169618.6
 
-   public Localizer2(Robot robot){
-      construct(robot);
+   public LocalizerOdo(Parts parts){
+      construct(parts);
    }
 
-   void construct(Robot robot){
-      this.robot = robot;
-      this.telemetry = robot.telemetry;
+   void construct(Parts parts){
+      this.parts = parts;
+      this.telemetry = parts.opMode.telemetry;
    }
 
    public void init() {
-      if (!robot.useODO) {
-         robotPosition.X = 0;   // done this way to not break the link back to Navigator class
-         robotPosition.Y = 0;
+      robotPosition = odoFieldStart.clone();
+      parts.robotPosition = robotPosition.clone();
+      if (!parts.useODO) {
+//         robotPosition.X = 0;   // done this way to not break the link back to Navigator class
+//         robotPosition.Y = 0;
+         robotPosition = new Position(0,0, robotPosition.R);
+         parts.robotPosition = robotPosition.clone();
          return;
       }
-      odoY = robot.motor0B;
-      odoXR = robot.motor1B;
-      odoXL = robot.motor2B;
+      odoY = parts.robot.motor0B;
+      odoXR = parts.robot.motor1B;
+      odoXL = parts.robot.motor2B;
 
       odoY.setDirection(DcMotorEx.Direction.FORWARD);
       odoXL.setDirection(DcMotorEx.Direction.REVERSE);
@@ -64,7 +67,7 @@ public class Localizer2 {
       encoderY0 = odoY.getCurrentPosition();
       encoderXL0 = odoXL.getCurrentPosition();
       encoderXR0 = odoXR.getCurrentPosition();
-      imuHeading0 = robot.returnImuHeading(true);
+      imuHeading0 = parts.robot.returnImuHeading(true);
       odoHeading0 = getOdoHeading();
       globalHeading0 = imuHeading0;
 
@@ -75,10 +78,11 @@ public class Localizer2 {
    }
 
    public void loop() {
-      if (!robot.useODO) {
-         imuHeading = robot.returnImuHeading();
+      if (!parts.useODO) {
+         imuHeading = parts.robot.returnImuHeading();
          globalHeading = imuHeading;
          robotPosition.R = globalHeading;
+         parts.robotPosition = robotPosition.clone();
          return;
       }
 
@@ -88,7 +92,7 @@ public class Localizer2 {
       encoderXR = odoXR.getCurrentPosition();
 
       /* Update heading */
-      imuHeading = robot.returnImuHeading();
+      imuHeading = parts.robot.returnImuHeading();
       odoHeading = getOdoHeading();
       globalHeading = fusedHeading();
 
@@ -99,9 +103,11 @@ public class Localizer2 {
       setOdoFinalPose();
 
       /* Update robot position */
-      robotPosition.X = odoFinalPose.X;   // done this way to not break the link back to Navigator class
-      robotPosition.Y = odoFinalPose.Y;   // (creating a new object messes things up)
-      robotPosition.R = odoFinalPose.R;
+//      robotPosition.X = odoFinalPose.X;   // done this way to not break the link back to Navigator class
+//      robotPosition.Y = odoFinalPose.Y;   // (creating a new object messes things up)
+//      robotPosition.R = odoFinalPose.R;
+      robotPosition = odoFinalPose.clone();
+      parts.robotPosition = robotPosition.clone();
 
    }
 

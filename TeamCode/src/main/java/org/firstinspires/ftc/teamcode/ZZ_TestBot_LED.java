@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 
 //import com.qualcomm.robotcore.util.Range;
@@ -117,7 +117,7 @@ public class ZZ_TestBot_LED extends LinearOpMode {
             /* Check for button presses to switch test motor & servo */
             // Left bumper switches motors
             //if (gamepad1.left_bumper && !toggleLB) {
-//            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.leftBUMPER)) {
+//            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.left_bumper)) {
 //                stopAllMotors();
 //                tgtMotor++;
 //                if (tgtMotor>3) tgtMotor=0;
@@ -125,7 +125,7 @@ public class ZZ_TestBot_LED extends LinearOpMode {
 //            }
 //            // Right bumper switches servos
 //            //if (gamepad1.right_bumper && !toggleRB) {
-//            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.rightBUMPER)) {
+//            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.right_bumper)) {
 //                    tgtServo++;
 //                if (tgtServo>5) tgtServo=0;
 //                //toggleRB=true;
@@ -153,7 +153,7 @@ public class ZZ_TestBot_LED extends LinearOpMode {
 //            }
 //            // A button toggles whether the servo position will be applied "Live"
 //            //if (gamepad1.a & !toggleA) {
-//            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.A)) {
+//            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.a)) {
 //                tgtServoLive=!tgtServoLive;
 //            //    toggleA = true;
 //            }
@@ -205,121 +205,121 @@ public class ZZ_TestBot_LED extends LinearOpMode {
 
             // If needed, could disable the servo signal with Servo.getController().pwmDisable()
 
-            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.X)) {
+            if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.x)) {
                 robot.qled.setColor(Color.BLUE);
-            } else if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.Y)) {
+            } else if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.y)) {
                 robot.qled.setColor(Color.YELLOW);
-            } else if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.B)) {
+            } else if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.b)) {
                 robot.qled.setColor(Color.RED);
-            } else if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.A)) {
+            } else if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.a)) {
                 robot.qled.setColor(Color.GREEN);
-            } else if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.BACK)) {
+            } else if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.back)) {
                 robot.qled.turnAllOff();
             }
 
-//            if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
+//            if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x)) {
 //                setLedColorArray(Color.BLUE, ledmode);
 //                ledmode++;
-//            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
+//            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y)) {
 //                setLedColorArray(Color.YELLOW, ledmode);
 //                ledmode++;
-//            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
+//            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b)) {
 //                setLedColorArray(Color.RED, ledmode);
 //                ledmode++;
-//            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
+//            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a)) {
 //                setLedColorArray(Color.GREEN, ledmode);
 //                ledmode++;
-//            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.BACK)) {
+//            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.back)) {
 //                setLedColorArray(0, 0);
 //                ledmode=1;
 //            }
 
-            if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN)) {
+            if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_down)) {
                 robot.qled.setMirrorMode(0);
-            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadLEFT)) {
+            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_left)) {
                 robot.qled.setMirrorMode(1);
-            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP)) {
+            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_up)) {
                 robot.qled.setMirrorMode(2);
-            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT)) {
+            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_right)) {
                 robot.qled.setAnimationOnOff(1);
             }
 
-            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.leftBUMPER)) {
-                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.left_bumper)) {
+                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x)) {
                     robot.qled.setColorGroup(0,2,Color.rgb(120, 0, 90));  //purple
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y)) {
                     robot.qled.setColorGroup(0,2,Color.rgb(127, 50, 0));  //yellow
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b)) {
                     robot.qled.setColorGroup(0,2,Color.rgb(48, 45, 36));  //white
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a)) {
                     robot.qled.setColorGroup(0, 2, Color.rgb(0, 127, 0));  //green
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.BACK)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.back)) {
                     robot.qled.forceReboot();
                 }
             }
-            else if (buttonMgr.isPressed(2, ButtonMgr.Buttons.rightBUMPER)) {
-                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
+            else if (buttonMgr.isPressed(2, ButtonMgr.Buttons.right_bumper)) {
+                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x)) {
                     robot.qled.setColorGroup(2,2,Color.rgb(120, 0, 90));  //purple
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y)) {
                     robot.qled.setColorGroup(2,2,Color.rgb(127, 50, 0));  //yellow
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b)) {
                     robot.qled.setColorGroup(2,2,Color.rgb(48, 45, 36));  //white
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a)) {
                     robot.qled.setColorGroup(2,2,Color.rgb(0, 127, 0));  //green
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.BACK)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.back)) {
                     robot.qled.forceReboot();
                 }
             }
-/*            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.leftBUMPER)) {
-                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
+/*            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.left_bumper)) {
+                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x)) {
                     robot.qled.setColorGroupX2(0,2,Color.rgb(80, 0, 110),5,2,Color.rgb(80, 0, 110));  //purple
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y)) {
                     robot.qled.setColorGroupX2(0,2,Color.rgb(127, 50, 0),5,2,Color.rgb(127, 50, 0));  //yellow
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b)) {
                     robot.qled.setColorGroupX2(0,2,Color.rgb(64, 60, 48),5,2,Color.rgb(64, 60, 48));  //white
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a)) {
                     robot.qled.setColorGroupX2(0,2,Color.rgb(0, 127, 0),5,2,Color.rgb(0, 127, 0));  //green
                 }
             }
-            else if (buttonMgr.isPressed(2, ButtonMgr.Buttons.rightBUMPER)) {
-                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
+            else if (buttonMgr.isPressed(2, ButtonMgr.Buttons.right_bumper)) {
+                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x)) {
                     robot.qled.setColorGroupX2(2,2,Color.rgb(80, 0, 110),7,2,Color.rgb(80, 0, 110));  //purple
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y)) {
                     robot.qled.setColorGroupX2(2,2,Color.rgb(127, 50, 0),7,2,Color.rgb(127, 50, 0));  //yellow
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b)) {
                     robot.qled.setColorGroupX2(2,2,Color.rgb(64, 60, 48),7,2,Color.rgb(64, 60, 48));  //white
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a)) {
                     robot.qled.setColorGroupX2(2,2,Color.rgb(0, 127, 0),7,2,Color.rgb(0, 127, 0));  //green
                 }
             }*/
             /*else {
-                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
+                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x)) {
                     setLedColorArray(Color.rgb(120, 0, 90), ledmode);  //purple
                     ledmode++;
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y)) {
                     setLedColorArray(Color.rgb(127, 50, 0), ledmode);  //yellow
                     ledmode++;
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b)) {
                     setLedColorArray(Color.rgb(48, 45, 36), ledmode);  //white
                     ledmode++;
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a)) {
                     setLedColorArray(Color.rgb(0, 127, 0), ledmode);  //green
                     ledmode++;
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.BACK)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.back)) {
                     setLedColorArray(0, 0);
                     ledmode = 1;
                 }
             } */
             else {
-                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
+                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x)) {
                     pushLedColorArray(Color.rgb(120, 0, 90));  //purple
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y)) {
                     pushLedColorArray(Color.rgb(127, 50, 0));  //yellow
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b)) {
                     pushLedColorArray(Color.rgb(48, 45, 36));  //white
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a)) {
                     pushLedColorArray(Color.rgb(0, 127, 0));  //green
-                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.BACK)) {
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.back)) {
                     pushLedColorArray(0, false);
                     pushLedColorArray(0, false);
                     robot.qled.turnAllOff();

@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import org.firstinspires.ftc.teamcode.robot.Tools.AdafruitNeoDriver;
-import org.firstinspires.ftc.teamcode.robot.Tools.QwiicLEDStick;
+import org.firstinspires.ftc.teamcode.robot.Universal.i2c.AdafruitNeoDriver;
+import org.firstinspires.ftc.teamcode.robot.Universal.i2c.QwiicLEDStick;
 
 @TeleOp (name="AA_TestBot_LED_CS_Neo", group="Test")
 //@Disabled

@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Auto;
-import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Navigator2;
+import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Navigator3;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Position;
 
 @Autonomous(name = "3Odo_2022_v8_Auto", group = "")
 //@Disabled
@@ -58,7 +58,7 @@ public class Odo_2022_v8_Auto extends LinearOpMode {
         while (!isStarted()) {
             // Prompt user to press start button.
             robot.buttonMgr.loop();
-            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.A)) robot.localizer.toggleUseFusedHeading();
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.a)) robot.localizer.toggleUseFusedHeading();
             telemetry.addData(">", "Press Play to start");
             telemetry.addData(">", "Robot Heading = %.1f", robot.returnImuHeading(true));
             telemetry.addData("Heading Type:", robot.localizer.useFusedHeading ? "FUSED/HYBRID" : "IMU ONLY");

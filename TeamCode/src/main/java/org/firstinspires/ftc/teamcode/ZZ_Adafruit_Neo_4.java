@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.NeoMatrix;
+import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Universal.NeoMatrix;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 
 @TeleOp (name="AA_Adafruit_Neo_4", group="Test")
@@ -33,7 +33,7 @@ public class ZZ_Adafruit_Neo_4 extends LinearOpMode {
     public void runOpMode() {
         robot = new Robot(this);
         buttonMgr = new ButtonMgr(this);
-        neo = new NeoMatrix(robot);
+        neo = new NeoMatrix(this, "neo");
 
         robot.init();
         neo.init();

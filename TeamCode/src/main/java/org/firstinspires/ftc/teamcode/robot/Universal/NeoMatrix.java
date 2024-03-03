@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot.Universal;
 
 import android.graphics.Color;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import org.firstinspires.ftc.teamcode.robot.Tools.AdafruitNeoDriver;
-import org.opencv.core.Mat;
+import org.firstinspires.ftc.teamcode.robot.Universal.i2c.AdafruitNeoDriver;
 
 import java.util.Arrays;
 
@@ -14,14 +14,14 @@ public class NeoMatrix {
 
    HardwareMap hardwareMap;
    Telemetry telemetry;
-   Robot robot;
+   LinearOpMode opMode;
+   String deviceName;
 
    public AdafruitNeoDriver ledMatrix = null;
 
    private boolean updatePanel = true;
    private boolean pendingUpdate = false;
    private boolean preventTearing = false;
-//   private boolean clearToUpdate = true;
 
    private int updateLimit = 1;
    private int updatePosition = 0;
@@ -36,26 +36,23 @@ public class NeoMatrix {
    final int updateSize = 8;   // i2c driver limit is 24 bytes, or 8 pixels * 3 RGB bytes
 
    int[][] matrixBuffer = new int[ledCols][ledRows];
-   //int[][] currentBuffer = new int[ledCols][ledRows];
-   //int[][] dimmedBuffer = new int[ledCols][ledRows];
    int[]   stringBuffer  = new int[ledQty];
    int[]   stringActual  = new int[ledQty];
    int[]   stringUpdate  = new int[updateSize];
 
    /* Constructor */
-   public NeoMatrix(Robot robot){
-      construct(robot);
+   public NeoMatrix(LinearOpMode opMode, String deviceName){
+      construct(opMode, deviceName);
    }
 
-   void construct(Robot robot){
-      this.robot = robot;
-      this.telemetry = robot.telemetry;
-      this.hardwareMap = robot.hardwareMap;
+   void construct(LinearOpMode opMode, String deviceName){
+      this.opMode = opMode;
+      this.deviceName = deviceName;
+      this.hardwareMap = opMode.hardwareMap;
    }
 
    public void init() {
-      ledMatrix = hardwareMap.get(AdafruitNeoDriver.class, "neo");
-//      ledMatrix.setNumberOfPixels(ledQty);
+      ledMatrix = hardwareMap.get(AdafruitNeoDriver.class, deviceName);
       ledMatrix.setNumberOfPixels(hwLedQty);
       ledMatrix.fill(0);
       ledMatrix.show();
@@ -290,13 +287,10 @@ public class NeoMatrix {
       boolean right = (xDir > 0);
       boolean up = (yDir < 0);
       // Do the x (columns) first
-//      if (xDir != 0) {
       for (int i = 0; i < Math.abs(xDir); i++) {
          for (int y = startRow; y <= endRow; y++) {
             int save = right ? matrixBuffer[endColumn][y] : matrixBuffer[startColumn][y];
             for (int x = startColumn; x < endColumn; x++) {
-//               if (right) matrixBuffer[x+1][y] = matrixBuffer[x][y];   //wrong?
-//               if (right) pMap[width-x] = pMap[width-x-1];
                if (right) matrixBuffer[endColumn-x][y] = matrixBuffer[endColumn-x-1][y];
                else matrixBuffer[x][y] = matrixBuffer[x+1][y];
             }
@@ -305,13 +299,10 @@ public class NeoMatrix {
          }
       }
       // Then do the y (rows)
-//      if (yDir != 0) {
       for (int i = 0; i < Math.abs(yDir); i++) {
          for (int x = startColumn; x <= endColumn; x++) {
             int save = !up ? matrixBuffer[x][endRow] : matrixBuffer[x][startRow];
             for (int y = startRow; y < endRow; y++) {
-//               if (!up) matrixBuffer[x][y+1] = matrixBuffer[x][y];    //wrong?
-//               if (!up) pMap[x][height-y] = pMap[x][height-y-1];
                if (!up) matrixBuffer[x][endRow-y] = matrixBuffer[x][endRow-y-1];
                else matrixBuffer[x][y] = matrixBuffer[x][y+1];
             }
@@ -421,15 +412,6 @@ public class NeoMatrix {
       return newMap;
    }
 
-//   public int[][] cloneArray(int[][] src) {
-//      int length = src.length;
-//      int[][] target = new int[length][src[0].length];
-//      for (int i = 0; i < length; i++) {
-//         System.arraycopy(src[i], 0, target[i], 0, src[i].length);
-//      }
-//      return target;
-//   }
-
    public int[][] cloneArray(final int[][] array) {
       // This works for 2D int arrays, which is what we have.
       if (array != null) {
@@ -451,32 +433,26 @@ public class NeoMatrix {
       int height = pMap[0].length - 1;
       boolean right = (xDir > 0);
       boolean up = (yDir < 0);
-      //if (xDir != 0) {
-         for (int i = 0; i < Math.abs(xDir); i++) {
-            int[] save = right ? pMap[width] : pMap[0];
-            for (int x = 0; x < width; x++) {
-//            if (right) pMap[x + 1] = pMap[x];   // wrong
-               if (right) pMap[width-x] = pMap[width-x-1];
-               else pMap[x] = pMap[x + 1];
-            }
-            if (right) pMap[0] = rotate ? save : new int[save.length];
-            else pMap[width] = rotate ? save : new int[save.length];
+      for (int i = 0; i < Math.abs(xDir); i++) {
+         int[] save = right ? pMap[width] : pMap[0];
+         for (int x = 0; x < width; x++) {
+            if (right) pMap[width-x] = pMap[width-x-1];
+            else pMap[x] = pMap[x + 1];
          }
-      //}
-      //if (yDir != 0) {
-         for (int i = 0; i < Math.abs(yDir); i++) {
-            for (int x = 0; x < pMap.length; x++) {
-               int save = !up ? pMap[x][height] : pMap[x][0];
-               for (int y = 0; y < height; y++) {
-//               if (!up) pMap[x][y + 1] = pMap[x][y];   // wrong
-                  if (!up) pMap[x][height-y] = pMap[x][height-y-1];
-                  else pMap[x][y] = pMap[x][y + 1];
-               }
-               if (!up) pMap[x][0] = rotate ? save : 0;
-               else pMap[x][height] = rotate ? save : 0;
+         if (right) pMap[0] = rotate ? save : new int[save.length];
+         else pMap[width] = rotate ? save : new int[save.length];
+      }
+      for (int i = 0; i < Math.abs(yDir); i++) {
+         for (int x = 0; x < pMap.length; x++) {
+            int save = !up ? pMap[x][height] : pMap[x][0];
+            for (int y = 0; y < height; y++) {
+               if (!up) pMap[x][height-y] = pMap[x][height-y-1];
+               else pMap[x][y] = pMap[x][y + 1];
             }
+            if (!up) pMap[x][0] = rotate ? save : 0;
+            else pMap[x][height] = rotate ? save : 0;
          }
-      //}
+      }
       return pMap;
    }
 
@@ -822,117 +798,13 @@ public class NeoMatrix {
    };
 }
 
-
-
-//   void dimBuffer(){
-//
-//      for (int c = 0; c < ledCols; c++) {
-//         for (int r = 0; r < ledRows; r++) {
-//            int intColor = matrixBuffer[c][r];
-//            int red = (int)(Color.red(intColor) * dimMax/255.0);
-//            int green = (int)(Color.green(intColor) * dimMax/255.0);
-//            int blue = (int)(Color.blue(intColor) * dimMax/255.0);
-//            dimmedBuffer[c][r] = Color.rgb(red,green,blue);
-//         }
-//      }
-//
-//
-//   }
-
-
-//   public int[][] shiftPixelMapVert (int[][] pMap, boolean rotate, boolean up) {
-//      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
-//      for (int x=0; x < pMap.length; x++) {
-//         int save = !up ? pMap[x][height] : pMap[x][0];
-//         for (int y=0; y < height; y++) {
-//            if (!up) pMap[x][y+1] = pMap[x][y]; else pMap[x][y] = pMap[x][y+1];
-//         }
-//         if (!up) {
-//            if (rotate) pMap[x][0] = save; else pMap[x][0] = 0;
-//         }
-//         else {
-//            if (rotate) pMap[x][height] = save; else pMap[x][height] = 0;
-//         }
-//      }
-//      return pMap;
-//   }
-
-//   public int[][] shiftPixelMapDown (int[][] pMap, boolean rotate) {
-//      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
-//      for (int x=0; x < pMap.length; x++) {
-//         int save = pMap[x][height];
-//         for (int y=0; y < height; y++) {
-//            pMap[x][y+1] = pMap[x][y];
-//         }
-//         if (rotate) pMap[x][0] = save; else pMap[x][0] = 0;
-//      }
-//      return pMap;
-//   }
-//
-//   public int[][] shiftPixelMapUp (int[][] pMap, boolean rotate) {
-//      int height = pMap[0].length - 1;  //should be 8 always, minis 1 for the index
-//      for (int x=0; x < pMap.length; x++) {
-//         int save = pMap[x][0];
-//         for (int y=0; y < height; y++) {
-//            pMap[x][y] = pMap[x][y+1];
-//         }
-//         if (rotate) pMap[x][height] = save; else pMap[x][height] = 0;
-//      }
-//      return pMap;
-//   }
-
-//   public int[][] shiftPixelMapHoriz (int[][] pMap, boolean rotate, boolean right) {
-//      int width = pMap.length - 1;
-//      int[] save = right ? pMap[width] : pMap[0];
-//      for (int x=0; x < width; x++) {
-//         if (right) pMap[x+1]=pMap[x]; else pMap[x]=pMap[x+1];
-//      }
-//      if (right) {
-//         if (rotate) pMap[0] = save; else pMap[0] = new int[save.length];
-//      }
-//      else {
-//         if (rotate) pMap[width] = save; else pMap[width] = new int[save.length];
-//      }
-//      return pMap;
-//   }
-
-//   public int[][] shiftPixelMapLeft (int[][] pMap, boolean rotate) {
-//      int width = pMap.length - 1;
-//      int[] save = pMap[0];
-//      for (int x=0; x < width; x++) {
-//         pMap[x]=pMap[x+1];
-//      }
-//      if (rotate) pMap[width] = save; else pMap[width] = new int[save.length];
-//      return pMap;
-//   }
-//
-//   public int[][] shiftPixelMapRight (int[][] pMap, boolean rotate) {
-//      int width = pMap.length - 1;
-//      int[] save = pMap[width];
-//      for (int x=0; x < width; x++) {
-//         pMap[x+1]=pMap[x];
-//      }
-//      if (rotate) pMap[0] = save; else pMap[0] = new int[save.length];
-//      return pMap;
-//   }
-
-
-//moved from AdafruitNeoDriver
-
-/* LK Future work:
+/* LK notes:
 
 Maintain a list of the colors of each pixel at the NeoDriver (actual display)
-
-//Maintain a list of changes requested (to Prioritize)?
-//    -What if the list gets too long and never catches up?
-//
-//or Maintain a list of colors to be sent (pixel order not priority)?
-//    -What if the changes keep happening early in the array so only that side gets updated regularly?
-//    -Better idea might be to step through the list a little further every loop
-
 Maintain a list of the colors of each pixel that we want to be displayed (local, future display)
 
 Current concept:
+
 0. Start at index 0
 
 1. Look for the first LED needing a change

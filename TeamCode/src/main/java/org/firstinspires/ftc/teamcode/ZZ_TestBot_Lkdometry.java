@@ -5,12 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Localizer2;
-import org.firstinspires.ftc.teamcode.robot.Om.Vector3;
-import org.firstinspires.ftc.teamcode.robot.Omdometry;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Position;
 
 @TeleOp (name="ZZ_TestBot_Lkdometry", group="Test")
 //@Disabled

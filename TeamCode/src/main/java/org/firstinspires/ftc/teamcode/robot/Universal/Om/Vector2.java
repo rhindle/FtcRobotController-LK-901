@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.Om;
+package org.firstinspires.ftc.teamcode.robot.Universal.Om;
 
 public class Vector2 {
     public final double X,Y;
