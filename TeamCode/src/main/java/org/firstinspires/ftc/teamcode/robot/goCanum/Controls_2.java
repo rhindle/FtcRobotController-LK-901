@@ -10,6 +10,8 @@ class Controls_2 extends Controls {
       super(parts);
    }
 
+   public int someNewVariable;
+
    @Override
    public void userInput() {
       // TeleOp / normal drive

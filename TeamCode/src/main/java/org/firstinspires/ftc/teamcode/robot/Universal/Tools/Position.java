@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.Universal.Tools;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
 // testing - brought this in from Om's old code
 public class Position
 {
@@ -27,6 +29,10 @@ public class Position
     }
 
     public Position clone(){ return new Position(X, Y, R);}
+
+    public Pose2d toPose2d(){
+        return new Pose2d(X, Y, Math.toRadians(R));
+    }
 
     public void add(Position pos2){
         X += pos2.X;

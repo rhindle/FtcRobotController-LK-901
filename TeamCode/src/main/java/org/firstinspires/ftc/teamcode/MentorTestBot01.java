@@ -33,6 +33,7 @@ public class MentorTestBot01 extends LinearOpMode {
         parts.localizer.odoRobotOffset = new Position (2.25,0,0);
 
         parts.useODO = true;
+        //parts.useSlamra = true;
         //robot.reverseDrive = true;  // for AndyMark test
         parts.useDistanceSensors = false; //true; //false;
 
@@ -80,6 +81,9 @@ public class MentorTestBot01 extends LinearOpMode {
                 telemetry.update();
             }
         }
+
+        parts.stop();
+
     }
 
     private void addTelemetryLoopStart() {

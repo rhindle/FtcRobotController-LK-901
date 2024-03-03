@@ -12,7 +12,9 @@ public class Parts {
    public boolean reverseDrive = false;
    public boolean useDistanceSensors = true;
    public boolean useDriveEncoders = true;
+   public boolean useSlamra = false;
    public Position robotPosition;
+   public Position slamraPosition;
 
    public LinearOpMode opMode;
    public Robot robot;
@@ -22,6 +24,7 @@ public class Parts {
    public Drivetrain drivetrain;
    public Navigator navigator;
    public LocalizerOdo localizer;
+   public Slamra slamra;
 
    /* Constructor */
    public Parts(LinearOpMode opMode, robotType rType){
@@ -39,6 +42,7 @@ public class Parts {
       drivetrain = new Drivetrain(this);
       localizer = new LocalizerOdo(this);
       navigator = new Navigator(this);
+      if (useSlamra) slamra = new Slamra(this);
 
       switch (rType) {
          case GOCANUM:
@@ -54,6 +58,7 @@ public class Parts {
    public void preInit() {
       robot.init();
       sensors.init();
+      if (useSlamra) slamra.init();
    }
 
    public void preRun() {
@@ -63,6 +68,7 @@ public class Parts {
 
       localizer.loop();  // get some things squared away before the real program runs
       navigator.loop();
+      if (useSlamra) slamra.onStart();
    }
 
    public void loop() {
@@ -70,8 +76,13 @@ public class Parts {
       sensors.loop();
       buttonMgr.loop();
       localizer.loop();
+      slamra.loop();
       controls.loop();
       navigator.loop();
+   }
+
+   public void stop() {
+      if (useSlamra) slamra.onStop();
    }
 
    public enum robotType {

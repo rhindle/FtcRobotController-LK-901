@@ -222,6 +222,10 @@ public class Robot {
         parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
         sensorIMU.initialize(parameters);
 
+        initOptions();
+    }
+
+    public void initOptions() {
         //i2c sensors
 //        sensorColor = hwMap.get(ColorSensor.class, "sensorColorRange");
 //        sensorDistance = hwMap.get(DistanceSensor.class, "sensorColorRange");
