@@ -34,6 +34,10 @@ public class Position
         return new Pose2d(X, Y, Math.toRadians(R));
     }
 
+    public void normalize() {
+        R = Functions.normalizeAngle(R);
+    }
+
     public void add(Position pos2){
         X += pos2.X;
         Y += pos2.Y;

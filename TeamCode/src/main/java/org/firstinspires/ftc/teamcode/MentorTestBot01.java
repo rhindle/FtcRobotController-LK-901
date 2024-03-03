@@ -29,13 +29,15 @@ public class MentorTestBot01 extends LinearOpMode {
     public void runOpMode() {
 
         parts = new Parts(this, Parts.robotType.GOCANUM);
-        parts.localizer.odoFieldStart = new Position (36,63,-90);
-        parts.localizer.odoRobotOffset = new Position (2.25,0,0);
 
         parts.useODO = true;
-        //parts.useSlamra = true;
+        parts.useSlamra = true;
         //robot.reverseDrive = true;  // for AndyMark test
         parts.useDistanceSensors = false; //true; //false;
+        parts.setup();
+
+        parts.localizer.odoFieldStart = new Position (36,63,-90);
+        parts.localizer.odoRobotOffset = new Position (2.25,0,0);
 
         elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -52,6 +54,9 @@ public class MentorTestBot01 extends LinearOpMode {
             telemetry.addData(">", "Press Play to start");
             telemetry.addData(">", "Robot Heading = %.1f", parts.robot.returnImuHeading(true));
             telemetry.addData("Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
+
+            if (parts.useSlamra) parts.slamra.loop();
+
             telemetry.update();
             sleep(20);
         }
@@ -68,6 +73,7 @@ public class MentorTestBot01 extends LinearOpMode {
                 parts.robot.loop();               // Clears bulk data and reads IMU
                 parts.buttonMgr.loop();           // Processes digital controller input
                 parts.localizer.loop();           // Updates odometry X, Y, Rotation
+                if (parts.useSlamra) parts.slamra.loop();
                 parts.sensors.loop();       // Update distance sensors, etc.
 
                 addTelemetryLoopStart();

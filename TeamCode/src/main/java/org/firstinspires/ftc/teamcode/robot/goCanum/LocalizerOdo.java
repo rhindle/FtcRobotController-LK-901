@@ -188,6 +188,7 @@ public class LocalizerOdo {
    void setOdoFinalPose() {
       //pos1 = odoFieldOffset, pos2 = odoRobotPose
       odoFinalPose = transformPosition(odoFieldOffset, odoRobotPose);
+      odoFinalPose.normalize();
    }
 
    void setOdoFieldOffset() {

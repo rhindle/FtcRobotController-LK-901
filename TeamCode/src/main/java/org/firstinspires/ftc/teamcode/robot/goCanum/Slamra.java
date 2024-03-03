@@ -20,7 +20,8 @@ public class Slamra  {
 //	double encoderMeasurementCovariance = 0.1; //0.8;
 
 	public Position slamraFieldStart = null;								// set when start pushed (? final ?)
-	public Position slamraRobotOffset = new Position(-6.5,0,-90);  // position transform to account for mounting position vs center of robot
+//	public Position slamraRobotOffset = new Position(-6.5,0,-90);  // position transform to account for mounting position vs center of robot
+	public Position slamraRobotOffset = new Position(-8,-1,0);  // position transform to account for mounting position vs center of robot
 	Position slamraRawPose = new Position();								// original position from slamra device
 	Position slamraRobotPose = new Position();								// slamra transformed by robot position
 	Position slamraFinalPose = new Position();                              // slamra transformed to field
@@ -44,6 +45,11 @@ public class Slamra  {
 			slamra = T265Helper.getCamera(
 					new T265Camera.OdometryInfo(new Pose2d(0,0,0),0.1),
 					parts.opMode.hardwareMap.appContext);
+//			slamra = new T265Camera(cameraToRobot, encoderMeasurementCovariance, parts.opMode.hardwareMap.appContext);
+//			slamra = new T265Camera(
+//					new T265Camera.OdometryInfo(new Pose2d(0,0,0), 0.1),
+//					"",
+//					parts.opMode.hardwareMap.appContext);
 		}
 		if (!slamra.isStarted()) slamra.start();
 
@@ -72,8 +78,8 @@ public class Slamra  {
 
 	public void loop() {
 		updateSlamraPosition();
-		telemetry.addData("slam final", slamraFinalPose);
-		telemetry.addData("last pos", lastPos);
+		telemetry.addData("slam final", slamraFinalPose.toString(2));
+		telemetry.addData("last pos", lastPos.toString(2));
 		if(!slamraFinalPose.equals(lastPos)) {
 //			parent.addPositionTicket(Slamra.class, new PositionTicket(slamraFinal));
 			parts.slamraPosition = slamraFinalPose.clone();
@@ -205,6 +211,7 @@ public class Slamra  {
 	void setSlamraFinalPose() {
 		//pos1 = slamraFieldOffset, pos2 = slamraRobotPose
 		slamraFinalPose = transformPosition(slamraFieldOffset, slamraRobotPose);
+		slamraFinalPose.normalize();
 	}
 	//End of LK ????????
 

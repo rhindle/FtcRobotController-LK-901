@@ -26,6 +26,9 @@ public class Parts {
    public LocalizerOdo localizer;
    public Slamra slamra;
 
+   private boolean isSetup = false;
+   private robotType rType;
+
    /* Constructor */
    public Parts(LinearOpMode opMode, robotType rType){
       construct(opMode, rType);
@@ -33,7 +36,36 @@ public class Parts {
 
    void construct(LinearOpMode opMode, robotType rType){
       this.opMode = opMode;
+      this.rType = rType;
 
+//      robot = new Robot(this);
+//      buttonMgr = new ButtonMgr(opMode);
+//      sensors = new Sensors(this);
+////      controls = new Controls_2(this);
+//      controls = new Controls(this);
+//      drivetrain = new Drivetrain(this);
+//      localizer = new LocalizerOdo(this);
+//      navigator = new Navigator(this);
+//      if (useSlamra) slamra = new Slamra(this);
+//
+//      switch (rType) {
+//         case GOCANUM:
+//            break;
+//         case ANDYMARK:
+//            break;
+//         case GENERIC:
+//            break;
+//         default:
+//      }
+   }
+
+   public void setup(){
+      // We do this after the construct because we may want to adjust some settings before creating all the sub-parts
+      if (isSetup) {
+         //throw new RuntimeException("Parts can only be setup once");
+         return;
+      }
+      isSetup = true;
       robot = new Robot(this);
       buttonMgr = new ButtonMgr(opMode);
       sensors = new Sensors(this);
@@ -76,7 +108,7 @@ public class Parts {
       sensors.loop();
       buttonMgr.loop();
       localizer.loop();
-      slamra.loop();
+      if (useSlamra) slamra.loop();
       controls.loop();
       navigator.loop();
    }
