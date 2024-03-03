@@ -70,7 +70,7 @@ public class Navigator {
       if (!parts.useODO) {
          targetPos = new Position(0,0,0);
       } else {
-         targetPos = parts.localizer.odoFieldStart.clone();
+         targetPos = parts.odometry.odoFieldStart.clone();
       }
       storedHeading = targetPos.R;
       deltaHeading = targetPos.R;

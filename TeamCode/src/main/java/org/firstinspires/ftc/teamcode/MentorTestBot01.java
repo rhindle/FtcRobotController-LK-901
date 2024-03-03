@@ -34,10 +34,10 @@ public class MentorTestBot01 extends LinearOpMode {
         parts.useSlamra = true;
         //robot.reverseDrive = true;  // for AndyMark test
         parts.useDistanceSensors = false; //true; //false;
+        parts.fieldStartPosition = new Position (36,63,-90);
+        parts.odoRobotOffset = new Position (2.25,0,0);
+        parts.slamraRobotOffset = new Position(-8,-1,0);
         parts.setup();
-
-        parts.localizer.odoFieldStart = new Position (36,63,-90);
-        parts.localizer.odoRobotOffset = new Position (2.25,0,0);
 
         elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -72,7 +72,7 @@ public class MentorTestBot01 extends LinearOpMode {
 
                 parts.robot.loop();               // Clears bulk data and reads IMU
                 parts.buttonMgr.loop();           // Processes digital controller input
-                parts.localizer.loop();           // Updates odometry X, Y, Rotation
+                parts.odometry.loop();           // Updates odometry X, Y, Rotation
                 if (parts.useSlamra) parts.slamra.loop();
                 parts.sensors.loop();       // Update distance sensors, etc.
 
@@ -101,7 +101,7 @@ public class MentorTestBot01 extends LinearOpMode {
 //        telemetry.addData("raw__", localizer.odoRawPose.toString(2));
 //        telemetry.addData("robot", localizer.odoRobotPose.toString(2));
 //        telemetry.addData("final", localizer.odoFinalPose.toString(2));
-        parts.localizer.addTeleOpTelemetry();
+        parts.odometry.addTeleOpTelemetry();
     }
 
     private void addTelemetryLoopEnd() {

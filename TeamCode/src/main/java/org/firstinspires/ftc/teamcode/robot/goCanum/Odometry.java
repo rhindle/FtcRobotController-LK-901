@@ -6,7 +6,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Position;
 
-public class LocalizerOdo {
+public class Odometry {
 
    Parts parts;
    Telemetry telemetry;
@@ -20,8 +20,10 @@ public class LocalizerOdo {
    public double yPos, xPos;
    public boolean useFusedHeading = true;
 
-   public Position odoRobotOffset = new Position (2.25,0,0);          // map odo to robot (so it holds turn position better)
-   public Position odoFieldStart = new Position (-36,63,-90);  // field start position [blue right slot]
+//   public Position odoRobotOffset = new Position (2.25,0,0);          // map odo to robot (so it holds turn position better)
+//   public Position odoFieldStart = new Position (-36,63,-90);  // field start position [blue right slot]
+   public Position odoRobotOffset = new Position();                     // map odo to robot (so it holds turn position better)
+   public Position odoFieldStart = new Position();                      // field start position [blue right slot]
 
    Position odoRawPose = new Position (0,0,0);                 // original calculation of position before transforms applied
    Position odoRobotPose = new Position ();                             // odo mapped to robot position (minor change)
@@ -34,7 +36,7 @@ public class LocalizerOdo {
    //2022-12-22 Measured 10 rot: 846684,850800; 845875,851775; 845127,845543; 848073,850867
    //                            169748.4		169765		169067		169894		==>  169618.6
 
-   public LocalizerOdo(Parts parts){
+   public Odometry(Parts parts){
       construct(parts);
    }
 
@@ -47,8 +49,6 @@ public class LocalizerOdo {
       robotPosition = odoFieldStart.clone();
       parts.robotPosition = robotPosition.clone();
       if (!parts.useODO) {
-//         robotPosition.X = 0;   // done this way to not break the link back to Navigator class
-//         robotPosition.Y = 0;
          robotPosition = new Position(0,0, robotPosition.R);
          parts.robotPosition = robotPosition.clone();
          return;
@@ -103,9 +103,6 @@ public class LocalizerOdo {
       setOdoFinalPose();
 
       /* Update robot position */
-//      robotPosition.X = odoFinalPose.X;   // done this way to not break the link back to Navigator class
-//      robotPosition.Y = odoFinalPose.Y;   // (creating a new object messes things up)
-//      robotPosition.R = odoFinalPose.R;
       robotPosition = odoFinalPose.clone();
       parts.robotPosition = robotPosition.clone();
 

@@ -15,6 +15,9 @@ public class Parts {
    public boolean useSlamra = false;
    public Position robotPosition;
    public Position slamraPosition;
+   public Position fieldStartPosition;
+   public Position odoRobotOffset;
+   public Position slamraRobotOffset;
 
    public LinearOpMode opMode;
    public Robot robot;
@@ -23,7 +26,7 @@ public class Parts {
    public Controls controls;
    public Drivetrain drivetrain;
    public Navigator navigator;
-   public LocalizerOdo localizer;
+   public Odometry odometry;
    public Slamra slamra;
 
    private boolean isSetup = false;
@@ -37,26 +40,6 @@ public class Parts {
    void construct(LinearOpMode opMode, robotType rType){
       this.opMode = opMode;
       this.rType = rType;
-
-//      robot = new Robot(this);
-//      buttonMgr = new ButtonMgr(opMode);
-//      sensors = new Sensors(this);
-////      controls = new Controls_2(this);
-//      controls = new Controls(this);
-//      drivetrain = new Drivetrain(this);
-//      localizer = new LocalizerOdo(this);
-//      navigator = new Navigator(this);
-//      if (useSlamra) slamra = new Slamra(this);
-//
-//      switch (rType) {
-//         case GOCANUM:
-//            break;
-//         case ANDYMARK:
-//            break;
-//         case GENERIC:
-//            break;
-//         default:
-//      }
    }
 
    public void setup(){
@@ -72,9 +55,18 @@ public class Parts {
 //      controls = new Controls_2(this);
       controls = new Controls(this);
       drivetrain = new Drivetrain(this);
-      localizer = new LocalizerOdo(this);
+
+      odometry = new Odometry(this);
+      odometry.odoFieldStart = fieldStartPosition;//.clone();
+      odometry.odoRobotOffset = odoRobotOffset;//.clone();
+
       navigator = new Navigator(this);
-      if (useSlamra) slamra = new Slamra(this);
+
+      if (useSlamra) {
+         slamra = new Slamra(this);
+         slamra.slamraFieldStart = fieldStartPosition;//.clone();
+         slamra.slamraRobotOffset = slamraRobotOffset;//.clone();
+      }
 
       switch (rType) {
          case GOCANUM:
@@ -95,10 +87,10 @@ public class Parts {
 
    public void preRun() {
       drivetrain.init();
-      localizer.init();
+      odometry.init();
       navigator.init();
 
-      localizer.loop();  // get some things squared away before the real program runs
+      odometry.loop();  // get some things squared away before the real program runs
       navigator.loop();
       if (useSlamra) slamra.onStart();
    }
@@ -107,7 +99,7 @@ public class Parts {
       robot.loop();
       sensors.loop();
       buttonMgr.loop();
-      localizer.loop();
+      odometry.loop();
       if (useSlamra) slamra.loop();
       controls.loop();
       navigator.loop();
