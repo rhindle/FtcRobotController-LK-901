@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import org.firstinspires.ftc.teamcode.robot.Universal.i2c.QwiicLEDStick;
+import org.firstinspires.ftc.teamcode.robot.Common.i2c.QwiicLEDStick;
 
 @TeleOp (name="ZZ_TestBot_LED_CS", group="Test")
 //@Disabled

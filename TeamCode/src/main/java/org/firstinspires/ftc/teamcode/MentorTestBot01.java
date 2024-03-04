@@ -5,9 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Position;
-import org.firstinspires.ftc.teamcode.robot.goCanum.Parts;
+import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.Parts;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.GoCanum.PartsGC;
 
 @TeleOp(name = "AA_MentorTestBot01", group = "")
 //@Disabled
@@ -28,7 +29,7 @@ public class MentorTestBot01 extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        parts = new Parts(this, Parts.robotType.GOCANUM);
+        parts = new PartsGC(this, Parts.robotType.GOCANUM);
 
         parts.useODO = true;
         parts.useSlamra = true;

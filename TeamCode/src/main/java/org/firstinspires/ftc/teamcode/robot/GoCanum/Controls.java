@@ -1,24 +1,48 @@
-package org.firstinspires.ftc.teamcode.robot.goCanum;
+package org.firstinspires.ftc.teamcode.robot.GoCanum;
+
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Functions;
+import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.Parts;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 
-class Controls_2 extends Controls {
+public class Controls {
 
-   public Controls_2(Parts parts) {
-      super(parts);
+   Parts parts;
+   Gamepad gamepad1;
+   Gamepad gamepad2;
+   ButtonMgr buttonMgr;
+   public double DriveSpeed, DriveAngle, Rotate, liftSpeed;
+
+   /* Constructor */
+   public Controls(Parts parts){
+      construct(parts);
    }
 
-   public int someNewVariable;
+   void construct(Parts parts){
+      this.parts = parts;
+      this.gamepad1 = parts.opMode.gamepad1;
+      this.gamepad2 = parts.opMode.gamepad2;
+      this.buttonMgr = parts.buttonMgr;
+   }
 
-   @Override
+   void init() {
+
+   }
+
+   public void loop() {
+      userInput();
+      parts.navigator.setUserDriveSettings(DriveSpeed, DriveAngle, Rotate);
+   }
+
    public void userInput() {
+
       // TeleOp / normal drive
 
       // Get speed and direction from left stick
       DriveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y)));
-      DriveAngle = Math.atan2(gamepad1.left_stick_x, gamepad1.left_stick_y) / Math.PI * 180;
+      DriveAngle = Math.atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y) / Math.PI * 180;
       // Get rotation from right stick
       Rotate = Math.pow(gamepad1.right_stick_x, 1);
       parts.navigator.handleRotate(Rotate);

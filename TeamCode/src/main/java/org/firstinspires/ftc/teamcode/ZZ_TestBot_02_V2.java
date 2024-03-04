@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 
 //import com.qualcomm.robotcore.util.Range;
 //import java.util.Locale;

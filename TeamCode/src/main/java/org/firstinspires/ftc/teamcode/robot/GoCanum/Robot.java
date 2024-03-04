@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.goCanum;
+package org.firstinspires.ftc.teamcode.robot.GoCanum;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -17,7 +17,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.robot.Universal.i2c.QwiicLEDStick;
+import org.firstinspires.ftc.teamcode.robot.Common.Parts;
+import org.firstinspires.ftc.teamcode.robot.Common.i2c.QwiicLEDStick;
 
 import java.util.List;
 

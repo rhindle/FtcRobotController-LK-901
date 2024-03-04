@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Functions;
-import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 
 public class Localizer {
 

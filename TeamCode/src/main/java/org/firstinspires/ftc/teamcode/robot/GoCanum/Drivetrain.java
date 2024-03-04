@@ -1,7 +1,8 @@
-package org.firstinspires.ftc.teamcode.robot.goCanum;
+package org.firstinspires.ftc.teamcode.robot.GoCanum;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import java.util.Arrays;
+
+import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 
 public class Drivetrain {
 

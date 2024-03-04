@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.Universal.i2c;
+package org.firstinspires.ftc.teamcode.robot.Common.i2c;
 
 import android.graphics.Color;
 import android.util.Log;

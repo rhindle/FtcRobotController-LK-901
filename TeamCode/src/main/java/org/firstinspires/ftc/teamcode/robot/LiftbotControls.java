@@ -3,9 +3,8 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Functions;
+import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 
 public class LiftbotControls {
 

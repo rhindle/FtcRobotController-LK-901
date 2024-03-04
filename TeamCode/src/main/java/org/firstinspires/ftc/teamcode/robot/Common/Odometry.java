@@ -1,17 +1,18 @@
-package org.firstinspires.ftc.teamcode.robot.goCanum;
+package org.firstinspires.ftc.teamcode.robot.Common;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Functions;
-import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 
 public class Odometry {
 
-   Parts parts;
+   public Parts parts;
    Telemetry telemetry;
 
-   DcMotorEx odoXL, odoY, odoXR;
+   public DcMotorEx odoXL, odoY, odoXR;
+   public byte odoXLdir, odoYdir, odoXRdir;
    public long encoderY, encoderXL, encoderXR;
    long encoderY0, encoderXL0, encoderXR0;
    double odoHeading, odoHeading0;
@@ -53,20 +54,11 @@ public class Odometry {
          parts.robotPosition = robotPosition.clone();
          return;
       }
-      odoY = parts.robot.motor0B;
-      odoXR = parts.robot.motor1B;
-      odoXL = parts.robot.motor2B;
+      configureEncoders();
 
-      odoY.setDirection(DcMotorEx.Direction.FORWARD);
-      odoXL.setDirection(DcMotorEx.Direction.REVERSE);
-      odoXR.setDirection(DcMotorEx.Direction.REVERSE);
-      odoY.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-      odoXL.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-      odoXR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-
-      encoderY0 = odoY.getCurrentPosition();
-      encoderXL0 = odoXL.getCurrentPosition();
-      encoderXR0 = odoXR.getCurrentPosition();
+      encoderY0 = odoY.getCurrentPosition() * (long)odoYdir;
+      encoderXL0 = odoXL.getCurrentPosition() * (long)odoXLdir;
+      encoderXR0 = odoXR.getCurrentPosition() * (long)odoXRdir;
       imuHeading0 = parts.robot.returnImuHeading(true);
       odoHeading0 = getOdoHeading();
       globalHeading0 = imuHeading0;
@@ -87,9 +79,9 @@ public class Odometry {
       }
 
       /* Update encoder readings */
-      encoderY = odoY.getCurrentPosition();
-      encoderXL = odoXL.getCurrentPosition();
-      encoderXR = odoXR.getCurrentPosition();
+      encoderY = odoY.getCurrentPosition() * (long)odoYdir;
+      encoderXL = odoXL.getCurrentPosition() * (long)odoXLdir;
+      encoderXR = odoXR.getCurrentPosition() * (long)odoXRdir;
 
       /* Update heading */
       imuHeading = parts.robot.returnImuHeading();
@@ -211,5 +203,23 @@ public class Odometry {
       telemetry.addData("raw__", odoRawPose.toString(2));
       telemetry.addData("robot", odoRobotPose.toString(2));
       telemetry.addData("final", odoFinalPose.toString(2));
+   }
+
+   public void configureEncoders() {
+//      /* this is separated so it can be overridden */
+//      odoY = parts.robot.motor0B;
+//      odoXR = parts.robot.motor1B;
+//      odoXL = parts.robot.motor2B;
+//      odoY.setDirection(DcMotorEx.Direction.FORWARD);
+//      odoXL.setDirection(DcMotorEx.Direction.REVERSE);
+//      odoXR.setDirection(DcMotorEx.Direction.REVERSE);
+//      odoY.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//      odoXL.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//      odoXR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//      /* dir should be -1 or 1 and is to account for the port being used elsewhere
+//         and needing to be set in direction opposite to what odometry needs */
+//      odoYdir = 1;
+//      odoXRdir = 1;
+//      odoXLdir = 1;
    }
 }

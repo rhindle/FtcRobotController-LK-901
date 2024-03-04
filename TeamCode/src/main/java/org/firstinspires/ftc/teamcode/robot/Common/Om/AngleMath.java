@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.Universal.Om;
+package org.firstinspires.ftc.teamcode.robot.Common.Om;
 
 public class AngleMath {
     public static double findAngleError(double currentAngle, double targetAngle)

@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode.robot.goCanum;
+package org.firstinspires.ftc.teamcode.robot.GoCanum;
 
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 
 public class Sensors {
 

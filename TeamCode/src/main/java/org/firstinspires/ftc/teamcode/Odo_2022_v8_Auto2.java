@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Auto;
-import org.firstinspires.ftc.teamcode.robot.Universal.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Navigator3;
 import org.firstinspires.ftc.teamcode.robot.Robot;
-import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Position;
-import org.firstinspires.ftc.teamcode.robot.Universal.Tools.Functions;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 
 @Autonomous(name = "3Odo_2022_v8_Auto2", group = "")
 //@Disabled
