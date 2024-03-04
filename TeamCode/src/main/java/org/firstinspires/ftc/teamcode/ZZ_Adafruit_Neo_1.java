@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.NeoMatrix;
-import org.firstinspires.ftc.teamcode.robot.Robot;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.Robot;
 
 @TeleOp (name="AA_Adafruit_Neo_1", group="Test")
 //@Disabled

@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Localizer2;
-import org.firstinspires.ftc.teamcode.robot.Robot;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.Localizer2;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.Robot;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 
 @TeleOp (name="ZZ_TestBot_Lkdometry", group="Test")

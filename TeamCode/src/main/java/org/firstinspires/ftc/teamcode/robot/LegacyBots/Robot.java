@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot.LegacyBots;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -104,7 +104,7 @@ public class Robot {
     HardwareMap hardwareMap;
 //    Gamepad gamepad1;
 //    Gamepad gamepad2;
-    Telemetry telemetry;
+    public Telemetry telemetry;
 
     Orientation angles;
     double imuHeading;

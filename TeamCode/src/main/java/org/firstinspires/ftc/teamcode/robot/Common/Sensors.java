@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.GoCanum;
+package org.firstinspires.ftc.teamcode.robot.Common;
 
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;

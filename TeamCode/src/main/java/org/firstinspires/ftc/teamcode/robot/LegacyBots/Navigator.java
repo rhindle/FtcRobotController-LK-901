@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.robot.LegacyBots;
 
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
@@ -8,7 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 
-public class Navigator3 {
+public class Navigator {
 
    Telemetry telemetry;
    Robot robot;
@@ -41,20 +40,10 @@ public class Navigator3 {
    private ElapsedTime navTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
    int lastStep = 0;
 
-   public PIDCoefficients PIDmovement = new PIDCoefficients(0.06,0.0012,0.006); //.12 0 .035
-   public PIDCoefficients PIDrotate = new PIDCoefficients(0.026,0.01,0.00025);  // .03 0 0
-   PIDCoefficients PIDmovement_calculated = new PIDCoefficients(0,0,0);
-   PIDCoefficients PIDrotate_calculated = new PIDCoefficients(0,0,0);
-   long PIDTimeCurrent;
-   long PIDTimeLast;
-   double errorDistLast;
-   double errorRotLast;
-   double navAngleLast;
-
    Position testPosition = null;
 
    /* Constructor */
-   public Navigator3(Robot robot){//}, Localizer localizer,Drivetrain drivetrain){
+   public Navigator(Robot robot){//}, Localizer localizer,Drivetrain drivetrain){
       construct(robot);//, localizer, drivetrain);
    }
 
@@ -71,32 +60,10 @@ public class Navigator3 {
       v1 = 0.0;
       v2 = 0.0;
       v3 = 0.0;
-      //storedHeading = localizer.returnGlobalHeading();
-      //storedHeading = robotPosition.R;
-      //setTargetToCurrentPosition();
-      if (!robot.useODO) {
-         targetX = 0;
-         targetY = 0;
-         targetRot = 0;
-      } else {
-         targetX = localizer.odoFieldStart.X;
-         targetY = localizer.odoFieldStart.Y;
-         targetRot = localizer.odoFieldStart.R;
-      }
-      storedHeading = targetRot;
-      deltaHeading = targetRot;
+      storedHeading = localizer.returnGlobalHeading();
    }
 
    public void loop() {
-
-      if (!robot.useODO) {
-         userDrive();
-         drivetrain.setDrivePowers(v0, v1, v2, v3);
-         return;
-      }
-
-      telemetry.addData("PIDmov", "PID = %.4f, %.4f, %.4f", PIDmovement.p, PIDmovement.i, PIDmovement.d);
-      telemetry.addData("PIDrot", "PID = %.4f, %.4f, %.4f", PIDrotate.p, PIDrotate.i, PIDrotate.d);
 
       // State machine-ish.  Needs embetterment.  This will determine motor powers then set them
       if (navigate == 1) {
@@ -208,32 +175,30 @@ public class Navigator3 {
 
    // Determine motor speeds when under automatic control
    public void autoDrive () {
-      double errorDist, deltaX, deltaY, errorRot, pDist, pRot, navAngle;
+      double distance, deltaX, deltaY, deltaRot, pDist, pRot, navAngle;
 //      v0 = 0.0;
 //      v2 = 0.0;
 //      v1 = 0.0;
 //      v3 = 0.0;
-//      deltaX = targetX - localizer.xPos;  // error in x
-//      deltaY = targetY - localizer.yPos;  // error in y
-      deltaX = targetX - robotPosition.X;  // error in x
-      deltaY = targetY - robotPosition.Y;  // error in y
+      deltaX = targetX - localizer.xPos;  // error in x
+      deltaY = targetY - localizer.yPos;  // error in y
       telemetry.addData("DeltaX", JavaUtil.formatNumber(deltaX, 2));
       telemetry.addData("DeltaY", JavaUtil.formatNumber(deltaY, 2));
-      errorRot = getError(targetRot);  // error in rotation   //20221222 added deltaheading!?
-      errorDist = Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));  // distance (error) from xy destination
+      deltaRot = getError(targetRot);  // error in rotation   //20221222 added deltaheading!?
+      distance = Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));  // distance (error) from xy destination
 
       //exit criteria if destination has been adequately reached
       onTargetByAccuracy = false;
-      if (accurate==0 && errorDist<2) {  // no rotation component here
+      if (accurate==0 && distance<2) {  // no rotation component here
          onTargetByAccuracy = true;
       }
-      if (errorDist<0.5 && Math.abs(errorRot)<0.2) {
+      if (distance<0.5 && Math.abs(deltaRot)<0.2) {
          onTargetByAccuracy = true;
       }
-      if (accurate==2 && errorDist<1 && Math.abs(errorRot)<1) {
+      if (accurate==2 && distance<1 && Math.abs(deltaRot)<1) {
          onTargetByAccuracy = true;
       }
-      if (accurate==3 && errorDist<2 && Math.abs(errorRot)<5) {  // ~ like 0 but still gets proportional
+      if (accurate==3 && distance<2 && Math.abs(deltaRot)<5) {  // ~ like 0 but still gets proportional
          onTargetByAccuracy = true;
       }
       if (onTargetByAccuracy) {
@@ -242,67 +207,25 @@ public class Navigator3 {
       }
 
       navAngle = Math.toDegrees(Math.atan2(deltaY,deltaX));  // angle to xy destination (vector when combined with distance)
- //     // linear proportional at 12", minimum 0.025
- //     pDist = Math.max(Math.min(errorDist/12,1),0.025);
- //     if (accurate==0) pDist = 1;  // don't bother with proportional when hitting transitional destinations
- //     // linear proportional at 15°, minimum 0.025
-//      pRot = Math.max(Math.min(Math.abs(errorRot)/15,1),0.025)*Math.signum(errorRot)*-1;
-
-      // 20230910 - Going to try for some proper PID here
-      //  Need to refactor all this later to make it less crappy`
-
-      PIDTimeCurrent = System.currentTimeMillis();
-
-      /*
-      i += k_i * (current_error * (current_time - previous_time))
-
-      if i > max_i:
-      i = max_i
-      elif i < -max_i:
-      i = -max_i
-      */
-
-      // Still need to reset I if we're going to use it.
-
-      if (Math.abs(navAngle-navAngleLast)>45) PIDmovement_calculated.i = 0;  // test - zero the I if we pass through an inflection
-
-      PIDmovement_calculated.p = PIDmovement.p * errorDist;
-      PIDmovement_calculated.i += PIDmovement.i * errorDist * ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
-      PIDmovement_calculated.i = Math.max(Math.min(PIDmovement_calculated.i,1),-1);
-      PIDmovement_calculated.d = PIDmovement.d * (errorDist - errorDistLast) / ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
-
-      pDist =  PIDmovement_calculated.p +  PIDmovement_calculated.i +  PIDmovement_calculated.d;
-      pDist = Math.max(Math.min(pDist,1),0.025);
+      // linear proportional at 12", minimum 0.025
+      pDist = Math.max(Math.min(distance/12,1),0.025);
       if (accurate==0) pDist = 1;  // don't bother with proportional when hitting transitional destinations
-
-      PIDrotate_calculated.p = PIDrotate.p * errorRot;
-      PIDrotate_calculated.i += PIDrotate.i * errorRot * ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
-      PIDrotate_calculated.i = Math.max(Math.min(PIDrotate_calculated.i,1),-1);
-      PIDrotate_calculated.d = PIDrotate.d * (errorDist - errorRotLast) / ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
-
-      pRot =  PIDrotate_calculated.p +  PIDrotate_calculated.i +  PIDrotate_calculated.d;
-      pRot = Math.max(Math.min(Math.abs(pRot),1),0.025)*Math.signum(pRot)*-1;
-      //pRot = Math.max(Math.min(Math.abs(errorRot)/15,1),0.025)*Math.signum(errorRot)*-1;
-
-      PIDTimeLast = PIDTimeCurrent;
-      errorDistLast = errorDist;
-      errorRotLast = errorRot;
-      navAngleLast = navAngle;
+      // linear proportional at 15°, minimum 0.025
+      pRot = Math.max(Math.min(Math.abs(deltaRot)/15,1),0.025)*Math.signum(deltaRot)*-1;
 
       //special cases:  Ramp up the proportional for pole finding (find a better way to do this)
       if (isTrackingPole) {
-         pDist = Math.max(Math.min(errorDist/4,1),0.15);
-         pRot = Math.max(Math.min(Math.abs(errorRot)/15,1),0.025)*Math.signum(errorRot)*-1;  //increase this?
+         pDist = Math.max(Math.min(distance/4,1),0.15);
+         pRot = Math.max(Math.min(Math.abs(deltaRot)/15,1),0.025)*Math.signum(deltaRot)*-1;  //increase this?
       }
 
-      telemetry.addData("NavDistance", JavaUtil.formatNumber(errorDist, 2));
+      telemetry.addData("NavDistance", JavaUtil.formatNumber(distance, 2));
       telemetry.addData("NavAngle", JavaUtil.formatNumber(navAngle, 2));
-      telemetry.addData("NavRotation", JavaUtil.formatNumber(errorRot, 2));
+      telemetry.addData("NavRotation", JavaUtil.formatNumber(deltaRot, 2));
       telemetry.addData("pDist", JavaUtil.formatNumber(pDist, 2));
       telemetry.addData("pRot", JavaUtil.formatNumber(pRot, 2));
 
-//      navAngle -= localizer.globalHeading;  // need to account for how the robot is oriented
-      navAngle -= robotPosition.R;  // need to account for how the robot is oriented
+      navAngle -= localizer.globalHeading;  // need to account for how the robot is oriented
       double autoSpeed = pDist * 1;  // 1 here is maxspeed; could be turned into a variable
       // the following adds the mecanum X, Y, and rotation motion components for each wheel
       v0 = autoSpeed * (Math.cos(Math.toRadians(navAngle)) - Math.sin(Math.toRadians(navAngle))) + pRot;
@@ -371,8 +294,7 @@ public class Navigator3 {
       // calculate error in -179 to +180 range  (
       //robotError = targetAngle - getHeading();
 //      robotError = targetAngle - robot.returnImuHeading();
-//      robotError = targetAngle - localizer.returnGlobalHeading();
-      robotError = targetAngle - robotPosition.R;
+      robotError = targetAngle - localizer.returnGlobalHeading();
 //      while (robotError > 180)  robotError -= 360;
 //      while (robotError <= -180) robotError += 360;
       return Functions.normalizeAngle(robotError);
@@ -408,23 +330,17 @@ public class Navigator3 {
       targetX=0;
       targetY=0;
       targetRot=0;
-      resetPID();
    }
 
    public void cancelAutoNavigation() {
       navigate=0;
-//      storedHeading = localizer.returnGlobalHeading();
-      storedHeading = robotPosition.R;
+      storedHeading = localizer.returnGlobalHeading();
    }
 
    public void setTargetToCurrentPosition() {
-//      targetX = Math.round(localizer.xPos);
-//      targetY = Math.round(localizer.yPos);
-//      targetRot = Math.round(localizer.returnGlobalHeading());
-      targetX = Math.round(robotPosition.X);
-      targetY = Math.round(robotPosition.Y);
-      targetRot = Math.round(robotPosition.R);
-      resetPID();
+      targetX = Math.round(localizer.xPos);
+      targetY = Math.round(localizer.yPos);
+      targetRot = Math.round(localizer.returnGlobalHeading());
    }
 
    public void setDeltaHeading() {
@@ -437,14 +353,12 @@ public class Navigator3 {
 
    public void toggleHeadingHold() {
       useHeadingHold = !useHeadingHold;
-//      storedHeading = localizer.returnGlobalHeading();
-      storedHeading = robotPosition.R;
+      storedHeading = localizer.returnGlobalHeading();
    }
 
    public void setUseHeadingHold(boolean boo) {
       useHeadingHold = boo;
-//      storedHeading = localizer.returnGlobalHeading();
-      storedHeading = robotPosition.R;
+      storedHeading = localizer.returnGlobalHeading();
    }
 
    public void setUseHoldPosition(boolean boo) {
@@ -465,12 +379,9 @@ public class Navigator3 {
    }
 
    public void setTargetByDelta(double X, double Y, double R) {
-      //TODO: revamp this to account for field centric operation accounting for starting orientation
       targetX += X;
       targetY += Y;
       targetRot += R;
-      storedHeading = targetRot;  //20230910 fix?
-      resetPID();
    }
 
    public boolean setTargetAbsolute(double X, double Y, double R) {
@@ -481,7 +392,6 @@ public class Navigator3 {
       targetX = X;
       targetY = Y;
       targetRot = Functions.normalizeAngle(R);
-      resetPID();
       return true;
    }
 
@@ -491,19 +401,16 @@ public class Navigator3 {
       targetRot += R;
       targetRot = Math.round(targetRot/45)*45;
       storedHeading = targetRot;
-      resetPID();
    }
 
    public void setTargetByDeltaRelative(double X, double Y, double R) {
-//      double rot = localizer.globalHeading;
-      double rot = robotPosition.R;
+      double rot = localizer.globalHeading;
 //      slamraRobotPose.X = sX + (rX*Math.cos(Math.toRadians(sR)) - rY*Math.sin(Math.toRadians(sR)));
 //      slamraRobotPose.Y = sY + (rX*Math.sin(Math.toRadians(sR)) + rY*Math.cos(Math.toRadians(sR)));
       targetX = targetX + (X * Math.cos(Math.toRadians(rot)) - Y * Math.sin(Math.toRadians(rot)));
       targetY = targetY + (X * Math.sin(Math.toRadians(rot)) + Y * Math.cos(Math.toRadians(rot)));
 //!!!!bug?      targetRot += R;
       targetRot += R;
-      resetPID();
    }
 
    public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {
@@ -538,24 +445,50 @@ public class Navigator3 {
 //      storedHeading += deltaHeading%45;
       storedHeading = Math.round(storedHeading/45)*45;
       targetRot = storedHeading;
-      resetPID();
    }
 
    public void handleRotate(double rotate) {
       // overall plan here is to deal with IMU latency
       if (rotate != 0) {
-//         storedHeading = localizer.returnGlobalHeading();
-         storedHeading = robotPosition.R;
+         storedHeading = localizer.returnGlobalHeading();
          headingDelay = System.currentTimeMillis() + 250;  // going to ignore the possibility of overflow
       } else if (headingDelay > System.currentTimeMillis()) {
          // keep re-reading until delay has passed
-//         storedHeading = localizer.returnGlobalHeading();
-         storedHeading = robotPosition.R;
+         storedHeading = localizer.returnGlobalHeading();
       }
    }
 
-   public void resetPID() {
-      PIDmovement_calculated.i = 0;
-      PIDrotate_calculated.i = 0;
-   }
+//   public enum Actions {
+//      MOVEACCURATE,
+//      MOVETRANSITION,
+//      PAUSE,
+//      ENDROUTINE
+//   }
+
+//   public class NavActions {
+//      Actions action;
+//      double parameter1;
+//      double parameter2;
+//      double parameter3;
+//
+//      public NavActions(Actions a, double x, double y, double r) {
+//         action = a;
+//         parameter1 = x;
+//         parameter2 = y;
+//         parameter3 = r;
+//      }
+//      public NavActions(Actions a) {
+//         action = a;
+//         parameter1 = 0;
+//         parameter2 = 0;
+//         parameter3 = 0;
+//      }
+//      public NavActions(Actions a, double p) {
+//         action = a;
+//         parameter1 = p;
+//         parameter2 = 0;
+//         parameter3 = 0;
+//      }
+//   }
+
 }

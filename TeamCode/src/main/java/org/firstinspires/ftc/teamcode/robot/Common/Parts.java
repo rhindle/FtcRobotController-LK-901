@@ -3,11 +3,6 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
-import org.firstinspires.ftc.teamcode.robot.GoCanum.Controls;
-import org.firstinspires.ftc.teamcode.robot.GoCanum.Drivetrain;
-import org.firstinspires.ftc.teamcode.robot.GoCanum.Navigator;
-import org.firstinspires.ftc.teamcode.robot.GoCanum.Robot;
-import org.firstinspires.ftc.teamcode.robot.GoCanum.Sensors;
 
 public class Parts {
 

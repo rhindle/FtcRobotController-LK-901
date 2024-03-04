@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Om.Vector3;
-import org.firstinspires.ftc.teamcode.robot.Omdometry;
-import org.firstinspires.ftc.teamcode.robot.Robot;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.Omdometry;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.Robot;
 
 @TeleOp (name="ZZ_TestBot_Omdometry", group="Test")
 //@Disabled

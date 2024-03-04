@@ -6,12 +6,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Drivetrain;
-import org.firstinspires.ftc.teamcode.robot.LiftbotControls;
-import org.firstinspires.ftc.teamcode.robot.LiftbotLifter;
-import org.firstinspires.ftc.teamcode.robot.Localizer;
-import org.firstinspires.ftc.teamcode.robot.Navigator3;
-import org.firstinspires.ftc.teamcode.robot.Robot;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.Drivetrain;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.LiftbotControls;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.LiftbotLifter;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.Localizer;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.Navigator3;
+import org.firstinspires.ftc.teamcode.robot.LegacyBots.Robot;
 
 @TeleOp(name = "AA_Liftbot", group = "")
 //@Disabled

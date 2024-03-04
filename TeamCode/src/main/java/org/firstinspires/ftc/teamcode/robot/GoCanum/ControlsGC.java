@@ -2,24 +2,32 @@ package org.firstinspires.ftc.teamcode.robot.GoCanum;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.Controls;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 
-class Controls_2 extends Controls {
+public class ControlsGC extends Controls {
 
-   public Controls_2(Parts parts) {
+   public ControlsGC(Parts parts) {
       super(parts);
    }
 
    public int someNewVariable;
 
    @Override
+   public void loop() {
+      userInput();
+      parts.navigator.setUserDriveSettings(DriveSpeed, DriveAngle, Rotate);
+   }
+
+   @Override
    public void userInput() {
+
       // TeleOp / normal drive
 
       // Get speed and direction from left stick
       DriveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y)));
-      DriveAngle = Math.atan2(gamepad1.left_stick_x, gamepad1.left_stick_y) / Math.PI * 180;
+      DriveAngle = Math.atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y) / Math.PI * 180;
       // Get rotation from right stick
       Rotate = Math.pow(gamepad1.right_stick_x, 1);
       parts.navigator.handleRotate(Rotate);

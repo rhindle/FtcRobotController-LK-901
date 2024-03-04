@@ -19,18 +19,18 @@ public class PartsGC extends Parts {
             return;
         }
         isSetup = true;
-        robot = new Robot(this);
+        robot = new RobotGC(this);
         buttonMgr = new ButtonMgr(opMode);
-        sensors = new Sensors(this);
+        sensors = new SensorsGC(this);
 //      controls = new Controls_2(this);
-        controls = new Controls(this);
-        drivetrain = new Drivetrain(this);
+        controls = new ControlsGC(this);
+        drivetrain = new DrivetrainGC(this);
 
         odometry = new OdometryGC(this);
         odometry.odoFieldStart = fieldStartPosition;//.clone();
         odometry.odoRobotOffset = odoRobotOffset;//.clone();
 
-        navigator = new Navigator(this);
+        navigator = new NavigatorGC(this);
 
         if (useSlamra) {
             slamra = new Slamra(this);
