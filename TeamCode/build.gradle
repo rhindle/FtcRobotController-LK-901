@@ -33,6 +33,7 @@ repositories {   // LK 20240303 1225 trying to get slamra working again
     maven { url = "https://dl.bintray.com/first-tech-challenge/ftcsdk/" }
     // Add this line
     maven { url = "https://maven.0x778.tk" }
+    //maven { url = "https://maven.catboy.camp" }  //lk 20240425
 }
 
 dependencies {
@@ -40,7 +41,8 @@ dependencies {
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
     implementation 'org.ftclib.ftclib:core:2.0.1'         //lk
     implementation files('lib/ftc265-3.0.0-pre.5.aar')    //lk
-    implementation 'com.intel.realsense:librealsense:2.41.1-ftc265@aar'  //LK 20240303 1228 trying to get slamra working again
+    implementation files('lib/librealsense-2.41.1-ftc265.aar')   //lk 20240425
+    //implementation 'com.intel.realsense:librealsense:2.41.1-ftc265@aar'  //LK 20240303 1228 trying to get slamra working again
     //implementation 'com.acmerobotics.dashboard:dashboard:0.4.6'        //lk
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.15'
     implementation 'com.acmerobotics.roadrunner:core:0.5.3'

@@ -6,8 +6,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 
-public class Sensors {
+public class Sensors {//implements PartsInterface {
 
    Parts parts;
    HardwareMap hardwareMap;
@@ -29,7 +30,7 @@ public class Sensors {
       construct(parts);
    }
 
-   void construct(Parts parts){
+   public void construct(Parts parts){
       this.parts = parts;
       this.hardwareMap = parts.opMode.hardwareMap;
    }
