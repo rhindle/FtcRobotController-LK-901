@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 public class Navigator {
 
    Parts parts;
-   Telemetry telemetry;
+//   Telemetry telemetry;
 
    Position robotPosition = new Position();
 
@@ -59,7 +59,7 @@ public class Navigator {
 
    void construct(Parts parts){
       this.parts = parts;
-      this.telemetry = parts.opMode.telemetry;
+//      this.telemetry = parts.opMode.telemetry;
    }
 
    public void init() {
@@ -87,8 +87,10 @@ public class Navigator {
          return;
       }
 
-      telemetry.addData("PIDmov", "PID = %.4f, %.4f, %.4f", PIDmovement.p, PIDmovement.i, PIDmovement.d);
-      telemetry.addData("PIDrot", "PID = %.4f, %.4f, %.4f", PIDrotate.p, PIDrotate.i, PIDrotate.d);
+//      telemetry.addData("PIDmov", "PID = %.4f, %.4f, %.4f", PIDmovement.p, PIDmovement.i, PIDmovement.d);
+//      telemetry.addData("PIDrot", "PID = %.4f, %.4f, %.4f", PIDrotate.p, PIDrotate.i, PIDrotate.d);
+      TelemetryHandler.Message(7,"PIDmov", "PID = %.4f, %.4f, %.4f", PIDmovement.p, PIDmovement.i, PIDmovement.d);
+      TelemetryHandler.Message(7, "PIDrot", "PID = %.4f, %.4f, %.4f", PIDrotate.p, PIDrotate.i, PIDrotate.d);
 
       // State machine-ish.  Needs embetterment.  This will determine motor powers then set them
       if (navigate == 1) {
@@ -143,8 +145,10 @@ public class Navigator {
       double errorDist, deltaX, deltaY, errorRot, pDist, pRot, navAngle;
       deltaX = targetPos.X - robotPosition.X;  // error in x
       deltaY = targetPos.Y - robotPosition.Y;  // error in y
-      telemetry.addData("DeltaX", JavaUtil.formatNumber(deltaX, 2));
-      telemetry.addData("DeltaY", JavaUtil.formatNumber(deltaY, 2));
+//      telemetry.addData("DeltaX", JavaUtil.formatNumber(deltaX, 2));
+//      telemetry.addData("DeltaY", JavaUtil.formatNumber(deltaY, 2));
+      TelemetryHandler.Message(7, "DeltaX", JavaUtil.formatNumber(deltaX, 2));
+      TelemetryHandler.Message(7, "DeltaY", JavaUtil.formatNumber(deltaY, 2));
       errorRot = getError(targetPos.R);  // error in rotation   //20221222 added deltaheading!?
       errorDist = Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));  // distance (error) from xy destination
 
@@ -220,11 +224,17 @@ public class Navigator {
          pRot = Math.max(Math.min(Math.abs(errorRot)/15,motorMaxPower),motorMinPower)*Math.signum(errorRot)*-1;  //increase this?
       }
 
-      telemetry.addData("NavDistance", JavaUtil.formatNumber(errorDist, 2));
-      telemetry.addData("NavAngle", JavaUtil.formatNumber(navAngle, 2));
-      telemetry.addData("NavRotation", JavaUtil.formatNumber(errorRot, 2));
-      telemetry.addData("pDist", JavaUtil.formatNumber(pDist, 2));
-      telemetry.addData("pRot", JavaUtil.formatNumber(pRot, 2));
+//      telemetry.addData("NavDistance", JavaUtil.formatNumber(errorDist, 2));
+//      telemetry.addData("NavAngle", JavaUtil.formatNumber(navAngle, 2));
+//      telemetry.addData("NavRotation", JavaUtil.formatNumber(errorRot, 2));
+//      telemetry.addData("pDist", JavaUtil.formatNumber(pDist, 2));
+//      telemetry.addData("pRot", JavaUtil.formatNumber(pRot, 2));
+      TelemetryHandler.Message(7, "NavDistance", JavaUtil.formatNumber(errorDist, 2));
+      TelemetryHandler.Message(7, "NavAngle", JavaUtil.formatNumber(navAngle, 2));
+      TelemetryHandler.Message(7, "NavRotation", JavaUtil.formatNumber(errorRot, 2));
+      TelemetryHandler.Message(7, "pDist", JavaUtil.formatNumber(pDist, 2));
+      TelemetryHandler.Message(7, "pRot", JavaUtil.formatNumber(pRot, 2));
+
 
 //      navAngle -= localizer.globalHeading;  // need to account for how the robot is oriented
       navAngle -= robotPosition.R;  // need to account for how the robot is oriented

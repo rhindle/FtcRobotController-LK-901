@@ -80,7 +80,7 @@ public class Robot {
 
     LinearOpMode opMode;
     HardwareMap hardwareMap;
-    Telemetry telemetry;
+//    Telemetry telemetry;
 
     Orientation angles;
     double imuHeading;
@@ -94,7 +94,7 @@ public class Robot {
     void construct(Parts parts){
         this.opMode = parts.opMode;
         this.hardwareMap = parts.opMode.hardwareMap;
-        this.telemetry = parts.opMode.telemetry;
+//        this.telemetry = parts.opMode.telemetry;
 
         // Bulk Reads - Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
         allHubs = hardwareMap.getAll(LynxModule.class);

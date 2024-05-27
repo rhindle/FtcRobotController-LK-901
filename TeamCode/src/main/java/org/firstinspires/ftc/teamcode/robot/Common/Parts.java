@@ -27,6 +27,7 @@ public class Parts {
    public Navigator navigator;
    public Odometry odometry;
    public Slamra slamra;
+   public TelemetryHandler telemetryHandler;
 
    public boolean isSetup = false;
    public robotType rType;
@@ -39,6 +40,7 @@ public class Parts {
    void construct(LinearOpMode opMode, robotType rType){
       this.opMode = opMode;
       this.rType = rType;
+      telemetryHandler = new TelemetryHandler(opMode);
    }
 
    public void setup(){
@@ -92,6 +94,10 @@ public class Parts {
 //      odometry.loop();  // get some things squared away before the real program runs
 //      navigator.loop();
 //      if (useSlamra) slamra.onStart();
+   }
+
+   public void initLoop() {
+
    }
 
    public void loop() {

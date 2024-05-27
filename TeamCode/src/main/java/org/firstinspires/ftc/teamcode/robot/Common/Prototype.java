@@ -12,7 +12,7 @@ public class Prototype {
    HardwareMap hardwareMap;
    Gamepad gamepad1;
    Gamepad gamepad2;
-   Telemetry telemetry;
+//   Telemetry telemetry;
    Robot robot;
 
    /* Constructor */
@@ -25,7 +25,7 @@ public class Prototype {
       this.hardwareMap = opMode.hardwareMap;
       this.gamepad1 = opMode.gamepad1;
       this.gamepad2 = opMode.gamepad2;
-      this.telemetry = opMode.telemetry;
+//      this.telemetry = opMode.telemetry;
       this.robot = robot;
    }
 }

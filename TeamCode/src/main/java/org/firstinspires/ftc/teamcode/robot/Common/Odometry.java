@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 public class Odometry {
 
    public Parts parts;
-   Telemetry telemetry;
+//   Telemetry telemetry;
 
    public DcMotorEx odoXL, odoY, odoXR;
    public byte odoXLdir, odoYdir, odoXRdir;
@@ -43,7 +43,7 @@ public class Odometry {
 
    void construct(Parts parts){
       this.parts = parts;
-      this.telemetry = parts.opMode.telemetry;
+//      this.telemetry = parts.opMode.telemetry;
    }
 
    public void init() {
@@ -142,7 +142,8 @@ public class Odometry {
 
       myHeading = getAvgHeading(globalHeading0, globalHeading);
 
-      telemetry.addData ("My Average Heading", myHeading);
+//      telemetry.addData ("My Average Heading", myHeading);
+      TelemetryHandler.Message(6,"My Average Heading", myHeading);
 
       xPos = xPos + deltaEncX * Math.cos(Math.toRadians(myHeading));
       yPos = yPos + deltaEncX * Math.sin(Math.toRadians(myHeading));
@@ -200,9 +201,12 @@ public class Odometry {
    }
 
    public void addTeleOpTelemetry() {
-      telemetry.addData("raw__", odoRawPose.toString(2));
-      telemetry.addData("robot", odoRobotPose.toString(2));
-      telemetry.addData("final", odoFinalPose.toString(2));
+//      telemetry.addData("raw__", odoRawPose.toString(2));
+//      telemetry.addData("robot", odoRobotPose.toString(2));
+//      telemetry.addData("final", odoFinalPose.toString(2));
+      TelemetryHandler.Message(6, "raw__", odoRawPose.toString(2));
+      TelemetryHandler.Message(6, "robot", odoRobotPose.toString(2));
+      TelemetryHandler.Message(6, "final", odoFinalPose.toString(2));
    }
 
    public void configureEncoders() {

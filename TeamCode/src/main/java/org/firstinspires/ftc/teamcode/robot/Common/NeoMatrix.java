@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class NeoMatrix {
 
    HardwareMap hardwareMap;
-   Telemetry telemetry;
+//   Telemetry telemetry;
    LinearOpMode opMode;
    String deviceName;
 

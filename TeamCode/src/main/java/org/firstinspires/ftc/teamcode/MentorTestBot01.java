@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryHandler;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 import org.firstinspires.ftc.teamcode.robot.GoCanum.PartsGC;
 
@@ -32,7 +33,7 @@ public class MentorTestBot01 extends LinearOpMode {
         parts = new PartsGC(this, Parts.robotType.GOCANUM);
 
         parts.useODO = true;
-        parts.useSlamra = true;
+        parts.useSlamra = true; //true;
         //robot.reverseDrive = true;  // for AndyMark test
         parts.useDistanceSensors = false; //true; //false;
         parts.fieldStartPosition = new Position (36,63,-90);
@@ -106,6 +107,7 @@ public class MentorTestBot01 extends LinearOpMode {
     }
 
     private void addTelemetryLoopEnd() {
+        TelemetryHandler.Message(1, "!!", "!!!TEST !!!!!!!!!!!!!!!!!!!!");
         telemetry.addData("r (magnitude)", parts.controls.DriveSpeed);
         telemetry.addData("robotAngle", parts.controls.DriveAngle);
         telemetry.addData("rotate", parts.controls.Rotate);

@@ -82,4 +82,8 @@ public class Position
         return diff.X < maxDiff.X && diff.Y < maxDiff.Y && diff.R < maxDiff.R;
     }
 
+    public boolean isEqualTo (Position pos2) {
+        return ((X == pos2.X) && (Y == pos2.Y) && (R == pos2.R));
+    }
+
 }

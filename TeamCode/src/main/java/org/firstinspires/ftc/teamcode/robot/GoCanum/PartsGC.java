@@ -68,6 +68,12 @@ public class PartsGC extends Parts {
     }
 
     @Override
+    public void initLoop() {
+        buttonMgr.loop();
+        if (useSlamra) slamra.initLoop();
+    }
+
+    @Override
     public void loop() {
         robot.loop();
         sensors.loop();
