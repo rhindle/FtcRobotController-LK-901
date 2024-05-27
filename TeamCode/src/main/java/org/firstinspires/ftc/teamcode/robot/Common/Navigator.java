@@ -23,10 +23,8 @@ public class Navigator {
    boolean useFieldCentricDrive = false; //true
    boolean useHeadingHold = true;
    boolean useHoldPosition = true;
-   boolean usePoleFinder = false;  //true
    boolean useAutoDistanceActivation = true;
    boolean useSnapToAngle = false;
-   boolean isTrackingPole = false;
    long headingDelay = System.currentTimeMillis();
    long idleDelay = System.currentTimeMillis();
    double motorMinPower = 0.025;
@@ -50,7 +48,7 @@ public class Navigator {
    double errorRotLast;
    double navAngleLast;
 
-   Position testPosition = null;
+//   Position testPosition = null;
 
    /* Constructor */
    public Navigator(Parts parts){
@@ -59,7 +57,6 @@ public class Navigator {
 
    void construct(Parts parts){
       this.parts = parts;
-//      this.telemetry = parts.opMode.telemetry;
    }
 
    public void init() {
@@ -87,8 +84,6 @@ public class Navigator {
          return;
       }
 
-//      telemetry.addData("PIDmov", "PID = %.4f, %.4f, %.4f", PIDmovement.p, PIDmovement.i, PIDmovement.d);
-//      telemetry.addData("PIDrot", "PID = %.4f, %.4f, %.4f", PIDrotate.p, PIDrotate.i, PIDrotate.d);
       TelemetryHandler.Message(7,"PIDmov", "PID = %.4f, %.4f, %.4f", PIDmovement.p, PIDmovement.i, PIDmovement.d);
       TelemetryHandler.Message(7, "PIDrot", "PID = %.4f, %.4f, %.4f", PIDrotate.p, PIDrotate.i, PIDrotate.d);
 
@@ -99,8 +94,6 @@ public class Navigator {
       else {
          userDrive();
          if (idleDelay < System.currentTimeMillis() && useHoldPosition) {
-            if (useAutoDistanceActivation) parts.sensors.readDistSensors(true);
-            if (usePoleFinder) autoPoleCenter();
             autoDrive();
          }
       }
@@ -108,45 +101,11 @@ public class Navigator {
       parts.drivetrain.setDrivePowers(new double[] {v0, v1, v2, v3});
    }
 
-   public void autoPoleCenter () {
-      double L = parts.sensors.distL;
-      double M = parts.sensors.distM;
-      double R = parts.sensors.distR;
-      double LM = Math.abs(L-M);
-      double RM = Math.abs(R-M);
-      double closest = Math.min(L, Math.min(R,M));
-      isTrackingPole = false;
-      if (L == -1 || M == -1 || R == -1) return;   // sensor not read so don't bother continuing
-      if (L < 10 || M < 10 || R < 10) {            // at least one sensor is reading low
-         if (L < M && LM > 1) {                    // to the left
-            setTargetByDeltaRelative(0, 0.125,0);
-            isTrackingPole = true;
-         }
-         if (R < M && RM > 1) {                    // to the right
-            setTargetByDeltaRelative(0, -0.125,0);
-            isTrackingPole = true;
-         }
-         //if (M < L && M < R) {                     // apparently centered
-            if (closest < 3) {   //was M
-               setTargetByDeltaRelative(-0.1,0,0);
-               isTrackingPole = true;
-            }
-            if (closest > 5) {
-               setTargetByDeltaRelative(0.1,0,0);
-               isTrackingPole = true;
-            }
-         //}
-      }
-      parts.sensors.ledRED.setState(!isTrackingPole);
-   }
-
    // Determine motor speeds when under automatic control
    public void autoDrive () {
       double errorDist, deltaX, deltaY, errorRot, pDist, pRot, navAngle;
       deltaX = targetPos.X - robotPosition.X;  // error in x
       deltaY = targetPos.Y - robotPosition.Y;  // error in y
-//      telemetry.addData("DeltaX", JavaUtil.formatNumber(deltaX, 2));
-//      telemetry.addData("DeltaY", JavaUtil.formatNumber(deltaY, 2));
       TelemetryHandler.Message(7, "DeltaX", JavaUtil.formatNumber(deltaX, 2));
       TelemetryHandler.Message(7, "DeltaY", JavaUtil.formatNumber(deltaY, 2));
       errorRot = getError(targetPos.R);  // error in rotation   //20221222 added deltaheading!?
@@ -218,25 +177,12 @@ public class Navigator {
       errorRotLast = errorRot;
       navAngleLast = navAngle;
 
-      //special cases:  Ramp up the proportional for pole finding (find a better way to do this)
-      if (isTrackingPole) {
-         pDist = Math.max(Math.min(errorDist/4,1),0.15);
-         pRot = Math.max(Math.min(Math.abs(errorRot)/15,motorMaxPower),motorMinPower)*Math.signum(errorRot)*-1;  //increase this?
-      }
-
-//      telemetry.addData("NavDistance", JavaUtil.formatNumber(errorDist, 2));
-//      telemetry.addData("NavAngle", JavaUtil.formatNumber(navAngle, 2));
-//      telemetry.addData("NavRotation", JavaUtil.formatNumber(errorRot, 2));
-//      telemetry.addData("pDist", JavaUtil.formatNumber(pDist, 2));
-//      telemetry.addData("pRot", JavaUtil.formatNumber(pRot, 2));
       TelemetryHandler.Message(7, "NavDistance", JavaUtil.formatNumber(errorDist, 2));
       TelemetryHandler.Message(7, "NavAngle", JavaUtil.formatNumber(navAngle, 2));
       TelemetryHandler.Message(7, "NavRotation", JavaUtil.formatNumber(errorRot, 2));
       TelemetryHandler.Message(7, "pDist", JavaUtil.formatNumber(pDist, 2));
       TelemetryHandler.Message(7, "pRot", JavaUtil.formatNumber(pRot, 2));
 
-
-//      navAngle -= localizer.globalHeading;  // need to account for how the robot is oriented
       navAngle -= robotPosition.R;  // need to account for how the robot is oriented
       double autoSpeed = pDist * 1;  // 1 here is maxspeed; could be turned into a variable
       // the following adds the mecanum X, Y, and rotation motion components for each wheel
@@ -457,7 +403,6 @@ public class Navigator {
    }
 
    private void updateRobotPosition() {
-//      robotPosition = parts.localizer.robotPosition.clone();
       robotPosition = parts.robotPosition.clone();
    }
 

@@ -5,6 +5,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -12,7 +13,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -80,7 +80,6 @@ public class Robot {
 
     LinearOpMode opMode;
     HardwareMap hardwareMap;
-//    Telemetry telemetry;
 
     Orientation angles;
     double imuHeading;
@@ -88,14 +87,11 @@ public class Robot {
     /* Constructor */
     public Robot(Parts parts){
         construct(parts);
-//        buttonMgr = new ButtonMgr(opMode);
     }
 
     void construct(Parts parts){
         this.opMode = parts.opMode;
         this.hardwareMap = parts.opMode.hardwareMap;
-//        this.telemetry = parts.opMode.telemetry;
-
         // Bulk Reads - Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
         allHubs = hardwareMap.getAll(LynxModule.class);
     }
@@ -131,9 +127,29 @@ public class Robot {
 
     /* Initialize standard Hardware interfaces */
     public void init() {
-
-        // Define and Initialize Motors
         // Bulk Reads - Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
+        // Bulk Reads - Important Step 3: Option B. Set all Expansion hubs to use the MANUAL Bulk Caching mode
+        for (LynxModule module : allHubs) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+
+        initMotors();
+        initServos();
+        initDigital();
+        initAnalog();
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "sensorIMU".
+        sensorIMU = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
+        sensorIMU.initialize(parameters);
+
+        initOptions();
+    }
+
+    public void initMotors() {
         motor0 = hardwareMap.get(DcMotorEx.class, "motor0");
         motor1 = hardwareMap.get(DcMotorEx.class, "motor1");
         motor2 = hardwareMap.get(DcMotorEx.class, "motor2");
@@ -142,11 +158,6 @@ public class Robot {
         motor1B = hardwareMap.get(DcMotorEx.class, "motor1B");
         motor2B = hardwareMap.get(DcMotorEx.class, "motor2B");
         motor3B = hardwareMap.get(DcMotorEx.class, "motor3B");
-
-        // Bulk Reads - Important Step 3: Option B. Set all Expansion hubs to use the MANUAL Bulk Caching mode
-        for (LynxModule module : allHubs) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        }
 
         motor0.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         motor1.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
@@ -168,15 +179,18 @@ public class Robot {
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        motor0.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        motor1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        motor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        motor3.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        motor0B.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        motor1B.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        motor2B.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        motor3B.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        DcMotorEx.RunMode runmode = DcMotorEx.RunMode.RUN_WITHOUT_ENCODER;
+        motor0.setMode(runmode);
+        motor1.setMode(runmode);
+        motor2.setMode(runmode);
+        motor3.setMode(runmode);
+        motor0B.setMode(runmode);
+        motor1B.setMode(runmode);
+        motor2B.setMode(runmode);
+        motor3B.setMode(runmode);
+    }
 
+    public void initServos() {
         // Define and initialize ALL installed servos.
         servo0 = hardwareMap.get(Servo.class,"servo0");
         servo1 = hardwareMap.get(Servo.class,"servo1");
@@ -190,7 +204,9 @@ public class Robot {
         servo3B = hardwareMap.get(Servo.class,"servo3B");
         servo4B = hardwareMap.get(Servo.class,"servo4B");
         servo5B = hardwareMap.get(Servo.class,"servo5B");
+    }
 
+    public void initDigital() {
         digital0 = hardwareMap.get(DigitalChannel.class, "digital0");
         digital1 = hardwareMap.get(DigitalChannel.class, "digital1");
         digital2 = hardwareMap.get(DigitalChannel.class, "digital2");
@@ -208,30 +224,22 @@ public class Robot {
         digital5.setMode(DigitalChannel.Mode.INPUT);
         digital6.setMode(DigitalChannel.Mode.INPUT);
         digital7.setMode(DigitalChannel.Mode.INPUT);
+    }
 
+    public void initAnalog() {
         analog0 = hardwareMap.get(AnalogInput.class, "analog0");
         analog1 = hardwareMap.get(AnalogInput.class, "analog1");
         analog2 = hardwareMap.get(AnalogInput.class, "analog2");
         analog3 = hardwareMap.get(AnalogInput.class, "analog3");
-
-        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
-        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
-        // and named "sensorIMU".
-        sensorIMU = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
-        sensorIMU.initialize(parameters);
-
-        initOptions();
     }
 
     public void initOptions() {
         //i2c sensors
 //        sensorColor = hwMap.get(ColorSensor.class, "sensorColorRange");
 //        sensorDistance = hwMap.get(DistanceSensor.class, "sensorColorRange");
-        sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
-        sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
-        sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
-        qled = hardwareMap.get(QwiicLEDStick.class, "led");
+//        sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
+//        sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
+//        sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
+//        qled = hardwareMap.get(QwiicLEDStick.class, "led");
     }
 }

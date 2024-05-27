@@ -4,18 +4,14 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.spartronics4915.lib.T265Camera;
 import com.spartronics4915.lib.T265Helper;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 
 public class Slamra  {
 
 	volatile T265Camera slamra;
 	Parts parts;
-//	Telemetry telemetry;
 
 	public Position slamraFieldStart = null;								// set when start pushed (? final ?)
-//	public Position slamraRobotOffset = new Position(-6.5,0,-90);  // position transform to account for mounting position vs center of robot
-//	public Position slamraRobotOffset = new Position(-8,-1,0);  // position transform to account for mounting position vs center of robot
     public Position slamraRobotOffset = new Position();                     // position transform to account for mounting position vs center of robot
 	Position slamraRawPose = new Position();								// original position from slamra device
 	Position slamraRobotPose = new Position();								// slamra transformed by robot position
@@ -31,11 +27,10 @@ public class Slamra  {
 
 	void construct(Parts parts){
 		this.parts = parts;
-//		this.telemetry = parts.opMode.telemetry;
 	}
 
 	public void init() {
-		// We'll set up slamra without an initial position because that has historically been very broken
+		// Use raw slamra values only (functions in the library are broken)
 		if (slamra == null) {
 			slamra = T265Helper.getCamera(
 					new T265Camera.OdometryInfo(new Pose2d(0,0,0),0.1),
@@ -45,8 +40,6 @@ public class Slamra  {
 	}
 
 	public void onStart() {
-		//slamraFieldStart = parts.robotPosition;
-		//setupFieldOffset(slamraFieldStart);
 	}
 
 	public void onStop() {
@@ -63,32 +56,14 @@ public class Slamra  {
 
 	public void loop() {
 		updateSlamraPosition();
-		//telemetry.addData("slam final", slamraFinalPose.toString(2));
-//		TelemetryHandler.Message(5,"slam final", slamraFinalPose.toString(2));
-//		//telemetry.addData("last pos", lastPos.toString(2));
-//		TelemetryHandler.Message(5,"last pos", lastPos.toString(2));
-//		if(!slamraFinalPose.equals(lastPos)) {
-//			parts.slamraPosition = slamraFinalPose.clone();
-//			timesStuck = 0;
-//			lastPos = slamraFinalPose;
-//		} else {
-//			timesStuck ++;
-//		}
-
 		isSlamraChanging();
-
-//		//telemetry.addData("slamra stuck", timesStuck);
-//		TelemetryHandler.Message(2, "slamra stuck", timesStuck);
 		addTeleOpTelemetry();
 	}
 
 	public boolean isSlamraDead(){return timesStuck > 4;}
 
 	public boolean isSlamraChanging() {
-//		if(!slamraRawPose.equals(lastPos)) {
-//		if(tempDiffTest(slamraRawPose, lastPos)) {
 		if(!slamraRawPose.isEqualTo(lastPos)) {
-//			parts.slamraPosition = slamraFinalPose.clone();
 			timesStuck = 0;
 			lastPos = slamraRawPose.clone();  // add .clone?????
 			return true;
@@ -97,13 +72,6 @@ public class Slamra  {
 			return false;
 		}
 	}
-
-//	public boolean tempDiffTest (Position Pos1, Position Pos2) {
-//		if (Pos1.X != Pos2.X) return true;
-//		if (Pos1.Y != Pos2.Y) return true;
-//		if (Pos1.R != Pos2.R) return true;
-//		return false;
-//	}
 
 	public void setupFieldOffset(Position fieldPosition) {
 		slamraFieldOffset = new Position (0, 0, 0);    // clear any existing offset
@@ -114,7 +82,6 @@ public class Slamra  {
 		slamraFieldOffset = new Position (0, 0, 0);    // clear any existing offset
 		updateSlamraPosition();
 		slamraFieldOffset = getSlamraFieldOffset(slamraRobotPose, slamraFieldStart);
-//		slamraFinalPose = getSlamraFinalPose();
 	}
 
 	public void updateSlamraPosition() {
@@ -140,10 +107,7 @@ public class Slamra  {
 	}
 
 	Position getSlamraFieldOffset(Position robotPose, Position fieldPose) {
-//		Position sFS = slamraFieldStart;
-//		Position sRP = slamraRobotPose;
 		double offsetR = fieldPose.R - robotPose.R;
-//		slamraFieldOffset = new Position (
 		return new Position (
 				fieldPose.X - (robotPose.X*Math.cos(Math.toRadians(offsetR)) - robotPose.Y*Math.sin(Math.toRadians(offsetR))),
 				fieldPose.Y - (robotPose.X*Math.sin(Math.toRadians(offsetR)) + robotPose.Y*Math.cos(Math.toRadians(offsetR))),
@@ -160,10 +124,6 @@ public class Slamra  {
 	}
 
 	public void addTeleOpTelemetry() {
-//		telemetry.addData("s-fldof", slamraFieldOffset.toString(2));
-//		telemetry.addData("s-raw__", slamraRawPose.toString(2));
-//		telemetry.addData("s-robot", slamraRobotPose.toString(2));
-//		telemetry.addData("s-final", slamraFinalPose.toString(2));
 		TelemetryHandler.Message(6, "s-fldof", slamraFieldOffset.toString(2));
 		TelemetryHandler.Message(6, "s-raw__", slamraRawPose.toString(2));
 		TelemetryHandler.Message(6, "s-robot", slamraRobotPose.toString(2));

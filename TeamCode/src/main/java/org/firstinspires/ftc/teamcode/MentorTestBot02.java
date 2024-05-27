@@ -47,22 +47,16 @@ public class MentorTestBot02 extends LinearOpMode {
 
       TelemetryHandler.setDebugLevel(10);
       while (!isStarted()) {
-         parts.initLoop();
-         //parts.buttonMgr.loop();
-         if (parts.buttonMgr.wasTapped(1, ButtonMgr.Buttons.x))
-            parts.reverseDrive = !parts.reverseDrive;
-         if (parts.buttonMgr.wasTapped(2, ButtonMgr.Buttons.x))
-            parts.reverseDrive = !parts.reverseDrive;
-
-         // Prompt user to press start button.
-//         telemetry.addData(">", "Press Play to start");
-//         telemetry.addData(">", "Robot Heading = %.1f", parts.robot.returnImuHeading(true));
-//         telemetry.addData("Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
          TelemetryHandler.Message(1, ">", "Press Play to start");
          TelemetryHandler.Message(1, ">", "Robot Heading = %.1f", parts.robot.returnImuHeading(true));
          TelemetryHandler.Message(1, "Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
 
-         //if (parts.useSlamra) parts.slamra.loop();
+         parts.initLoop();
+
+         if (parts.buttonMgr.wasTapped(1, ButtonMgr.Buttons.x))
+            parts.reverseDrive = !parts.reverseDrive;
+         if (parts.buttonMgr.wasTapped(2, ButtonMgr.Buttons.x))
+            parts.reverseDrive = !parts.reverseDrive;
 
          TelemetryHandler.Update(true);
          sleep(20);
@@ -102,11 +96,11 @@ public class MentorTestBot02 extends LinearOpMode {
    }
 
    private void addTelemetryLoopStart() {
-      telemetry.addData("Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
-      telemetry.addData("heading", JavaUtil.formatNumber(parts.robot.returnImuHeading(),2));
-      telemetry.addData("rangeL", String.format("%.01f in", parts.sensors.distL));
-      telemetry.addData("rangeM", String.format("%.01f in", parts.sensors.distM));
-      telemetry.addData("rangeR", String.format("%.01f in", parts.sensors.distR));
+      TelemetryHandler.Message(2, "Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
+      TelemetryHandler.Message(2, "heading", JavaUtil.formatNumber(parts.robot.returnImuHeading(),2));
+//      TelemetryHandler.Message(3, "rangeL", String.format("%.01f in", parts.sensors.distL));
+//      TelemetryHandler.Message(3, "rangeM", String.format("%.01f in", parts.sensors.distM));
+//      TelemetryHandler.Message(3, "rangeR", String.format("%.01f in", parts.sensors.distR));
 //        telemetry.addData("raw__", localizer.odoRawPose.toString(2));
 //        telemetry.addData("robot", localizer.odoRobotPose.toString(2));
 //        telemetry.addData("final", localizer.odoFinalPose.toString(2));
@@ -114,12 +108,11 @@ public class MentorTestBot02 extends LinearOpMode {
    }
 
    private void addTelemetryLoopEnd() {
-      TelemetryHandler.Message(1, "!!", "!!!TEST !!!!!!!!!!!!!!!!!!!!");
-      telemetry.addData("r (magnitude)", parts.controls.DriveSpeed);
-      telemetry.addData("robotAngle", parts.controls.DriveAngle);
-      telemetry.addData("rotate", parts.controls.Rotate);
-      telemetry.addData("storedHeading", JavaUtil.formatNumber(parts.navigator.storedHeading, 2));
-      telemetry.addData("deltaHeading", JavaUtil.formatNumber(parts.navigator.deltaHeading, 2));
+      TelemetryHandler.Message(4, "r (magnitude)", parts.controls.DriveSpeed);
+      TelemetryHandler.Message(4, "robotAngle", parts.controls.DriveAngle);
+      TelemetryHandler.Message(4, "rotate", parts.controls.Rotate);
+      TelemetryHandler.Message(4, "storedHeading", JavaUtil.formatNumber(parts.navigator.storedHeading, 2));
+      TelemetryHandler.Message(4, "deltaHeading", JavaUtil.formatNumber(parts.navigator.deltaHeading, 2));
 //        telemetry.addData("error", JavaUtil.formatNumber(currentError, 2));
 //        telemetry.addData("v0", JavaUtil.formatNumber(navigator.v0, 2));
 //        telemetry.addData("v1", JavaUtil.formatNumber(navigator.v2, 2));
@@ -136,9 +129,6 @@ public class MentorTestBot02 extends LinearOpMode {
 //        telemetry.addData ("X", JavaUtil.formatNumber(localizer.xPos, 2));
 //        telemetry.addData ("Y", JavaUtil.formatNumber(localizer.yPos, 2));
 
-//        telemetry.addData("rangeL", String.format("%.01f in", robot.sensors.distL));
-//        telemetry.addData("rangeM", String.format("%.01f in", robot.sensors.distM));
-//        telemetry.addData("rangeR", String.format("%.01f in", robot.sensors.distR));
    }
 
    // Calculate loop time for performance optimization
