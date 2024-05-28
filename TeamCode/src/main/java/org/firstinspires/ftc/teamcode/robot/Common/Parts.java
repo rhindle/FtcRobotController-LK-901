@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.DiscShooter.AprilTag;
 
 public class Parts {
 
@@ -12,7 +13,7 @@ public class Parts {
    public boolean useDistanceSensors = true;
    public boolean useDriveEncoders = true;
    public boolean useSlamra = false;
-   public Position robotPosition;
+   public Position robotPosition = new Position();
    public Position slamraPosition;
    public Position fieldStartPosition;
    public Position odoRobotOffset;
@@ -28,6 +29,7 @@ public class Parts {
    public Odometry odometry;
    public Slamra slamra;
    public TelemetryHandler telemetryHandler;
+   public AprilTag apriltag;
 
    public boolean isSetup = false;
    public robotType rType;

@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.robot.GoCanum;
+package org.firstinspires.ftc.teamcode.robot.DiscShooter;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Odometry;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 
-public class OdometryGC extends Odometry {
+public class OdometryDS extends Odometry {
 
-    public OdometryGC(Parts parts) {
+    public OdometryDS(Parts parts) {
         super(parts);
     }
 

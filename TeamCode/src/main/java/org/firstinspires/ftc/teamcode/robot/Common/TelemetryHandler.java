@@ -28,6 +28,14 @@ public class TelemetryHandler {
         }
     }
 
+    public static void Message (int lvl, String cap) {
+        if (lvl <= debugLevel) {
+            opMode.telemetry.addLine(cap);
+            needsUpdate = true;
+        }
+    }
+
+
     public static void Update () {
         if (needsUpdate) opMode.telemetry.update();
         needsUpdate = false;
