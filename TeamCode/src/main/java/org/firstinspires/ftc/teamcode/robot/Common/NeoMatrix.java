@@ -13,49 +13,71 @@ import java.util.Arrays;
 public class NeoMatrix {
 
    HardwareMap hardwareMap;
-//   Telemetry telemetry;
    LinearOpMode opMode;
    String deviceName;
 
    public AdafruitNeoDriver ledMatrix = null;
 
+   final int updateSize = 8;   // i2c driver limit is 24 bytes, or 8 pixels * 3 RGB bytes
    private boolean updatePanel = true;
    private boolean pendingUpdate = false;
    private boolean preventTearing = false;
 
    private int updateLimit = 1;
    private int updatePosition = 0;
-   private int dimMax = 255;     // for initial debugging, let's not change the max
+   private int ledRows = 8;
+   private int ledCols = 24; //32
 
-   final int ledRows = 8;
-   final int ledCols = 32; //32
-   final int ledQty = ledCols * ledRows;
-   final int hwLedQty = Math.min(1536, ledQty); // the board doesn't work at more than 255 pixels? A problem with documentation?
-   final boolean flipVert = false;
-   final boolean flipHoriz = false;
-   final int updateSize = 8;   // i2c driver limit is 24 bytes, or 8 pixels * 3 RGB bytes
+   public int dimMax = 255;     // for initial debugging, let's not change the max
+   public boolean flipVert = false;
+   public  boolean flipHoriz = false;
 
-   int[][] matrixBuffer = new int[ledCols][ledRows];
-   int[]   stringBuffer  = new int[ledQty];
-   int[]   stringActual  = new int[ledQty];
+   private int ledQty; //= ledCols * ledRows;
+//   private int hwLedQty; // = Math.min(1536, ledQty); // the board doesn't work at more than 255 pixels? A problem with documentation?
+   int[][] matrixBuffer; // = new int[ledCols][ledRows];
+   int[]   stringBuffer; //  = new int[ledQty];
+   int[]   stringActual; //  = new int[ledQty];
    int[]   stringUpdate  = new int[updateSize];
 
    /* Constructor */
    public NeoMatrix(LinearOpMode opMode, String deviceName){
       construct(opMode, deviceName);
    }
+   public NeoMatrix(LinearOpMode opMode, String deviceName, int ledRows, int ledCols){
+      construct(opMode, deviceName, ledRows, ledCols);
+   }
 
    void construct(LinearOpMode opMode, String deviceName){
+      construct(opMode, deviceName, ledRows, ledCols);
+   }
+   void construct(LinearOpMode opMode, String deviceName, int ledRows, int ledCols){
       this.opMode = opMode;
       this.deviceName = deviceName;
       this.hardwareMap = opMode.hardwareMap;
+      this.ledRows = ledRows;
+      this.ledCols = ledCols;
    }
 
    public void init() {
       ledMatrix = hardwareMap.get(AdafruitNeoDriver.class, deviceName);
+      updateMatrixSize(ledRows, ledCols);
+   }
+
+   public boolean updateMatrixSize(int rows, int columns) {
+      if (ledMatrix==null) return false;
+      ledRows = rows;
+      ledCols = columns;
+      ledQty = ledCols * ledRows;
+      int hwLedQty = Math.min(1536, ledQty);
+      matrixBuffer = new int[ledCols][ledRows];
+      stringBuffer  = new int[ledQty];
+      stringActual  = new int[ledQty];
+
       ledMatrix.setNumberOfPixels(hwLedQty);
       ledMatrix.fill(0);
       ledMatrix.show();
+
+      return true;
    }
 
    public void loop(){
@@ -163,6 +185,16 @@ public class NeoMatrix {
       }
    }
 
+   private boolean putMatrixBuffer(int x, int y, int pixelColor) {
+      // this is for checking input to avoid applying out of bounds data
+      if (!(x<0 || x>=ledCols || y<0 || y>=ledRows)) {
+         matrixBuffer[x][y] = pixelColor;
+         return true;
+      } else {
+         return false;
+      }
+   }
+
    public void clearMatrix() {
       // This will clear the buffer, and then the normal update process will write it to the LEDs
       for (int c = 0; c < ledCols; c++) {
@@ -180,6 +212,7 @@ public class NeoMatrix {
       for (int c = startC; c <= endC; c++) {
          for (int r = 0; r < ledRows; r++) {
             matrixBuffer[c][r]=0;
+
          }
       }
    }
@@ -201,13 +234,16 @@ public class NeoMatrix {
       int xStep = (startX <= endX) ? 1 : -1;
       int yStep = (startY <= endY) ? 1 : -1;
       for (int x = startX; x != endX; x += xStep) {
-         matrixBuffer[x][interpolate(startX,startY,endX,endY,x)] = lineColor;
+         //matrixBuffer[x][interpolate(startX,startY,endX,endY,x)] = lineColor;
+         putMatrixBuffer(x, interpolate(startX,startY,endX,endY,x), lineColor);
       }
       for (int y = startY; y != endY; y += yStep) {
-         matrixBuffer[interpolate(startY,startX,endY,endX,y)][y] = lineColor;
+         //matrixBuffer[interpolate(startY,startX,endY,endX,y)][y] = lineColor;
+         putMatrixBuffer(interpolate(startY,startX,endY,endX,y), y, lineColor);
       }
       // the last point is missed because both loops stop before reaching the end
-      matrixBuffer[endX][endY] = lineColor;
+      //matrixBuffer[endX][endY] = lineColor;
+      putMatrixBuffer(endX, endY, lineColor);
    }
 
    int interpolate (int X1, int Y1, int X2, int Y2, int XX) {
@@ -223,23 +259,33 @@ public class NeoMatrix {
    }
    public void drawRectangle(int startColumn, int endColumn, int startRow, int endRow, int lineColor, boolean fill, int fillColor) {
       // Part 1: The outer rectangle
-      if (startColumn < 0 || startColumn >= ledCols) return;
-      if (endColumn < startColumn || endColumn >= ledCols) return;
-      if (startRow < 0 || startRow >= ledRows) return;
-      if (endRow < startRow || endRow >= ledRows) return;
+      if (startColumn < 0) startColumn = 0;
+      if (startColumn >= ledCols) startColumn = ledCols - 1;
+      if (endColumn < startColumn) endColumn = startColumn;
+      if (endColumn >= ledCols) endColumn = ledCols - 1;
+      if (startRow < 0) startRow = 0;
+      if (startRow >= ledRows) startRow = ledRows - 1;
+      if (endRow < startRow) endRow = startRow;
+      if (endRow >= ledRows) endRow = ledRows - 1;
+
       // a. make the lines across
       for (int c = startColumn; c <= endColumn; c++) {
-         matrixBuffer[c][startRow]=lineColor;
-         matrixBuffer[c][endRow]=lineColor;
+         //matrixBuffer[c][startRow]=lineColor;
+         putMatrixBuffer(c, startRow, lineColor);
+         //matrixBuffer[c][endRow]=lineColor;
+         putMatrixBuffer(c, endRow, lineColor);
       }
       // b. make the lines down
       startRow++;
       endRow--;
       for (int r = startRow; r <= endRow; r++) {
-         matrixBuffer[startColumn][r] = lineColor;
-         matrixBuffer[endColumn][r] = lineColor;
+         //matrixBuffer[startColumn][r] = lineColor;
+         putMatrixBuffer(startColumn, r, lineColor);
+         //matrixBuffer[endColumn][r] = lineColor;
+         putMatrixBuffer(endColumn, r, lineColor);
       }
       if (!fill) return;
+
       // Part 2: The fill
       startColumn++;
       endColumn--;
@@ -247,7 +293,8 @@ public class NeoMatrix {
       //if (startRow >= ledRows || endRow < startRow) return;
       for (int c = startColumn; c <= endColumn; c++) {
          for (int r = startRow; r <= endRow; r++) {
-            matrixBuffer[c][r] = fillColor;
+            //matrixBuffer[c][r] = fillColor;
+            putMatrixBuffer(c, r, fillColor);
          }
       }
    }
@@ -291,11 +338,15 @@ public class NeoMatrix {
          for (int y = startRow; y <= endRow; y++) {
             int save = right ? matrixBuffer[endColumn][y] : matrixBuffer[startColumn][y];
             for (int x = startColumn; x < endColumn; x++) {
-               if (right) matrixBuffer[endColumn-x][y] = matrixBuffer[endColumn-x-1][y];
-               else matrixBuffer[x][y] = matrixBuffer[x+1][y];
+//               if (right) matrixBuffer[endColumn-x][y] = matrixBuffer[endColumn-x-1][y];
+//               else matrixBuffer[x][y] = matrixBuffer[x+1][y];
+               if (right) putMatrixBuffer(endColumn-x, y, matrixBuffer[endColumn-x-1][y]);
+               else putMatrixBuffer(x, y, matrixBuffer[x+1][y]);
             }
-            if (right) matrixBuffer[startColumn][y] = rotate ? save : 0;
-            else matrixBuffer[endColumn][y] = rotate ? save : 0;
+//            if (right) matrixBuffer[startColumn][y] = rotate ? save : 0;
+//            else matrixBuffer[endColumn][y] = rotate ? save : 0;
+            if (right) putMatrixBuffer(startColumn, y, rotate ? save : 0);
+            else putMatrixBuffer(endColumn, y, rotate ? save : 0);
          }
       }
       // Then do the y (rows)
@@ -303,11 +354,15 @@ public class NeoMatrix {
          for (int x = startColumn; x <= endColumn; x++) {
             int save = !up ? matrixBuffer[x][endRow] : matrixBuffer[x][startRow];
             for (int y = startRow; y < endRow; y++) {
-               if (!up) matrixBuffer[x][endRow-y] = matrixBuffer[x][endRow-y-1];
-               else matrixBuffer[x][y] = matrixBuffer[x][y+1];
+//               if (!up) matrixBuffer[x][endRow-y] = matrixBuffer[x][endRow-y-1];
+//               else matrixBuffer[x][y] = matrixBuffer[x][y+1];
+               if (!up) putMatrixBuffer(x, endRow-y, matrixBuffer[x][endRow-y-1]);
+               else putMatrixBuffer(x, y, matrixBuffer[x][y+1]);
             }
-            if (!up) matrixBuffer[x][startRow] = rotate ? save : 0;
-            else matrixBuffer[x][endRow] = rotate ? save : 0;
+//            if (!up) matrixBuffer[x][startRow] = rotate ? save : 0;
+//            else matrixBuffer[x][endRow] = rotate ? save : 0;
+            if (!up) putMatrixBuffer(x, startRow, rotate ? save : 0);
+            else putMatrixBuffer(x, endRow, rotate ? save : 0);
          }
       }
    }
@@ -315,13 +370,15 @@ public class NeoMatrix {
    public void applyPixelMapToBuffer (int[][] pMap, int colStart, int colEnd, int mapStart, boolean opaque) {
       // assuming that the height of the pixel map is the same as the panel because lazy
       if (colStart < 0) colStart = 0;
-      if (colEnd == 0) colEnd = ledCols;
+      if (colEnd == 0) colEnd = ledCols - 1;  // -1?
+      if (colEnd >= ledCols) colEnd = ledCols - 1;
       if (colEnd-colStart+1 > pMap.length) colEnd = colStart+pMap.length-1;
       int pMapX = mapStart;
       for (int c = colStart; c <= colEnd; c++) {
          for (int r = 0; r < ledRows; r++) {
             int px = pMap[pMapX][r];
-            if (opaque || (px & 0xFFFFFF) != 0) matrixBuffer[c][r] = px;
+            //if (opaque || (px & 0xFFFFFF) != 0) matrixBuffer[c][r] = px;
+            if (opaque || (px & 0xFFFFFF) != 0) putMatrixBuffer(c, r, px);
          }
          pMapX++;
       }

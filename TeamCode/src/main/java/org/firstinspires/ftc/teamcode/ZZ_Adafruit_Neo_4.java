@@ -33,7 +33,7 @@ public class ZZ_Adafruit_Neo_4 extends LinearOpMode {
     public void runOpMode() {
         robot = new Robot(this);
         buttonMgr = new ButtonMgr(this);
-        neo = new NeoMatrix(this, "neo");
+        neo = new NeoMatrix(this, "neo", 8,32);
 
         robot.init();
         neo.init();
