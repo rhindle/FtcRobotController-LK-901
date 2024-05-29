@@ -26,17 +26,16 @@ public class NeoMatrix {
    private int updateLimit = 1;
    private int updatePosition = 0;
    private int ledRows = 8;
-   private int ledCols = 24; //32
+   private int ledCols = 32;
 
    public int dimMax = 255;     // for initial debugging, let's not change the max
    public boolean flipVert = false;
    public  boolean flipHoriz = false;
 
-   private int ledQty; //= ledCols * ledRows;
-//   private int hwLedQty; // = Math.min(1536, ledQty); // the board doesn't work at more than 255 pixels? A problem with documentation?
-   int[][] matrixBuffer; // = new int[ledCols][ledRows];
-   int[]   stringBuffer; //  = new int[ledQty];
-   int[]   stringActual; //  = new int[ledQty];
+   private int ledQty;
+   int[][] matrixBuffer;
+   int[]   stringBuffer;
+   int[]   stringActual;
    int[]   stringUpdate  = new int[updateSize];
 
    /* Constructor */
@@ -92,19 +91,12 @@ public class NeoMatrix {
       // Also, apply dimming.
       if (preventTearing && pendingUpdate) return;
       boolean flipFlop = flipVert;
-//      int zigCount = 0;
       int stringPos;
       for (int c = 0; c < ledCols; c++) {
          for (int r = 0; r < ledRows; r++) {
             stringPos = c * ledRows + r;
             if (flipHoriz) stringPos = ledQty-1 - stringPos;
             stringBuffer[stringPos] = !flipFlop ? dimColor(matrixBuffer[c][r], dimMax) : dimColor(matrixBuffer[c][ledRows-1-r], dimMax);
-
-//            zigCount++;
-//            if (zigCount == ledCols) {
-//               zigCount = 0;
-//               flipFlop = !flipFlop;
-//            }
          }
          flipFlop = !flipFlop;
       }
@@ -234,15 +226,12 @@ public class NeoMatrix {
       int xStep = (startX <= endX) ? 1 : -1;
       int yStep = (startY <= endY) ? 1 : -1;
       for (int x = startX; x != endX; x += xStep) {
-         //matrixBuffer[x][interpolate(startX,startY,endX,endY,x)] = lineColor;
          putMatrixBuffer(x, interpolate(startX,startY,endX,endY,x), lineColor);
       }
       for (int y = startY; y != endY; y += yStep) {
-         //matrixBuffer[interpolate(startY,startX,endY,endX,y)][y] = lineColor;
          putMatrixBuffer(interpolate(startY,startX,endY,endX,y), y, lineColor);
       }
       // the last point is missed because both loops stop before reaching the end
-      //matrixBuffer[endX][endY] = lineColor;
       putMatrixBuffer(endX, endY, lineColor);
    }
 
@@ -250,7 +239,6 @@ public class NeoMatrix {
       return (int)(0.5 + Y1 + (1.0* (XX - X1) / (X2 - X1)) * (Y2 - Y1));
    }
    float interpolate (float X1, float Y1, float X2, float Y2, float XX) {
-      //y = y1 + ((x - x1) / (x2 - x1)) * (y2 - y1)
       return Y1 + ((XX - X1) / (X2 - X1)) * (Y2 - Y1);
    }
 
@@ -270,18 +258,14 @@ public class NeoMatrix {
 
       // a. make the lines across
       for (int c = startColumn; c <= endColumn; c++) {
-         //matrixBuffer[c][startRow]=lineColor;
          putMatrixBuffer(c, startRow, lineColor);
-         //matrixBuffer[c][endRow]=lineColor;
          putMatrixBuffer(c, endRow, lineColor);
       }
       // b. make the lines down
       startRow++;
       endRow--;
       for (int r = startRow; r <= endRow; r++) {
-         //matrixBuffer[startColumn][r] = lineColor;
          putMatrixBuffer(startColumn, r, lineColor);
-         //matrixBuffer[endColumn][r] = lineColor;
          putMatrixBuffer(endColumn, r, lineColor);
       }
       if (!fill) return;
@@ -289,11 +273,8 @@ public class NeoMatrix {
       // Part 2: The fill
       startColumn++;
       endColumn--;
-      //if (startColumn >= ledCols || endColumn < startColumn) return;
-      //if (startRow >= ledRows || endRow < startRow) return;
       for (int c = startColumn; c <= endColumn; c++) {
          for (int r = startRow; r <= endRow; r++) {
-            //matrixBuffer[c][r] = fillColor;
             putMatrixBuffer(c, r, fillColor);
          }
       }
@@ -338,13 +319,9 @@ public class NeoMatrix {
          for (int y = startRow; y <= endRow; y++) {
             int save = right ? matrixBuffer[endColumn][y] : matrixBuffer[startColumn][y];
             for (int x = startColumn; x < endColumn; x++) {
-//               if (right) matrixBuffer[endColumn-x][y] = matrixBuffer[endColumn-x-1][y];
-//               else matrixBuffer[x][y] = matrixBuffer[x+1][y];
                if (right) putMatrixBuffer(endColumn-x, y, matrixBuffer[endColumn-x-1][y]);
                else putMatrixBuffer(x, y, matrixBuffer[x+1][y]);
             }
-//            if (right) matrixBuffer[startColumn][y] = rotate ? save : 0;
-//            else matrixBuffer[endColumn][y] = rotate ? save : 0;
             if (right) putMatrixBuffer(startColumn, y, rotate ? save : 0);
             else putMatrixBuffer(endColumn, y, rotate ? save : 0);
          }
@@ -354,13 +331,9 @@ public class NeoMatrix {
          for (int x = startColumn; x <= endColumn; x++) {
             int save = !up ? matrixBuffer[x][endRow] : matrixBuffer[x][startRow];
             for (int y = startRow; y < endRow; y++) {
-//               if (!up) matrixBuffer[x][endRow-y] = matrixBuffer[x][endRow-y-1];
-//               else matrixBuffer[x][y] = matrixBuffer[x][y+1];
                if (!up) putMatrixBuffer(x, endRow-y, matrixBuffer[x][endRow-y-1]);
                else putMatrixBuffer(x, y, matrixBuffer[x][y+1]);
             }
-//            if (!up) matrixBuffer[x][startRow] = rotate ? save : 0;
-//            else matrixBuffer[x][endRow] = rotate ? save : 0;
             if (!up) putMatrixBuffer(x, startRow, rotate ? save : 0);
             else putMatrixBuffer(x, endRow, rotate ? save : 0);
          }
@@ -377,7 +350,6 @@ public class NeoMatrix {
       for (int c = colStart; c <= colEnd; c++) {
          for (int r = 0; r < ledRows; r++) {
             int px = pMap[pMapX][r];
-            //if (opaque || (px & 0xFFFFFF) != 0) matrixBuffer[c][r] = px;
             if (opaque || (px & 0xFFFFFF) != 0) putMatrixBuffer(c, r, px);
          }
          pMapX++;
@@ -628,7 +600,6 @@ public class NeoMatrix {
    public final char[][] littleLetters = {
                               {' ', 0, 0, 0},
                               {'0', 31, 17, 31, 0},
-//                              {'1', 0, 31, 0, 0},
                               {'1', 31, 0},
                               {'2', 29, 21, 23, 0},
                               {'3', 21, 21, 31, 0},
@@ -839,9 +810,6 @@ public class NeoMatrix {
            {'b', 60, 126, 255, 255, 231, 231, 102, 36},
            {'c', 60, 126, 255, 255, 231, 231, 66, 0},
            {'d', 60, 126, 255, 231, 195, 129, 0, 0},
-//           {'a', 56, 124, 254, 254, 254, 124, 56},  // pac ball
-//           {'b', 56, 124, 254, 238, 238, 108, 40},  // pac slit
-//           {'c', 56, 124, 254, 238, 198, 68, 0},    // pac wide
            {'H', 252, 94, 235, 95, 235, 94, 252},   // blueghost1
            {'h', 124, 238, 91, 239, 91, 238, 124},  // blueghost2
            {'I', 0, 32, 20, 32, 20, 32, 0},         // blueghostdetail1
