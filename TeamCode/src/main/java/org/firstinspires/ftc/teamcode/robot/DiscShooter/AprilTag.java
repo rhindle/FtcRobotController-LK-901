@@ -147,37 +147,37 @@ public class AprilTag {
 
                 // raw camera values (ftcPose in it's native coordinate system) of XY
                 Position camRaw = new Position(detection.ftcPose.x, detection.ftcPose.y, 0);
-                TelemetryHandler.Message(7,String.format("camRaw   XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camRaw.X, camRaw.Y, camRaw.R));
+                TelemetryHandler.Message(7,String.format("camRaw   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camRaw.X, camRaw.Y, camRaw.R));
 
                 // transform the camera raw position using the yaw to align with field
                 Position camTrans = transPos(new Position(0, 0, -detection.ftcPose.yaw), camRaw);
-                TelemetryHandler.Message(7,String.format("camTrans XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camTrans.X, camTrans.Y, camTrans.R));
+                TelemetryHandler.Message(7,String.format("camTrans XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camTrans.X, camTrans.Y, camTrans.R));
 
                 // rotate the camera XY 90deg to match the field by switching axes
                 Position camRot = new Position(-camTrans.Y, camTrans.X, camTrans.R);
-                TelemetryHandler.Message(7,String.format("camRot   XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camRot.X, camRot.Y, camRot.R));
+                TelemetryHandler.Message(7,String.format("camRot   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camRot.X, camRot.Y, camRot.R));
 
                 // Do everything in one step: Switch ftcPose to field XY and transform by yaw to align with field
                 Position camTry2 = transPos(new Position(0,0, -detection.ftcPose.yaw),
                         new Position(-detection.ftcPose.y, detection.ftcPose.x, 0 ));
-                TelemetryHandler.Message(5,String.format("camTry2  XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camTry2.X, camTry2.Y, camTry2.R));
+                TelemetryHandler.Message(5,String.format("camTry2  XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camTry2.X, camTry2.Y, camTry2.R));
 
                 // Switch ftcPose to field XY relative to tag, add robot offset, and transform by yaw to align with field
                 Position camPos = transPos(new Position(0,0, -detection.ftcPose.yaw),
                         new Position(-detection.ftcPose.y + camOffset.X, detection.ftcPose.x + camOffset.Y, 0 ));
-                TelemetryHandler.Message(5,String.format("camPos   XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", camPos.X, camPos.Y, camPos.R));
+                TelemetryHandler.Message(5,String.format("camPos   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camPos.X, camPos.Y, camPos.R));
 
                 // Get the tag's field position
                 // the library has bad x values!  60.3, but in reality it's 63.5.  So let's add 3.2 inches.
                 double adjustment = 0; //3.2;
                 float[] fieldPos = detection.metadata.fieldPosition.getData();
-                TelemetryHandler.Message(7,String.format("field XYZ %6.1f %6.1f %6.1f  (inch)", fieldPos[0], fieldPos[1], fieldPos[2]));
+                TelemetryHandler.Message(7,String.format("field XYR %6.1f %6.1f %6.1f  (inch)", fieldPos[0], fieldPos[1], fieldPos[2]));
                 Position tagPos = new Position(detection.metadata.fieldPosition.get(0)+adjustment, detection.metadata.fieldPosition.get(1),0);
-                TelemetryHandler.Message(7,String.format("tagPos   XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", tagPos.X, tagPos.Y, tagPos.R));
+                TelemetryHandler.Message(7,String.format("tagPos   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", tagPos.X, tagPos.Y, tagPos.R));
 
                 // Calculate the robot position based on camera position and tag position
                 Position robotPos = new Position(tagPos.X+camPos.X, tagPos.Y+camPos.Y, camPos.R);
-                TelemetryHandler.Message(5,String.format("robotPos XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", robotPos.X, robotPos.Y, robotPos.R));
+                TelemetryHandler.Message(5,String.format("robotPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", robotPos.X, robotPos.Y, robotPos.R));
                 robotTagPosition = robotPos;
 
             } else {

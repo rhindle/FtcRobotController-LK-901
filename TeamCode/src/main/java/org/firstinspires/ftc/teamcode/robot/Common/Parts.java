@@ -13,6 +13,8 @@ public class Parts {
    public boolean useDistanceSensors = true;
    public boolean useDriveEncoders = true;
    public boolean useSlamra = false;
+   public boolean useNeoMatrix = false;
+   public boolean useAprilTag = false;
    public Position robotPosition = new Position();
    public Position slamraPosition;
    public Position fieldStartPosition;
@@ -30,6 +32,7 @@ public class Parts {
    public Slamra slamra;
    public TelemetryHandler telemetryHandler;
    public AprilTag apriltag;
+   public NeoMatrix neo;
 
    public boolean isSetup = false;
    public robotType rType;

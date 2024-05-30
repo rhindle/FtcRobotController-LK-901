@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.robot.DiscShooter;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.NeoMatrix;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.Slamra;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
@@ -26,7 +29,7 @@ public class PartsDS extends Parts {
 //      controls = new Controls_2(this);
         controls = new ControlsDS(this);
         drivetrain = new DrivetrainDS(this);
-        apriltag = new AprilTag(this);
+        if (useAprilTag) apriltag = new AprilTag(this);
 
 //        odometry = new OdometryDS(this);
 //        odometry.odoFieldStart = fieldStartPosition;
@@ -39,6 +42,8 @@ public class PartsDS extends Parts {
             slamra.slamraFieldStart = fieldStartPosition;
             slamra.slamraRobotOffset = slamraRobotOffset;
         }
+
+        if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 8);
 
         switch (rType) {
             case GOCANUM:
@@ -56,7 +61,15 @@ public class PartsDS extends Parts {
         robot.init();
 //        sensors.init();
         if (useSlamra) slamra.init();
-        apriltag.init();
+        if (useAprilTag) apriltag.init();
+
+        if (useNeoMatrix) {
+            neo.init();
+            neo.setUpdateLimit(1);
+            neo.setPreventTearing(true);
+            neo.setDimmingValue(192);
+            neo.drawRectangle(0, 7, 0, 7, Color.rgb(1, 1, 0));
+        }
     }
 
     @Override
@@ -68,13 +81,15 @@ public class PartsDS extends Parts {
         if (useODO) odometry.loop();  // get some things squared away before the real program runs
         navigator.loop();
         if (useSlamra) slamra.onStart();
+        if (useNeoMatrix) neo.drawRectangle(0,7,0,7, Color.rgb(0,2,0));
     }
 
     @Override
     public void initLoop() {
         buttonMgr.loop();
         if (useSlamra) slamra.initLoop();
-        apriltag.initLoop();
+        if (useAprilTag) apriltag.initLoop();
+        if (useNeoMatrix) neo.loop();
     }
 
     @Override
@@ -84,19 +99,25 @@ public class PartsDS extends Parts {
         buttonMgr.loop();
         if (useODO) odometry.loop();
         if (useSlamra) slamra.loop();
-        apriltag.loop();
+        if (useAprilTag) apriltag.loop();
         controls.loop();
         navigator.loop();
+        if (useNeoMatrix) neo.loop();
 
         //experiment follows, to be moved elsewhere eventually
-        Position roboTag = apriltag.getRobotTagPosition();
-        if (roboTag!=null) slamra.setupFieldOffset(roboTag);
+        if (useAprilTag) {
+            Position roboTag = apriltag.getRobotTagPosition();
+            if (roboTag != null) {
+                slamra.setupFieldOffset(roboTag);
+                navigator.deltaHeading = robot.returnImuHeading() - roboTag.R;
+            }
+        }
     }
 
     @Override
     public void stop() {
         if (useSlamra) slamra.onStop();
-        apriltag.stop();
+        if (useAprilTag) apriltag.stop();
     }
 
 }

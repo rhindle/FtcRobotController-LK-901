@@ -36,6 +36,8 @@ public class MentorTestAT01 extends LinearOpMode {
 
       parts.useODO = false;
       parts.useSlamra = true; //true;
+      parts.useNeoMatrix = true;
+      parts.useAprilTag = true;
       //robot.reverseDrive = true;  // for AndyMark test
       parts.useDistanceSensors = false; //true; //false;
       parts.fieldStartPosition = new Position (36,63,-90);
@@ -103,6 +105,7 @@ public class MentorTestAT01 extends LinearOpMode {
       TelemetryHandler.Message(4, "rotate", parts.controls.Rotate);
       TelemetryHandler.Message(4, "storedHeading", JavaUtil.formatNumber(parts.navigator.storedHeading, 2));
       TelemetryHandler.Message(4, "deltaHeading", JavaUtil.formatNumber(parts.navigator.deltaHeading, 2));
+      TelemetryHandler.Message(4, "IMU-Modified", JavaUtil.formatNumber(parts.robot.returnImuHeading()-parts.navigator.deltaHeading, 2));
 //        telemetry.addData("error", JavaUtil.formatNumber(currentError, 2));
 //        telemetry.addData("v0", JavaUtil.formatNumber(navigator.v0, 2));
 //        telemetry.addData("v1", JavaUtil.formatNumber(navigator.v2, 2));
