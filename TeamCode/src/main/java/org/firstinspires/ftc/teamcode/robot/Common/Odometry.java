@@ -30,7 +30,7 @@ public class Odometry implements PartsInterface {
    Position odoRobotPose = new Position ();                             // odo mapped to robot position (minor change)
    Position odoFinalPose = new Position ();                             // odo mapped to field
    Position odoFieldOffset = new Position ();                           // transform from initial position (more relevant for slamra!)
-   public Position robotPosition; // = odoFieldStart.clone();
+   public Position odoRobotPosition; // = odoFieldStart.clone();
 
    private static final double eTicksPerInch = 82300 / 48.0;
    private static final double eTicksPerRotate = 169619;
@@ -47,11 +47,11 @@ public class Odometry implements PartsInterface {
    }
 
    public void initialize() {
-      robotPosition = odoFieldStart.clone();
-      parts.robotPosition = robotPosition.clone();
+      odoRobotPosition = odoFieldStart.clone();  //TODO: deal with odoFieldStart set to null
+      parts.robotPosition = odoRobotPosition.clone();
       if (!parts.useODO) {
-         robotPosition = new Position(0,0, robotPosition.R);
-         parts.robotPosition = robotPosition.clone();
+         odoRobotPosition = new Position(0,0, odoRobotPosition.R);
+         parts.robotPosition = odoRobotPosition.clone();
          return;
       }
       configureEncoders();
@@ -82,8 +82,8 @@ public class Odometry implements PartsInterface {
       if (!parts.useODO) {
          imuHeading = parts.robot.returnImuHeading();
          globalHeading = imuHeading;
-         robotPosition.R = globalHeading;
-         parts.robotPosition = robotPosition.clone();
+         odoRobotPosition.R = globalHeading;
+         parts.robotPosition = odoRobotPosition.clone();
          return;
       }
 
@@ -104,8 +104,8 @@ public class Odometry implements PartsInterface {
       setOdoFinalPose();
 
       /* Update robot position */
-      robotPosition = odoFinalPose.clone();
-      parts.robotPosition = robotPosition.clone();
+      odoRobotPosition = odoFinalPose.clone();
+      parts.robotPosition = odoRobotPosition.clone();
 
    }
 
@@ -193,7 +193,7 @@ public class Odometry implements PartsInterface {
       odoFinalPose.normalize();
    }
 
-   void setOdoFieldOffset() {
+   void setOdoFieldOffset() {    //TODO: deal with odoFieldStart set to null [also, is this necessary or vestigial?]
       Position fS = odoFieldStart;
       Position rP = odoRobotPose;
       double offsetR = fS.R - rP.R;

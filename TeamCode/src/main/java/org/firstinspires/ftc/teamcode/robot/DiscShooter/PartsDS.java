@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.NeoMatrix;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
+import org.firstinspires.ftc.teamcode.robot.Common.PositionMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Slamra;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 
@@ -31,11 +32,14 @@ public class PartsDS extends Parts {
         drivetrain = new DrivetrainDS(this);
         if (useAprilTag) apriltag = new AprilTag(this);
 
-//        odometry = new OdometryDS(this);
-//        odometry.odoFieldStart = fieldStartPosition;
-//        odometry.odoRobotOffset = odoRobotOffset;
+        if (useODO) {
+            odometry = new OdometryDS(this);
+            odometry.odoFieldStart = fieldStartPosition;
+            odometry.odoRobotOffset = odoRobotOffset;
+        }
 
         navigator = new NavigatorDS(this);
+        positionMgr = new PositionMgr(this);
 
         if (useSlamra) {
             slamra = new Slamra(this);
@@ -96,6 +100,7 @@ public class PartsDS extends Parts {
         buttonMgr.runLoop();
         if (useSlamra) slamra.initLoop();
         if (useAprilTag) apriltag.initLoop();
+        positionMgr.initLoop();
         if (useNeoMatrix) {
             neo.applyPixelMapToBuffer(textMatrix,0,7, 0, true);
             neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
@@ -113,13 +118,14 @@ public class PartsDS extends Parts {
         if (useODO) odometry.runLoop();
         if (useSlamra) slamra.runLoop();
         if (useAprilTag) apriltag.runLoop();
+        positionMgr.runLoop();
         controls.runLoop();
         navigator.runLoop();
         if (useNeoMatrix) neo.runLoop();
 
         //experiment follows, to be moved elsewhere eventually
         if (useAprilTag) {
-            Position roboTag = apriltag.getRobotTagPosition();
+            Position roboTag = apriltag.getTagRobotPosition();
             if (roboTag != null) {
                 slamra.setupFieldOffset(roboTag);
                 navigator.deltaHeading = robot.returnImuHeading() - roboTag.R;

@@ -18,6 +18,8 @@ public class Slamra implements PartsInterface {
 	Position slamraRobotPose = new Position();								// slamra transformed by robot position
 	Position slamraFinalPose = new Position();                              // slamra transformed to field
 	Position slamraFieldOffset = new Position();							// transform from initial position reported by slamra (may not be zero!)
+	public Position slamraRobotPosition;
+	final Position zeroPos = new Position (0, 0, 0);
 
 	Position lastPos = new Position();
 	int timesStuck = 0;
@@ -46,6 +48,7 @@ public class Slamra implements PartsInterface {
 	public void initLoop () {
 		setupFieldOffset();
 		slamraFinalPose = getSlamraFinalPose();
+		slamraRobotPosition = slamraFinalPose;
 		parts.slamraPosition = slamraFinalPose;//.clone();
 		isSlamraChanging();
 		addTeleOpTelemetry();
@@ -73,19 +76,29 @@ public class Slamra implements PartsInterface {
 			return true;
 		} else {
 			timesStuck ++;
+			if (timesStuck > 50) slamraFieldOffset = zeroPos;  // assume a reset, this will let isSlamraPositionGood() work
 			return false;
 		}
 	}
 
+	public boolean isSlamraOffset() {
+		return !slamraFieldOffset.isEqualTo(zeroPos);
+	}
+
+	public boolean isSlamraPositionGood() {
+		return !isSlamraDead() && isSlamraOffset();
+	}
+
 	public void setupFieldOffset(Position fieldPosition) {
-		slamraFieldOffset = new Position (0, 0, 0);    // clear any existing offset
+		slamraFieldOffset = zeroPos;    // clear any existing offset
 		updateSlamraPosition();
 		slamraFieldOffset = getSlamraFieldOffset(slamraRobotPose, fieldPosition);
 	}
 	public void setupFieldOffset() {
-		slamraFieldOffset = new Position (0, 0, 0);    // clear any existing offset
+		slamraFieldOffset = zeroPos;    // clear any existing offset
 		updateSlamraPosition();
-		slamraFieldOffset = getSlamraFieldOffset(slamraRobotPose, slamraFieldStart);
+		if (slamraFieldStart!=null) slamraFieldOffset = getSlamraFieldOffset(slamraRobotPose, slamraFieldStart);
+		// if the field offset is 0,0,0, it can be known that it was not properly offset
 	}
 
 	public void updateSlamraPosition() {
@@ -94,6 +107,7 @@ public class Slamra implements PartsInterface {
 		slamraRawPose = new Position(update.getX(), update.getY(), Math.toDegrees(update.getHeading()));
 		slamraRobotPose = getSlamraRobotPose();
 		slamraFinalPose = getSlamraFinalPose();
+		slamraRobotPosition = slamraFinalPose;
 		parts.slamraPosition = slamraFinalPose;//.clone();
 	}
 
@@ -133,6 +147,6 @@ public class Slamra implements PartsInterface {
 		TelemetryMgr.Message(6, "s-robot", slamraRobotPose.toString(2));
 		TelemetryMgr.Message(6, "s-final", slamraFinalPose.toString(2));
 		TelemetryMgr.Message(2, "slamra stuck", timesStuck);
-		TelemetryMgr.Message(6,"last pos", lastPos.toString(2));
+//		TelemetryMgr.Message(6,"last pos", lastPos.toString(2));
 	}
 }

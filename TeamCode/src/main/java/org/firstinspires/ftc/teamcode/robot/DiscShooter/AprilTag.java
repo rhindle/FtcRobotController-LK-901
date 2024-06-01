@@ -24,7 +24,7 @@ public class AprilTag implements PartsInterface {
     private static final boolean USE_WEBCAM = false;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-    public Position robotTagPosition;
+    public Position tagRobotPosition;
 
     /* Constructor */
     public AprilTag(Parts parts){
@@ -129,7 +129,7 @@ public class AprilTag implements PartsInterface {
 
     private void updateAprilTag() {
 
-        robotTagPosition = null;
+        tagRobotPosition = null;
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         TelemetryMgr.Message(5,"# AprilTags Detected", currentDetections.size());
 
@@ -178,7 +178,7 @@ public class AprilTag implements PartsInterface {
                 // Calculate the robot position based on camera position and tag position
                 Position robotPos = new Position(tagPos.X+camPos.X, tagPos.Y+camPos.Y, camPos.R);
                 TelemetryMgr.Message(5,String.format("robotPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", robotPos.X, robotPos.Y, robotPos.R));
-                robotTagPosition = robotPos;
+                tagRobotPosition = robotPos;
 
             } else {
                 TelemetryMgr.Message(5,String.format("\n==== (ID %d) Unknown", detection.id));
@@ -214,8 +214,8 @@ public class AprilTag implements PartsInterface {
 //        lkOdoRobotPose = lkTransformPosition(lkOdoRawPose, lkOdoRobotOffset);
 //    }
 
-    public Position getRobotTagPosition() {
-        return robotTagPosition;
+    public Position getTagRobotPosition() {
+        return tagRobotPosition;
     }
 
     Position transPos(Position pos1, Position pos2) {

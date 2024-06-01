@@ -38,7 +38,7 @@ public class MentorTestAT01 extends LinearOpMode {
       parts.useAprilTag = true;
       //robot.reverseDrive = true;  // for AndyMark test
       parts.useDistanceSensors = false; //true; //false;
-      parts.fieldStartPosition = new Position (36,63,-90);
+      //parts.fieldStartPosition = new Position (36,63,-90);
       parts.odoRobotOffset = new Position (2.25,0,0);
       parts.slamraRobotOffset = new Position(-8,-1,0);
       parts.setup();
@@ -119,7 +119,7 @@ public class MentorTestAT01 extends LinearOpMode {
 //        telemetry.addData ("OdoXR", localizer.encoderXR);
 //        telemetry.addData ("X", JavaUtil.formatNumber(localizer.xPos, 2));
 //        telemetry.addData ("Y", JavaUtil.formatNumber(localizer.yPos, 2));
-      Position robo = parts.apriltag.getRobotTagPosition();
+      Position robo = parts.apriltag.getTagRobotPosition();
       if (robo!=null) TelemetryMgr.Message(3,String.format("robotPos XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", robo.X, robo.Y, robo.R));
       else TelemetryMgr.Message(3,"robotpos - no tag position");
 

@@ -34,6 +34,7 @@ public class Parts implements PartsInterface {
    public TelemetryMgr telemetryHandler;
    public AprilTag apriltag;
    public NeoMatrix neo;
+   public PositionMgr positionMgr;
 
    public boolean isSetup = false;
    public robotType rType;
