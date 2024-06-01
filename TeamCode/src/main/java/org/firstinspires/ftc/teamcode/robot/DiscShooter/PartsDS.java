@@ -58,13 +58,13 @@ public class PartsDS extends Parts {
 
     @Override
     public void preInit() {
-        robot.init();
+        robot.initialize();
 //        sensors.init();
-        if (useSlamra) slamra.init();
-        if (useAprilTag) apriltag.init();
+        if (useSlamra) slamra.initialize();
+        if (useAprilTag) apriltag.initialize();
 
         if (useNeoMatrix) {
-            neo.init();
+            neo.initialize();
             //neo.setUpdateLimit(1);
             neo.setUpdateLimit(0);
             neo.setPreventTearing(true);
@@ -78,13 +78,13 @@ public class PartsDS extends Parts {
 
     @Override
     public void preRun() {
-        drivetrain.init();
-        if (useODO) odometry.init();
-        navigator.init();
+        drivetrain.initialize();
+        if (useODO) odometry.initialize();
+        navigator.initialize();
 
-        if (useODO) odometry.loop();  // get some things squared away before the real program runs
-        navigator.loop();
-        if (useSlamra) slamra.onStart();
+        if (useODO) odometry.runLoop();  // get some things squared away before the real program runs
+        navigator.runLoop();
+        if (useSlamra) slamra.preRun();
         if (useNeoMatrix) {
             neo.drawRectangle(0,7,0,7, Color.rgb(0,2,0));
             neo.setUpdateLimit(1);
@@ -93,7 +93,7 @@ public class PartsDS extends Parts {
 
     @Override
     public void initLoop() {
-        buttonMgr.loop();
+        buttonMgr.runLoop();
         if (useSlamra) slamra.initLoop();
         if (useAprilTag) apriltag.initLoop();
         if (useNeoMatrix) {
@@ -101,21 +101,21 @@ public class PartsDS extends Parts {
             neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
 //            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
             textMatrix = neo.shiftPixelMap(textMatrix,-8,0,true);
-            neo.loop();
+            neo.runLoop();
         }
     }
 
     @Override
-    public void loop() {
-        robot.loop();
+    public void runLoop() {
+        robot.runLoop();
 //        sensors.loop();
-        buttonMgr.loop();
-        if (useODO) odometry.loop();
-        if (useSlamra) slamra.loop();
-        if (useAprilTag) apriltag.loop();
-        controls.loop();
-        navigator.loop();
-        if (useNeoMatrix) neo.loop();
+        buttonMgr.runLoop();
+        if (useODO) odometry.runLoop();
+        if (useSlamra) slamra.runLoop();
+        if (useAprilTag) apriltag.runLoop();
+        controls.runLoop();
+        navigator.runLoop();
+        if (useNeoMatrix) neo.runLoop();
 
         //experiment follows, to be moved elsewhere eventually
         if (useAprilTag) {
@@ -129,7 +129,7 @@ public class PartsDS extends Parts {
 
     @Override
     public void stop() {
-        if (useSlamra) slamra.onStop();
+        if (useSlamra) slamra.stop();
         if (useAprilTag) apriltag.stop();
     }
 

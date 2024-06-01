@@ -2,10 +2,11 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 import org.firstinspires.ftc.teamcode.robot.DiscShooter.AprilTag;
 
-public class Parts {
+public class Parts implements PartsInterface {
 
    /* Public OpMode members. */
    public boolean useODO = false; //true;
@@ -30,7 +31,7 @@ public class Parts {
    public Navigator navigator;
    public Odometry odometry;
    public Slamra slamra;
-   public TelemetryHandler telemetryHandler;
+   public TelemetryMgr telemetryHandler;
    public AprilTag apriltag;
    public NeoMatrix neo;
 
@@ -45,7 +46,7 @@ public class Parts {
    void construct(LinearOpMode opMode, robotType rType){
       this.opMode = opMode;
       this.rType = rType;
-      telemetryHandler = new TelemetryHandler(opMode);
+      telemetryHandler = new TelemetryMgr(opMode);
    }
 
    public void setup(){
@@ -85,10 +86,16 @@ public class Parts {
 //      }
    }
 
+   public void initialize() {
+   }
+
    public void preInit() {
 //      robot.init();
 //      sensors.init();
 //      if (useSlamra) slamra.init();
+   }
+
+   public void initLoop() {
    }
 
    public void preRun() {
@@ -101,11 +108,7 @@ public class Parts {
 //      if (useSlamra) slamra.onStart();
    }
 
-   public void initLoop() {
-
-   }
-
-   public void loop() {
+   public void runLoop() {
 //      robot.loop();
 //      sensors.loop();
 //      buttonMgr.loop();

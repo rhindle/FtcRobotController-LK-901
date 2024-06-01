@@ -36,7 +36,7 @@ public class ZZ_Adafruit_Neo_3 extends LinearOpMode {
         neo = new NeoMatrix(this, "neo");
 
         robot.init();
-        neo.init();
+        neo.initialize();
         neo.setUpdateLimit(1);
 
         while (!isStarted()) {
@@ -79,7 +79,7 @@ public class ZZ_Adafruit_Neo_3 extends LinearOpMode {
             neo.clearCols(5, 12);
             neo.applyPixelMapToBuffer(textMatrix1,17-textMatrix1.length,16,0, true);
 
-            neo.loop();
+            neo.runLoop();
 
             sleep(8);
 

@@ -4,7 +4,6 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import org.firstinspires.ftc.teamcode.robot.Common.i2c.AdafruitNeoDriver;
 
@@ -57,7 +56,7 @@ public class NeoMatrix {
       this.ledCols = ledCols;
    }
 
-   public void init() {
+   public void initialize() {
       ledMatrix = hardwareMap.get(AdafruitNeoDriver.class, deviceName);
       updateMatrixSize(ledRows, ledCols);
    }
@@ -79,7 +78,7 @@ public class NeoMatrix {
       return true;
    }
 
-   public void loop(){
+   public void runLoop(){
       if (!updatePanel) return;
       convertMatrix();
       updateMatrix();

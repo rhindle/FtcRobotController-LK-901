@@ -51,42 +51,42 @@ public class PartsGC extends Parts {
 
     @Override
     public void preInit() {
-        robot.init();
-        sensors.init();
-        if (useSlamra) slamra.init();
+        robot.initialize();
+        sensors.initialize();
+        if (useSlamra) slamra.initialize();
     }
 
     @Override
     public void preRun() {
-        drivetrain.init();
-        odometry.init();
-        navigator.init();
+        drivetrain.initialize();
+        odometry.initialize();
+        navigator.initialize();
 
-        odometry.loop();  // get some things squared away before the real program runs
-        navigator.loop();
-        if (useSlamra) slamra.onStart();
+        odometry.runLoop();  // get some things squared away before the real program runs
+        navigator.runLoop();
+        if (useSlamra) slamra.preRun();
     }
 
     @Override
     public void initLoop() {
-        buttonMgr.loop();
+        buttonMgr.runLoop();
         if (useSlamra) slamra.initLoop();
     }
 
     @Override
-    public void loop() {
-        robot.loop();
-        sensors.loop();
-        buttonMgr.loop();
-        odometry.loop();
-        if (useSlamra) slamra.loop();
-        controls.loop();
-        navigator.loop();
+    public void runLoop() {
+        robot.runLoop();
+        sensors.runLoop();
+        buttonMgr.runLoop();
+        odometry.runLoop();
+        if (useSlamra) slamra.runLoop();
+        controls.runLoop();
+        navigator.runLoop();
     }
 
     @Override
     public void stop() {
-        if (useSlamra) slamra.onStop();
+        if (useSlamra) slamra.stop();
     }
 
 }

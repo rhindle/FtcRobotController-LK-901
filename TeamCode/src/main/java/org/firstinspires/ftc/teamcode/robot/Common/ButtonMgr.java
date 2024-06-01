@@ -34,7 +34,7 @@ public class ButtonMgr {
         }
     }
 
-    public void loop() {
+    public void runLoop() {
         updateAll();
     }
 

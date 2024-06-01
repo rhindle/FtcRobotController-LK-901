@@ -74,7 +74,7 @@ public class Odo_2022_v8 extends LinearOpMode {
             while (opModeIsActive()) {
 
                 robot.loop();               // Clears bulk data and reads IMU
-                buttonMgr.loop();           // Processes digital controller input
+                buttonMgr.runLoop();           // Processes digital controller input
                 localizer.loop();           // Updates odometry X, Y, Rotation
                 robot.sensors.loop();       // Update distance sensors, etc.
 

@@ -2,11 +2,11 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 
-public class Odometry {
+public class Odometry implements PartsInterface {
 
    public Parts parts;
 //   Telemetry telemetry;
@@ -46,7 +46,7 @@ public class Odometry {
 //      this.telemetry = parts.opMode.telemetry;
    }
 
-   public void init() {
+   public void initialize() {
       robotPosition = odoFieldStart.clone();
       parts.robotPosition = robotPosition.clone();
       if (!parts.useODO) {
@@ -69,7 +69,16 @@ public class Odometry {
       setOdoFieldOffset();
    }
 
-   public void loop() {
+   public void preInit() {
+   }
+
+   public void initLoop() {
+   }
+
+   public void preRun() {
+   }
+
+   public void runLoop() {
       if (!parts.useODO) {
          imuHeading = parts.robot.returnImuHeading();
          globalHeading = imuHeading;
@@ -98,6 +107,9 @@ public class Odometry {
       robotPosition = odoFinalPose.clone();
       parts.robotPosition = robotPosition.clone();
 
+   }
+
+   public void stop() {
    }
 
    private double fusedHeading() {
@@ -143,7 +155,7 @@ public class Odometry {
       myHeading = getAvgHeading(globalHeading0, globalHeading);
 
 //      telemetry.addData ("My Average Heading", myHeading);
-      TelemetryHandler.Message(6,"My Average Heading", myHeading);
+      TelemetryMgr.Message(6,"My Average Heading", myHeading);
 
       xPos = xPos + deltaEncX * Math.cos(Math.toRadians(myHeading));
       yPos = yPos + deltaEncX * Math.sin(Math.toRadians(myHeading));
@@ -204,9 +216,9 @@ public class Odometry {
 //      telemetry.addData("raw__", odoRawPose.toString(2));
 //      telemetry.addData("robot", odoRobotPose.toString(2));
 //      telemetry.addData("final", odoFinalPose.toString(2));
-      TelemetryHandler.Message(6, "raw__", odoRawPose.toString(2));
-      TelemetryHandler.Message(6, "robot", odoRobotPose.toString(2));
-      TelemetryHandler.Message(6, "final", odoFinalPose.toString(2));
+      TelemetryMgr.Message(6, "raw__", odoRawPose.toString(2));
+      TelemetryMgr.Message(6, "robot", odoRobotPose.toString(2));
+      TelemetryMgr.Message(6, "final", odoFinalPose.toString(2));
    }
 
    public void configureEncoders() {

@@ -93,7 +93,7 @@ public class Auto {
    public void robotLoop() {
       if (robot.opMode.opModeIsActive()) {
          robot.loop();               // Clears bulk data and reads IMU
-         robot.buttonMgr.loop();     // Processes digital controller input
+         robot.buttonMgr.runLoop();     // Processes digital controller input
          robot.localizer.loop();     // Updates odometry X, Y, Rotation
          robot.sensors.loop();       // Update distance sensors, etc.
 

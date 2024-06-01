@@ -2,10 +2,9 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 
-public class Controls {
+public class Controls implements PartsInterface {
 
    public Parts parts;
    public Gamepad gamepad1;
@@ -25,13 +24,24 @@ public class Controls {
       this.buttonMgr = parts.buttonMgr;
    }
 
-   void init() {
-
+   public void initialize() {
    }
 
-   public void loop() {
+   public void preInit() {
+   }
+
+   public void initLoop() {
+   }
+
+   public void preRun() {
+   }
+
+   public void runLoop() {
       userInput();
 //      parts.navigator.setUserDriveSettings(DriveSpeed, DriveAngle, Rotate);
+   }
+
+   public void stop() {
    }
 
    public void userInput() {

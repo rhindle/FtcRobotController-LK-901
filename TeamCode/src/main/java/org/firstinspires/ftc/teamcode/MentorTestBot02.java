@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
-import org.firstinspires.ftc.teamcode.robot.Common.TelemetryHandler;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 import org.firstinspires.ftc.teamcode.robot.GoCanum.PartsGC;
 
@@ -45,11 +45,11 @@ public class MentorTestBot02 extends LinearOpMode {
 
       parts.preInit();
 
-      TelemetryHandler.setDebugLevel(10);
+      TelemetryMgr.setDebugLevel(10);
       while (!isStarted()) {
-         TelemetryHandler.Message(1, ">", "Press Play to start");
-         TelemetryHandler.Message(1, ">", "Robot Heading = %.1f", parts.robot.returnImuHeading(true));
-         TelemetryHandler.Message(1, "Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
+         TelemetryMgr.Message(1, ">", "Press Play to start");
+         TelemetryMgr.Message(1, ">", "Robot Heading = %.1f", parts.robot.returnImuHeading(true));
+         TelemetryMgr.Message(1, "Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
 
          parts.initLoop();
 
@@ -58,7 +58,7 @@ public class MentorTestBot02 extends LinearOpMode {
          if (parts.buttonMgr.wasTapped(2, ButtonMgr.Buttons.x))
             parts.reverseDrive = !parts.reverseDrive;
 
-         TelemetryHandler.Update(true);
+         TelemetryMgr.Update(true);
          sleep(20);
       }
 
@@ -67,27 +67,27 @@ public class MentorTestBot02 extends LinearOpMode {
       parts.navigator.setMaxSpeed(maxSpeed);
       //navigator.setDeltaHeading();
 
-      TelemetryHandler.setDebugLevel(10);
+      TelemetryMgr.setDebugLevel(10);
       if (opModeIsActive()) {
          // Put run blocks here.
          while (opModeIsActive()) {
 
-            parts.robot.loop();               // Clears bulk data and reads IMU
-            parts.buttonMgr.loop();           // Processes digital controller input
-            parts.odometry.loop();           // Updates odometry X, Y, Rotation
-            if (parts.useSlamra) parts.slamra.loop();
-            parts.sensors.loop();       // Update distance sensors, etc.
+            parts.robot.runLoop();               // Clears bulk data and reads IMU
+            parts.buttonMgr.runLoop();           // Processes digital controller input
+            parts.odometry.runLoop();           // Updates odometry X, Y, Rotation
+            if (parts.useSlamra) parts.slamra.runLoop();
+            parts.sensors.runLoop();       // Update distance sensors, etc.
 
             addTelemetryLoopStart();
 
-            parts.controls.loop();            // Acts on user controls
+            parts.controls.runLoop();            // Acts on user controls
 
 //                lifter.loop();
-            parts.navigator.loop();           // Automatic navigation actions
+            parts.navigator.runLoop();           // Automatic navigation actions
 
             addTelemetryLoopEnd();
             //telemetry.update();
-            TelemetryHandler.Update();
+            TelemetryMgr.Update();
          }
       }
 
@@ -96,8 +96,8 @@ public class MentorTestBot02 extends LinearOpMode {
    }
 
    private void addTelemetryLoopStart() {
-      TelemetryHandler.Message(2, "Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
-      TelemetryHandler.Message(2, "heading", JavaUtil.formatNumber(parts.robot.returnImuHeading(),2));
+      TelemetryMgr.Message(2, "Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
+      TelemetryMgr.Message(2, "heading", JavaUtil.formatNumber(parts.robot.returnImuHeading(),2));
 //      TelemetryHandler.Message(3, "rangeL", String.format("%.01f in", parts.sensors.distL));
 //      TelemetryHandler.Message(3, "rangeM", String.format("%.01f in", parts.sensors.distM));
 //      TelemetryHandler.Message(3, "rangeR", String.format("%.01f in", parts.sensors.distR));
@@ -108,11 +108,11 @@ public class MentorTestBot02 extends LinearOpMode {
    }
 
    private void addTelemetryLoopEnd() {
-      TelemetryHandler.Message(4, "r (magnitude)", parts.controls.DriveSpeed);
-      TelemetryHandler.Message(4, "robotAngle", parts.controls.DriveAngle);
-      TelemetryHandler.Message(4, "rotate", parts.controls.Rotate);
-      TelemetryHandler.Message(4, "storedHeading", JavaUtil.formatNumber(parts.navigator.storedHeading, 2));
-      TelemetryHandler.Message(4, "deltaHeading", JavaUtil.formatNumber(parts.navigator.deltaHeading, 2));
+      TelemetryMgr.Message(4, "r (magnitude)", parts.controls.DriveSpeed);
+      TelemetryMgr.Message(4, "robotAngle", parts.controls.DriveAngle);
+      TelemetryMgr.Message(4, "rotate", parts.controls.Rotate);
+      TelemetryMgr.Message(4, "storedHeading", JavaUtil.formatNumber(parts.navigator.storedHeading, 2));
+      TelemetryMgr.Message(4, "deltaHeading", JavaUtil.formatNumber(parts.navigator.deltaHeading, 2));
 //        telemetry.addData("error", JavaUtil.formatNumber(currentError, 2));
 //        telemetry.addData("v0", JavaUtil.formatNumber(navigator.v0, 2));
 //        telemetry.addData("v1", JavaUtil.formatNumber(navigator.v2, 2));

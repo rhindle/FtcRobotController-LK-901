@@ -5,7 +5,6 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -17,11 +16,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.i2c.QwiicLEDStick;
 
 import java.util.List;
 
-public class Robot {
+public class Robot implements PartsInterface {
     /* Public OpMode members. */
     public boolean disableIMUupdate = false;
 
@@ -96,13 +96,30 @@ public class Robot {
         allHubs = hardwareMap.getAll(LynxModule.class);
     }
 
-    public void loop() {
+    public void initialize(){
+        // initialization is complex and messy in this class, so move it elsewhere for readability
+        init();
+    }
+
+    public void preInit() {
+    }
+
+    public void initLoop() {
+    }
+
+    public void preRun() {
+    }
+
+    public void runLoop() {
         // Bulk Reads - Important Step 4: If you are using MANUAL mode, you must clear the BulkCache once per control cycle
         for (LynxModule module : allHubs) {
             module.clearBulkCache();
         }
         // Read IMU - once per cycle!
         if (!disableIMUupdate) updateImuHeading();
+    }
+
+    public void stop() {
     }
 
     private void updateImuHeading() {

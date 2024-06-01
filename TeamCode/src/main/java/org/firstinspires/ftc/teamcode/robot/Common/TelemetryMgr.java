@@ -2,16 +2,14 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-public class TelemetryHandler {
+public class TelemetryMgr {
 
     static int debugLevel = 10;
     static boolean needsUpdate = false;
     static LinearOpMode opMode;
 
-    public TelemetryHandler(LinearOpMode opMode) {
-        TelemetryHandler.opMode = opMode;
+    public TelemetryMgr(LinearOpMode opMode) {
+        TelemetryMgr.opMode = opMode;
     }
 
     public static void Message (int lvl, String cap, Object val) {

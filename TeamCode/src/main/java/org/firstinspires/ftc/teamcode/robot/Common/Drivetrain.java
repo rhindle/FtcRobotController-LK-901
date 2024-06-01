@@ -21,7 +21,7 @@ public class Drivetrain {
         this.parts = parts;
     }
 
-    public void init() {
+    public void initialize() {
         motorLF = parts.robot.motor0;
         motorRF = parts.robot.motor1;
         motorLR = parts.robot.motor2;

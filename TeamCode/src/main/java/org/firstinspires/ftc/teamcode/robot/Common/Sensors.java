@@ -5,10 +5,9 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 
-public class Sensors {//implements PartsInterface {
+public class Sensors implements PartsInterface {
 
    Parts parts;
    HardwareMap hardwareMap;
@@ -35,7 +34,7 @@ public class Sensors {//implements PartsInterface {
       this.hardwareMap = parts.opMode.hardwareMap;
    }
 
-   public void init(){
+   public void initialize(){
       if (parts.useDistanceSensors) {
          sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
          sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
@@ -52,8 +51,20 @@ public class Sensors {//implements PartsInterface {
       switch0B.setMode(DigitalChannel.Mode.INPUT);
    }
 
-   public void loop(){
+   public void preInit() {
+   }
+
+   public void initLoop() {
+   }
+
+   public void preRun() {
+   }
+
+   public void runLoop(){
       if (parts.useDistanceSensors) updateDistanceSensors();
+   }
+
+   public void stop() {
    }
 
    private void updateDistanceSensors() {

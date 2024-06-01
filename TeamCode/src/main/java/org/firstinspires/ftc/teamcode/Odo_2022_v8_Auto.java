@@ -56,7 +56,7 @@ public class Odo_2022_v8_Auto extends LinearOpMode {
 
         while (!isStarted()) {
             // Prompt user to press start button.
-            robot.buttonMgr.loop();
+            robot.buttonMgr.runLoop();
             if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.a)) robot.localizer.toggleUseFusedHeading();
             telemetry.addData(">", "Press Play to start");
             telemetry.addData(">", "Robot Heading = %.1f", robot.returnImuHeading(true));

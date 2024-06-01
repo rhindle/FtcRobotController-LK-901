@@ -4,9 +4,10 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.spartronics4915.lib.T265Camera;
 import com.spartronics4915.lib.T265Helper;
 
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 
-public class Slamra  {
+public class Slamra implements PartsInterface {
 
 	volatile T265Camera slamra;
 	Parts parts;
@@ -29,7 +30,7 @@ public class Slamra  {
 		this.parts = parts;
 	}
 
-	public void init() {
+	public void initialize() {
 		// Use raw slamra values only (functions in the library are broken)
 		if (slamra == null) {
 			slamra = T265Helper.getCamera(
@@ -39,11 +40,7 @@ public class Slamra  {
 		if (!slamra.isStarted()) slamra.start();
 	}
 
-	public void onStart() {
-	}
-
-	public void onStop() {
-		slamra.stop();
+	public void preInit() {
 	}
 
 	public void initLoop () {
@@ -54,10 +51,17 @@ public class Slamra  {
 		addTeleOpTelemetry();
 	}
 
-	public void loop() {
+	public void preRun() {
+	}
+
+	public void runLoop() {
 		updateSlamraPosition();
 		isSlamraChanging();
 		addTeleOpTelemetry();
+	}
+
+	public void stop() {
+		slamra.stop();
 	}
 
 	public boolean isSlamraDead(){return timesStuck > 4;}
@@ -124,11 +128,11 @@ public class Slamra  {
 	}
 
 	public void addTeleOpTelemetry() {
-		TelemetryHandler.Message(6, "s-fldof", slamraFieldOffset.toString(2));
-		TelemetryHandler.Message(6, "s-raw__", slamraRawPose.toString(2));
-		TelemetryHandler.Message(6, "s-robot", slamraRobotPose.toString(2));
-		TelemetryHandler.Message(6, "s-final", slamraFinalPose.toString(2));
-		TelemetryHandler.Message(2, "slamra stuck", timesStuck);
-		TelemetryHandler.Message(6,"last pos", lastPos.toString(2));
+		TelemetryMgr.Message(6, "s-fldof", slamraFieldOffset.toString(2));
+		TelemetryMgr.Message(6, "s-raw__", slamraRawPose.toString(2));
+		TelemetryMgr.Message(6, "s-robot", slamraRobotPose.toString(2));
+		TelemetryMgr.Message(6, "s-final", slamraFinalPose.toString(2));
+		TelemetryMgr.Message(2, "slamra stuck", timesStuck);
+		TelemetryMgr.Message(6,"last pos", lastPos.toString(2));
 	}
 }

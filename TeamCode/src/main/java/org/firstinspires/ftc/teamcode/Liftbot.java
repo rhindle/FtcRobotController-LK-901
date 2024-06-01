@@ -66,7 +66,7 @@ public class Liftbot extends LinearOpMode {
         lifter.init();
 
         while (!isStarted()) {
-            robot.buttonMgr.loop();
+            robot.buttonMgr.runLoop();
             if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.x))
                 robot.reverseDrive = !robot.reverseDrive;
             if (robot.buttonMgr.wasTapped(2, ButtonMgr.Buttons.x))
@@ -91,7 +91,7 @@ public class Liftbot extends LinearOpMode {
             while (opModeIsActive()) {
 
                 robot.loop();               // Clears bulk data and reads IMU
-                buttonMgr.loop();           // Processes digital controller input
+                buttonMgr.runLoop();           // Processes digital controller input
                 localizer.loop();           // Updates odometry X, Y, Rotation
                 robot.sensors.loop();       // Update distance sensors, etc.
 

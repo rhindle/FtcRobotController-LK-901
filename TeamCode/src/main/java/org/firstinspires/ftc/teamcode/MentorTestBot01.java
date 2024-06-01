@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
-import org.firstinspires.ftc.teamcode.robot.Common.TelemetryHandler;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 import org.firstinspires.ftc.teamcode.robot.GoCanum.PartsGC;
 
@@ -46,7 +46,7 @@ public class MentorTestBot01 extends LinearOpMode {
         parts.preInit();
 
         while (!isStarted()) {
-            parts.buttonMgr.loop();
+            parts.buttonMgr.runLoop();
             if (parts.buttonMgr.wasTapped(1, ButtonMgr.Buttons.x))
                 parts.reverseDrive = !parts.reverseDrive;
             if (parts.buttonMgr.wasTapped(2, ButtonMgr.Buttons.x))
@@ -57,7 +57,7 @@ public class MentorTestBot01 extends LinearOpMode {
             telemetry.addData(">", "Robot Heading = %.1f", parts.robot.returnImuHeading(true));
             telemetry.addData("Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
 
-            if (parts.useSlamra) parts.slamra.loop();
+            if (parts.useSlamra) parts.slamra.runLoop();
 
             telemetry.update();
             sleep(20);
@@ -72,18 +72,18 @@ public class MentorTestBot01 extends LinearOpMode {
             // Put run blocks here.
             while (opModeIsActive()) {
 
-                parts.robot.loop();               // Clears bulk data and reads IMU
-                parts.buttonMgr.loop();           // Processes digital controller input
-                parts.odometry.loop();           // Updates odometry X, Y, Rotation
-                if (parts.useSlamra) parts.slamra.loop();
-                parts.sensors.loop();       // Update distance sensors, etc.
+                parts.robot.runLoop();               // Clears bulk data and reads IMU
+                parts.buttonMgr.runLoop();           // Processes digital controller input
+                parts.odometry.runLoop();           // Updates odometry X, Y, Rotation
+                if (parts.useSlamra) parts.slamra.runLoop();
+                parts.sensors.runLoop();       // Update distance sensors, etc.
 
                 addTelemetryLoopStart();
 
-                parts.controls.loop();            // Acts on user controls
+                parts.controls.runLoop();            // Acts on user controls
 
 //                lifter.loop();
-                parts.navigator.loop();           // Automatic navigation actions
+                parts.navigator.runLoop();           // Automatic navigation actions
 
                 addTelemetryLoopEnd();
                 telemetry.update();
@@ -107,7 +107,7 @@ public class MentorTestBot01 extends LinearOpMode {
     }
 
     private void addTelemetryLoopEnd() {
-        TelemetryHandler.Message(1, "!!", "!!!TEST !!!!!!!!!!!!!!!!!!!!");
+        TelemetryMgr.Message(1, "!!", "!!!TEST !!!!!!!!!!!!!!!!!!!!");
         telemetry.addData("r (magnitude)", parts.controls.DriveSpeed);
         telemetry.addData("robotAngle", parts.controls.DriveAngle);
         telemetry.addData("rotate", parts.controls.Rotate);

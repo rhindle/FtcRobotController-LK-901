@@ -36,7 +36,7 @@ public class ZZ_Adafruit_Neo_4 extends LinearOpMode {
         neo = new NeoMatrix(this, "neo", 8,32);
 
         robot.init();
-        neo.init();
+        neo.initialize();
         neo.setUpdateLimit(1);
         neo.setPreventTearing(true);
         neo.setDimmingValue(192);
@@ -88,7 +88,7 @@ public class ZZ_Adafruit_Neo_4 extends LinearOpMode {
         while (opModeIsActive()) {
             robot.loop();  // this will take care of clearing out the bulk reads
             buttonMgr.updateAll();
-            neo.loop();
+            neo.runLoop();
 
             if (System.currentTimeMillis() >= lastAnimUpdate + animUpdateInterval) {
                 lastAnimUpdate = System.currentTimeMillis();

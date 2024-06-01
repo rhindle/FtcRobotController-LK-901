@@ -15,7 +15,7 @@ public class ControlsDS extends Controls {
    public int someNewVariable;
 
    @Override
-   public void loop() {
+   public void runLoop() {
       userInput();
       parts.navigator.setUserDriveSettings(DriveSpeed, DriveAngle, Rotate);
    }
