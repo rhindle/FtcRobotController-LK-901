@@ -43,7 +43,7 @@ public class PartsDS extends Parts {
             slamra.slamraRobotOffset = slamraRobotOffset;
         }
 
-        if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 8);
+        if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 16);
 
         switch (rType) {
             case GOCANUM:
@@ -65,11 +65,15 @@ public class PartsDS extends Parts {
 
         if (useNeoMatrix) {
             neo.init();
-            neo.setUpdateLimit(1);
+            //neo.setUpdateLimit(1);
+            neo.setUpdateLimit(0);
             neo.setPreventTearing(true);
             neo.setDimmingValue(192);
             neo.drawRectangle(0, 7, 0, 7, Color.rgb(1, 1, 0));
+            textMatrix = neo.buildPixelMapFromString("abcd", misc, Color.rgb(1,1,0), Color.rgb(0,0,0));
         }
+
+
     }
 
     @Override
@@ -81,7 +85,10 @@ public class PartsDS extends Parts {
         if (useODO) odometry.loop();  // get some things squared away before the real program runs
         navigator.loop();
         if (useSlamra) slamra.onStart();
-        if (useNeoMatrix) neo.drawRectangle(0,7,0,7, Color.rgb(0,2,0));
+        if (useNeoMatrix) {
+            neo.drawRectangle(0,7,0,7, Color.rgb(0,2,0));
+            neo.setUpdateLimit(1);
+        }
     }
 
     @Override
@@ -89,7 +96,13 @@ public class PartsDS extends Parts {
         buttonMgr.loop();
         if (useSlamra) slamra.initLoop();
         if (useAprilTag) apriltag.initLoop();
-        if (useNeoMatrix) neo.loop();
+        if (useNeoMatrix) {
+            neo.applyPixelMapToBuffer(textMatrix,0,7, 0, true);
+            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
+//            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
+            textMatrix = neo.shiftPixelMap(textMatrix,-8,0,true);
+            neo.loop();
+        }
     }
 
     @Override
@@ -119,5 +132,17 @@ public class PartsDS extends Parts {
         if (useSlamra) slamra.onStop();
         if (useAprilTag) apriltag.stop();
     }
+
+    int[][] textMatrix;
+
+    public final char[][] misc = {
+    {'a', 17, 128, 0, 0, 1, 128, 0, 34},
+    {'b', 34, 0, 128, 1, 0, 0, 128, 17},
+    {'c', 68, 0, 1, 128, 0, 0, 1, 136},
+    {'d', 136, 1, 0, 0, 128, 1, 0, 68},
+    {'e', 238, 1, 129, 129, 128, 1, 129, 221},
+    {'f', 221, 129, 1, 128, 129, 129, 1, 238},
+    {'g', 187, 129, 128, 1, 129, 129, 128, 119},
+    {'h', 119, 128, 129, 129, 1, 128, 129, 187} };
 
 }

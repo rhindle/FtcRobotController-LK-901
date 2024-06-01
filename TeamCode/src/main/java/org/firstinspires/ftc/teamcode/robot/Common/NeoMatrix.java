@@ -347,7 +347,7 @@ public class NeoMatrix {
       if (colEnd >= ledCols) colEnd = ledCols - 1;
       if (colEnd-colStart+1 > pMap.length) colEnd = colStart+pMap.length-1;
       int pMapX = mapStart;
-      for (int c = colStart; c <= colEnd; c++) {
+      for (int c = colStart; c <= colEnd; c++) {   //20240531 - changed from c <= colEnd
          for (int r = 0; r < ledRows; r++) {
             int px = pMap[pMapX][r];
             if (opaque || (px & 0xFFFFFF) != 0) putMatrixBuffer(c, r, px);
