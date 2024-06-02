@@ -64,11 +64,15 @@ public class Navigator implements PartsInterface {
       v1 = 0.0;
       v2 = 0.0;
       v3 = 0.0;
-      if (!parts.useODO) {
-         targetPos = new Position(0,0,0);
-      } else {
-         targetPos = parts.odometry.odoFieldStart.clone();
-      }
+
+//      if (!parts.useODO) {
+//         targetPos = new Position(0,0,0);
+//      } else {
+//         targetPos = parts.odometry.odoFieldStart.clone();
+//      }
+      if (parts.fieldStartPosition!=null) targetPos=parts.fieldStartPosition.clone();
+      else targetPos= new Position();
+
       storedHeading = targetPos.R;
       deltaHeading = targetPos.R;
       updateRobotPosition();

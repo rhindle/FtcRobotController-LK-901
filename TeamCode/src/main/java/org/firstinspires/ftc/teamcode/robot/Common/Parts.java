@@ -14,11 +14,11 @@ public class Parts implements PartsInterface {
    public boolean useDistanceSensors = true;
    public boolean useDriveEncoders = true;
    public boolean useSlamra = false;
-   public boolean useNeoMatrix = false;
    public boolean useAprilTag = false;
+   public boolean useNeoMatrix = false;
    public Position robotPosition = new Position();
    public Position slamraPosition;
-   public Position fieldStartPosition;
+   public Position fieldStartPosition; // = new Position();
    public Position odoRobotOffset;
    public Position slamraRobotOffset;
 

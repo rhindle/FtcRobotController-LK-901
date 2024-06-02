@@ -12,15 +12,19 @@ public class PositionMgr implements PartsInterface {
    public Position odoPosition;
    public Position slamraPosition;
    public Position tagPosition;
+   //public Position encoderPosition;
 
    public Position fieldStartPosition;
-   public Position odoRobotOffset;
-   public Position slamraRobotOffset;
+//   public Position odoRobotOffset;
+//   public Position slamraRobotOffset;
 
-   public int odoPriority = 1;
-   public int slarmaPriority = 2;
-   public int tagPriority = 3;
-   public Boolean prioritizeSlamraR = false;
+//   public int odoPriority = 1;
+//   public int slarmaPriority = 2;
+//   public int tagPriority = 3;
+   public PosSource[] priorityList = {PosSource.ODO, PosSource.SLAMRA, PosSource.TAG};
+   public Boolean prioritizeSlamraRforODO = false;      // use Slamra R instead of IMU for ODO
+   public Boolean prioritizeIMUforSLAMRA = false;       // use IMU instead of Slarma R for SLAMRA
+   public PosSource posSource;
 
    /* Constructor */
    public PositionMgr(Parts parts){
@@ -32,6 +36,10 @@ public class PositionMgr implements PartsInterface {
    }
 
    public void initialize(){
+//      if (fieldStartPosition!=null) {
+//         if (parts.useODO) parts.odometry.odoFieldStart=fieldStartPosition;
+//         if (parts.useSlamra) parts.slamra.slamraFieldStart=fieldStartPosition;
+//      }
    }
 
    public void preInit() {
@@ -45,7 +53,9 @@ public class PositionMgr implements PartsInterface {
    }
 
    public void runLoop() {
-      if (parts.useODO) odoPosition=parts.odometry.odoRobotPosition;
+      if (parts.useODO) {
+         odoPosition = parts.odometry.isOdoPositionGood() ? parts.odometry.odoRobotPosition : null;
+      }
       if (parts.useSlamra) {
          slamraPosition = parts.slamra.isSlamraPositionGood() ? parts.slamra.slamraRobotPosition : null;
       }
@@ -61,20 +71,67 @@ public class PositionMgr implements PartsInterface {
    }
 
    Position normalUpdate() {
-      // This logic should really be cleaned up...
-      // First deal with all nulls/
-      if (odoPosition == null && slamraPosition == null && tagPosition == null) return null;
-      // Then deal with only one usable position
-      if (odoPosition == null && tagPosition == null) return slamraPosition;
-      if (slamraPosition == null && tagPosition == null) return odoPosition;
-      if (odoPosition == null && slamraPosition == null) return tagPosition;
-      // Then deal with two usable positions
-      if (odoPosition == null) { if (slarmaPriority < tagPriority) return slamraPosition; else return tagPosition; }
-      if (slamraPosition == null) { if (odoPriority < tagPriority) return odoPosition; else return tagPosition; }
-      if (tagPosition == null) { if (odoPriority < slarmaPriority) return odoPosition; else return slamraPosition; }
-      // All three are valid, so one final test
-      if (odoPriority < slarmaPriority && odoPriority < tagPriority) return odoPosition;
-      if (slarmaPriority < tagPriority) return slamraPosition;
-      return tagPosition;
+      posSource = returnPrioritySource();
+      switch (posSource) {
+         case NONE:
+            return null;
+         case ODO:
+            if (prioritizeSlamraRforODO && slamraPosition!=null) {
+               return odoPosition.withR(slamraPosition.R);
+            }
+            return odoPosition;
+         case SLAMRA:
+            //if (prioritizeIMUforSLAMRA) return slamraPosition.withR() //todo: finish this
+            return slamraPosition;
+         case TAG:
+            return tagPosition;
+         default:
+            return null;
+      }
    }
+
+//   PosSource returnPrioritySource() {
+//      // This logic should really be cleaned up...
+//      // First deal with all nulls/
+//      if (odoPosition == null && slamraPosition == null && tagPosition == null) return PosSource.NONE;
+//      // Then deal with only one usable position
+//      if (odoPosition == null && tagPosition == null) return PosSource.SLAMRA;
+//      if (slamraPosition == null && tagPosition == null) return PosSource.ODO;
+//      if (odoPosition == null && slamraPosition == null) return PosSource.TAG;
+//      // Then deal with two usable positions
+//      if (odoPosition == null) { if (slarmaPriority < tagPriority) return PosSource.SLAMRA; else return PosSource.TAG; }
+//      if (slamraPosition == null) { if (odoPriority < tagPriority) return PosSource.ODO; else return PosSource.TAG; }
+//      if (tagPosition == null) { if (odoPriority < slarmaPriority) return PosSource.ODO; else return PosSource.SLAMRA; }
+//      // All three are valid, so one final test
+//      if (odoPriority < slarmaPriority && odoPriority < tagPriority) return PosSource.ODO;
+//      if (slarmaPriority < tagPriority) return PosSource.SLAMRA;
+//      return PosSource.TAG;
+//   }
+
+   PosSource returnPrioritySource() {
+      for (PosSource source : priorityList) {
+         switch (source) {
+            case ODO:
+               if (odoPosition!=null) return PosSource.ODO;
+               break;
+            case SLAMRA:
+               if (slamraPosition!=null) return PosSource.SLAMRA;
+               break;
+            case TAG:
+               if (tagPosition!=null) return PosSource.TAG;
+               break;
+            default:
+         }
+      }
+      return PosSource.NONE;
+   }
+
+   public enum PosSource {
+      NONE,
+      ODO,
+      SLAMRA,
+      TAG,
+      ENCODER
+   }
+
 }

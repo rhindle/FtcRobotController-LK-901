@@ -86,4 +86,8 @@ public class Position
         return ((X == pos2.X) && (Y == pos2.Y) && (R == pos2.R));
     }
 
+    public Position withR (double newR) {
+        return new Position(X, Y, newR);
+    }
+
 }

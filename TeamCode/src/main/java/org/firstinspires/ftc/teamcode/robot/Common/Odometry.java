@@ -31,6 +31,7 @@ public class Odometry implements PartsInterface {
    Position odoFinalPose = new Position ();                             // odo mapped to field
    Position odoFieldOffset = new Position ();                           // transform from initial position (more relevant for slamra!)
    public Position odoRobotPosition; // = odoFieldStart.clone();
+   final Position zeroPos = new Position (0, 0, 0);
 
    private static final double eTicksPerInch = 82300 / 48.0;
    private static final double eTicksPerRotate = 169619;
@@ -47,11 +48,13 @@ public class Odometry implements PartsInterface {
    }
 
    public void initialize() {
-      odoRobotPosition = odoFieldStart.clone();  //TODO: deal with odoFieldStart set to null
-      parts.robotPosition = odoRobotPosition.clone();
+//      odoRobotPosition = odoFieldStart.clone();  //TODO: deal with odoFieldStart set to null
+      if (odoFieldStart!=null) odoRobotPosition = odoFieldStart.clone();
+      else odoRobotPosition = new Position ();
+//           parts.robotPosition = odoRobotPosition.clone();
       if (!parts.useODO) {
          odoRobotPosition = new Position(0,0, odoRobotPosition.R);
-         parts.robotPosition = odoRobotPosition.clone();
+//         parts.robotPosition = odoRobotPosition.clone();
          return;
       }
       configureEncoders();
@@ -64,9 +67,10 @@ public class Odometry implements PartsInterface {
       globalHeading0 = imuHeading0;
 
       // odo start position is 0,0,0; imu should also read 0.  odoRawPose is already 0,0,0
-      updateOdoRobotPose();
-      setOdoFinalPose();
-      setOdoFieldOffset();
+      odoRobotPose = getOdoRobotPose();
+      odoFinalPose = getOdoFinalPose();
+//      setOdoFieldOffset();
+      setupFieldOffset();
    }
 
    public void preInit() {
@@ -83,7 +87,7 @@ public class Odometry implements PartsInterface {
          imuHeading = parts.robot.returnImuHeading();
          globalHeading = imuHeading;
          odoRobotPosition.R = globalHeading;
-         parts.robotPosition = odoRobotPosition.clone();
+//         parts.robotPosition = odoRobotPosition.clone();
          return;
       }
 
@@ -100,12 +104,12 @@ public class Odometry implements PartsInterface {
       /* Calculate position */
       updateXY();
       odoRawPose = new Position(xPos, yPos, globalHeading);
-      updateOdoRobotPose();
-      setOdoFinalPose();
+      odoRobotPose = getOdoRobotPose();
+      odoFinalPose = getOdoFinalPose();
 
       /* Update robot position */
       odoRobotPosition = odoFinalPose.clone();
-      parts.robotPosition = odoRobotPosition.clone();
+//      parts.robotPosition = odoRobotPosition.clone();
 
    }
 
@@ -182,24 +186,56 @@ public class Odometry implements PartsInterface {
       return Functions.normalizeAngle(robotHeading);
    }
 
-   void updateOdoRobotPose() {
+   Position getOdoRobotPose() {
       //pos1 = odoRawPose, pos2 = odoRobotOffset
-      odoRobotPose = transformPosition(odoRawPose, odoRobotOffset);
+      return transformPosition(odoRawPose, odoRobotOffset);
    }
 
-   void setOdoFinalPose() {
+   Position getOdoFinalPose() {
       //pos1 = odoFieldOffset, pos2 = odoRobotPose
-      odoFinalPose = transformPosition(odoFieldOffset, odoRobotPose);
-      odoFinalPose.normalize();
+      Position odoFinal;
+      odoFinal = transformPosition(odoFieldOffset, odoRobotPose);
+      odoFinal.normalize();
+      return odoFinal;
    }
 
-   void setOdoFieldOffset() {    //TODO: deal with odoFieldStart set to null [also, is this necessary or vestigial?]
-      Position fS = odoFieldStart;
-      Position rP = odoRobotPose;
-      double offsetR = fS.R - rP.R;
-      odoFieldOffset = new Position (
-              fS.X - (rP.X*Math.cos(Math.toRadians(offsetR)) - rP.Y*Math.sin(Math.toRadians(offsetR))),
-              fS.Y - (rP.X*Math.sin(Math.toRadians(offsetR)) + rP.Y*Math.cos(Math.toRadians(offsetR))),
+//   void setOdoFieldOffset() {    //TODO: deal with odoFieldStart set to null [also, is this necessary or vestigial?]
+//      Position fS = odoFieldStart;
+//      Position rP = odoRobotPose;
+//      double offsetR = fS.R - rP.R;
+//      odoFieldOffset = new Position (
+//              fS.X - (rP.X*Math.cos(Math.toRadians(offsetR)) - rP.Y*Math.sin(Math.toRadians(offsetR))),
+//              fS.Y - (rP.X*Math.sin(Math.toRadians(offsetR)) + rP.Y*Math.cos(Math.toRadians(offsetR))),
+//              offsetR *1
+//      );
+//   }
+
+   public boolean isOdoOffset() {
+      return !odoFieldOffset.isEqualTo(zeroPos);
+   }
+
+   public boolean isOdoPositionGood() {
+      return isOdoOffset();
+      // could add future checks for weirdness indicating a wheel lifted or something
+   }
+
+   public void setupFieldOffset(Position fieldPosition) {
+      odoFieldOffset = zeroPos;    // clear any existing offset
+//      updateOdoRobotPose();
+      odoFieldOffset = getOdoFieldOffset(odoRobotPose, fieldPosition);
+   }
+   public void setupFieldOffset() {
+      odoFieldOffset = zeroPos;    // clear any existing offset
+//      updateOdoRobotPose();
+      if (odoFieldStart!=null) odoFieldOffset = getOdoFieldOffset(odoRobotPose, odoFieldStart);
+      // if the field offset is 0,0,0, it can be known that it was not properly offset
+   }
+
+   Position getOdoFieldOffset(Position robotPose, Position fieldPose) {
+      double offsetR = fieldPose.R - robotPose.R;
+      return new Position (
+              fieldPose.X - (robotPose.X*Math.cos(Math.toRadians(offsetR)) - robotPose.Y*Math.sin(Math.toRadians(offsetR))),
+              fieldPose.Y - (robotPose.X*Math.sin(Math.toRadians(offsetR)) + robotPose.Y*Math.cos(Math.toRadians(offsetR))),
               offsetR *1
       );
    }
@@ -213,12 +249,10 @@ public class Odometry implements PartsInterface {
    }
 
    public void addTeleOpTelemetry() {
-//      telemetry.addData("raw__", odoRawPose.toString(2));
-//      telemetry.addData("robot", odoRobotPose.toString(2));
-//      telemetry.addData("final", odoFinalPose.toString(2));
-      TelemetryMgr.Message(6, "raw__", odoRawPose.toString(2));
-      TelemetryMgr.Message(6, "robot", odoRobotPose.toString(2));
-      TelemetryMgr.Message(6, "final", odoFinalPose.toString(2));
+      TelemetryMgr.Message(6, "odo-fldof", odoFieldOffset.toString(2));
+      TelemetryMgr.Message(6, "odo-raw__", odoRawPose.toString(2));
+      TelemetryMgr.Message(6, "odo-robot", odoRobotPose.toString(2));
+      TelemetryMgr.Message(6, "odo-final", odoFinalPose.toString(2));
    }
 
    public void configureEncoders() {

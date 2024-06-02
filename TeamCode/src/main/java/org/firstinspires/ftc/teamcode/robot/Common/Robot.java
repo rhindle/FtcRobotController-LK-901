@@ -73,7 +73,7 @@ public class Robot implements PartsInterface {
     public BNO055IMU sensorIMU      = null;
 
     // Bulk Reads - Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
-    List<LynxModule> allHubs = null;
+    List<LynxModule> allHubs = null;  // gets populated in construct()
 
     /* local OpMode members. */
     private ElapsedTime period  = new ElapsedTime();

@@ -49,7 +49,7 @@ public class Slamra implements PartsInterface {
 		setupFieldOffset();
 		slamraFinalPose = getSlamraFinalPose();
 		slamraRobotPosition = slamraFinalPose;
-		parts.slamraPosition = slamraFinalPose;//.clone();
+//		parts.slamraPosition = slamraFinalPose;//.clone();
 		isSlamraChanging();
 		addTeleOpTelemetry();
 	}
@@ -108,7 +108,7 @@ public class Slamra implements PartsInterface {
 		slamraRobotPose = getSlamraRobotPose();
 		slamraFinalPose = getSlamraFinalPose();
 		slamraRobotPosition = slamraFinalPose;
-		parts.slamraPosition = slamraFinalPose;//.clone();
+//		parts.slamraPosition = slamraFinalPose;//.clone();
 	}
 
 	Position getSlamraRobotPose() {
@@ -142,10 +142,10 @@ public class Slamra implements PartsInterface {
 	}
 
 	public void addTeleOpTelemetry() {
-		TelemetryMgr.Message(6, "s-fldof", slamraFieldOffset.toString(2));
-		TelemetryMgr.Message(6, "s-raw__", slamraRawPose.toString(2));
-		TelemetryMgr.Message(6, "s-robot", slamraRobotPose.toString(2));
-		TelemetryMgr.Message(6, "s-final", slamraFinalPose.toString(2));
+		TelemetryMgr.Message(6, "slm-fldof", slamraFieldOffset.toString(2));
+		TelemetryMgr.Message(6, "slm-raw__", slamraRawPose.toString(2));
+		TelemetryMgr.Message(6, "slm-robot", slamraRobotPose.toString(2));
+		TelemetryMgr.Message(6, "slm-final", slamraFinalPose.toString(2));
 		TelemetryMgr.Message(2, "slamra stuck", timesStuck);
 //		TelemetryMgr.Message(6,"last pos", lastPos.toString(2));
 	}

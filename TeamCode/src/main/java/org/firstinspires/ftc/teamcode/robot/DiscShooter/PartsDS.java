@@ -30,17 +30,16 @@ public class PartsDS extends Parts {
 //      controls = new Controls_2(this);
         controls = new ControlsDS(this);
         drivetrain = new DrivetrainDS(this);
-        if (useAprilTag) apriltag = new AprilTag(this);
 
+        positionMgr = new PositionMgr(this);
+        navigator = new NavigatorDS(this);
+
+        if (useAprilTag) apriltag = new AprilTag(this);
         if (useODO) {
             odometry = new OdometryDS(this);
             odometry.odoFieldStart = fieldStartPosition;
             odometry.odoRobotOffset = odoRobotOffset;
         }
-
-        navigator = new NavigatorDS(this);
-        positionMgr = new PositionMgr(this);
-
         if (useSlamra) {
             slamra = new Slamra(this);
             slamra.slamraFieldStart = fieldStartPosition;
@@ -63,6 +62,7 @@ public class PartsDS extends Parts {
     @Override
     public void preInit() {
         robot.initialize();
+        positionMgr.initialize();
 //        sensors.init();
         if (useSlamra) slamra.initialize();
         if (useAprilTag) apriltag.initialize();
@@ -127,7 +127,8 @@ public class PartsDS extends Parts {
         if (useAprilTag) {
             Position roboTag = apriltag.getTagRobotPosition();
             if (roboTag != null) {
-                slamra.setupFieldOffset(roboTag);
+                if (useSlamra) slamra.setupFieldOffset(roboTag);
+                if (useODO) odometry.setupFieldOffset(roboTag);
                 navigator.deltaHeading = robot.returnImuHeading() - roboTag.R;
             }
         }
