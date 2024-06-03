@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.DiscShooter;
 
+import android.graphics.Color;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -24,7 +26,13 @@ public class AprilTag implements PartsInterface {
     private static final boolean USE_WEBCAM = false;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
+    public Position instantTagRobotPosition;
     public Position tagRobotPosition;
+    Position[] lastPositions = new Position[10];
+    int lastPositionPointer=0;
+    public Position acceptableStDev = new Position(0.15,0.15,0.15);
+    public boolean strongLocked = false;
+    public double strongLockMaxAngle = 10.0;
 
     /* Constructor */
     public AprilTag(Parts parts){
@@ -37,6 +45,9 @@ public class AprilTag implements PartsInterface {
 
     public void initialize() {
         lkAprilTag();
+        for (int i=0; i<lastPositions.length; i++) {
+            lastPositions[i]=new Position();
+        }
     }
 
     public void preInit() {};
@@ -129,7 +140,9 @@ public class AprilTag implements PartsInterface {
 
     private void updateAprilTag() {
 
+        instantTagRobotPosition = null;
         tagRobotPosition = null;
+
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         TelemetryMgr.Message(5,"# AprilTags Detected", currentDetections.size());
 
@@ -178,15 +191,18 @@ public class AprilTag implements PartsInterface {
                 // Calculate the robot position based on camera position and tag position
                 Position robotPos = new Position(tagPos.X+camPos.X, tagPos.Y+camPos.Y, camPos.R);
                 TelemetryMgr.Message(5,String.format("robotPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", robotPos.X, robotPos.Y, robotPos.R));
-                tagRobotPosition = robotPos;
+                instantTagRobotPosition = robotPos;
 
             } else {
                 TelemetryMgr.Message(5,String.format("\n==== (ID %d) Unknown", detection.id));
                 TelemetryMgr.Message(5,String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
+            processTagPosition();
         }   // end for() loop
 
         if (currentDetections.size() == 0) {
+            TelemetryMgr.Message(5,"X");
+            TelemetryMgr.Message(5,"X");
             TelemetryMgr.Message(5,"X");
             TelemetryMgr.Message(5,"X");
             TelemetryMgr.Message(5,"X");
@@ -213,6 +229,48 @@ public class AprilTag implements PartsInterface {
 //        //pos1 = odoRawPose, pos2 = odoRobotOffset
 //        lkOdoRobotPose = lkTransformPosition(lkOdoRawPose, lkOdoRobotOffset);
 //    }
+
+    void processTagPosition() {
+        int length=lastPositions.length;
+
+        lastPositions[lastPositionPointer] = instantTagRobotPosition;
+        lastPositionPointer++;
+        if (lastPositionPointer >= length) lastPositionPointer=0;
+
+        // get the mean of array
+        Position meanPosition = new Position();
+        for (Position i : lastPositions) {
+            if (i==null) i=new Position();
+            meanPosition.X += i.X / length;
+            meanPosition.Y += i.Y / length;
+            meanPosition.R += i.R / length;
+        }
+        TelemetryMgr.Message(5,String.format("meanPos_ XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", meanPosition.X, meanPosition.Y, meanPosition.R));
+
+        // calculate the standard deviation
+        Position stdevPosition = new Position();
+        for (Position i : lastPositions) {
+            stdevPosition.X += Math.pow(i.X - meanPosition.X, 2);
+            stdevPosition.Y += Math.pow(i.Y - meanPosition.Y, 2);
+            stdevPosition.R += Math.pow(i.R - meanPosition.R, 2);
+        }
+        stdevPosition.X = Math.sqrt(stdevPosition.X / length);
+        stdevPosition.Y = Math.sqrt(stdevPosition.Y / length);
+        stdevPosition.R = Math.sqrt(stdevPosition.R / length);
+        TelemetryMgr.Message(5,String.format("stdvPos_ XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", stdevPosition.X, stdevPosition.Y, stdevPosition.R));
+
+        if (stdevPosition.X <= acceptableStDev.X && stdevPosition.Y <= acceptableStDev.Y && stdevPosition.R <= acceptableStDev.R) {
+            if (Math.abs(meanPosition.R) <= strongLockMaxAngle) {
+                strongLocked = true;
+                tagRobotPosition = meanPosition;
+            }
+            if (!strongLocked) {
+                // until the first strong lock, update anyway
+                // may want to move the robot automatically to a better position for a stronger lock
+                tagRobotPosition = meanPosition;
+            }
+        }
+    }
 
     public Position getTagRobotPosition() {
         return tagRobotPosition;

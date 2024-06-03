@@ -81,21 +81,6 @@ public class PartsDS extends Parts {
     }
 
     @Override
-    public void preRun() {
-        drivetrain.initialize();
-        if (useODO) odometry.initialize();
-        navigator.initialize();
-
-        if (useODO) odometry.runLoop();  // get some things squared away before the real program runs
-        navigator.runLoop();
-        if (useSlamra) slamra.preRun();
-        if (useNeoMatrix) {
-            neo.drawRectangle(0,7,0,7, Color.rgb(0,2,0));
-            neo.setUpdateLimit(1);
-        }
-    }
-
-    @Override
     public void initLoop() {
         buttonMgr.runLoop();
         if (useSlamra) slamra.initLoop();
@@ -107,6 +92,22 @@ public class PartsDS extends Parts {
 //            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
             textMatrix = neo.shiftPixelMap(textMatrix,-8,0,true);
             neo.runLoop();
+        }
+    }
+
+    @Override
+    public void preRun() {
+        drivetrain.initialize();
+        if (useODO) odometry.initialize();
+        navigator.initialize();
+
+        if (useODO) odometry.runLoop();  // get some things squared away before the real program runs
+        navigator.runLoop();
+        if (useSlamra) slamra.preRun();
+        if (useNeoMatrix) {
+            neo.clearMatrix();
+            neo.drawRectangle(0,7,0,7, Color.rgb(1,1,1));
+            neo.setUpdateLimit(1);
         }
     }
 
@@ -131,6 +132,19 @@ public class PartsDS extends Parts {
                 if (useODO) odometry.setupFieldOffset(roboTag);
                 navigator.deltaHeading = robot.returnImuHeading() - roboTag.R;
             }
+            if (apriltag.tagRobotPosition!=null){
+                neo.drawRectangle(3,4,3,4, Color.rgb(0,4,1));
+            } else if (apriltag.instantTagRobotPosition!=null) {
+                neo.drawRectangle(3,4,3,4, Color.rgb(2,1,0));
+            } else {
+                neo.drawRectangle(3,4,3,4, Color.rgb(2,0,0));
+            }
+        }
+
+        if (positionMgr.robotPosition!=null) {
+            neo.drawRectangle(2,5,2,5, Color.rgb(0,2,0));
+        } else {
+            neo.drawRectangle(2,5,2,5, Color.rgb(2,0,0));
         }
     }
 
