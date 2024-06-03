@@ -33,6 +33,7 @@ public class PartsDS extends Parts {
 
         positionMgr = new PositionMgr(this);
         navigator = new NavigatorDS(this);
+        misc = new Misc(this);
 
         if (useAprilTag) apriltag = new AprilTag(this);
         if (useODO) {
@@ -74,7 +75,7 @@ public class PartsDS extends Parts {
             neo.setPreventTearing(true);
             neo.setDimmingValue(192);
             neo.drawRectangle(0, 7, 0, 7, Color.rgb(1, 1, 0));
-            textMatrix = neo.buildPixelMapFromString("abcd", misc, Color.rgb(1,1,0), Color.rgb(0,0,0));
+            textMatrix = neo.buildPixelMapFromString("abcd", marquis, Color.rgb(1,1,0), Color.rgb(0,0,0));
         }
 
 
@@ -91,6 +92,7 @@ public class PartsDS extends Parts {
             neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
 //            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
             textMatrix = neo.shiftPixelMap(textMatrix,-8,0,true);
+            misc.clearMessage();
             neo.runLoop();
         }
     }
@@ -100,6 +102,7 @@ public class PartsDS extends Parts {
         drivetrain.initialize();
         if (useODO) odometry.initialize();
         navigator.initialize();
+        navigator.setTargetAbsolute(-20,0,0);
 
         if (useODO) odometry.runLoop();  // get some things squared away before the real program runs
         navigator.runLoop();
@@ -122,7 +125,10 @@ public class PartsDS extends Parts {
         positionMgr.runLoop();
         controls.runLoop();
         navigator.runLoop();
-        if (useNeoMatrix) neo.runLoop();
+        if (useNeoMatrix) {
+            misc.clearMessage();
+            neo.runLoop();
+        }
 
         //experiment follows, to be moved elsewhere eventually
         if (useAprilTag) {
@@ -161,7 +167,7 @@ public class PartsDS extends Parts {
 
     int[][] textMatrix;
 
-    public final char[][] misc = {
+    public final char[][] marquis = {
     {'a', 17, 128, 0, 0, 1, 128, 0, 34},
     {'b', 34, 0, 128, 1, 0, 0, 128, 17},
     {'c', 68, 0, 1, 128, 0, 0, 1, 136},

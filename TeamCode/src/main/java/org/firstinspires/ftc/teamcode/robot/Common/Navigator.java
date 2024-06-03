@@ -91,7 +91,8 @@ public class Navigator implements PartsInterface {
 
       updateRobotPosition();
 
-      if (!parts.useODO) {
+//      if (!parts.useODO) {
+      if (robotPosition==null) {
          userDrive();
          parts.drivetrain.setDrivePowers(new double[] {v0, v1, v2, v3});
          return;
@@ -119,6 +120,7 @@ public class Navigator implements PartsInterface {
 
    // Determine motor speeds when under automatic control
    public void autoDrive () {
+      if (robotPosition==null) return;   //todo: make sure this doesn't leave motors running
       double errorDist, deltaX, deltaY, errorRot, pDist, pRot, navAngle;
       deltaX = targetPos.X - robotPosition.X;  // error in x
       deltaY = targetPos.Y - robotPosition.Y;  // error in y
@@ -250,6 +252,7 @@ public class Navigator implements PartsInterface {
 
    // Get heading error
    public double getError(double targetAngle) {
+      if (robotPosition==null) return 0;  //todo: check if necessary
       double robotError;
       robotError = targetAngle - robotPosition.R;
       return Functions.normalizeAngle(robotError);
@@ -288,10 +291,12 @@ public class Navigator implements PartsInterface {
 
    public void cancelAutoNavigation() {
       navigate=0;
+      if (robotPosition==null) return;
       storedHeading = robotPosition.R;
    }
 
    public void setTargetToCurrentPosition() {
+      if (robotPosition==null) return;
       targetPos = new Position (
          Math.round(robotPosition.X),
          Math.round(robotPosition.Y),
@@ -304,16 +309,23 @@ public class Navigator implements PartsInterface {
       deltaHeading = storedHeading;
    }
 
-   public void toggleFieldCentricDrive() {
+   public boolean toggleFieldCentricDrive() {
       useFieldCentricDrive = !useFieldCentricDrive;
+      return useFieldCentricDrive;
    }
 
-   public void toggleHeadingHold() {
+   public boolean toggleHeadingHold() {
+      if (robotPosition==null) {
+         useHeadingHold = false;
+         return useHeadingHold;
+      }
       useHeadingHold = !useHeadingHold;
       storedHeading = robotPosition.R;
+      return useHeadingHold;
    }
 
    public void setUseHeadingHold(boolean boo) {
+      if (robotPosition==null) return;
       useHeadingHold = boo;
       storedHeading = robotPosition.R;
    }
@@ -326,9 +338,10 @@ public class Navigator implements PartsInterface {
       useAutoDistanceActivation = boo;
    }
 
-   public void togglePositionHold() {
+   public boolean togglePositionHold() {
       useHoldPosition = !useHoldPosition;
       if (useHoldPosition) setTargetToCurrentPosition();
+      return useHoldPosition;
    }
 
    public void toggleSnapToAngle() {
@@ -353,6 +366,9 @@ public class Navigator implements PartsInterface {
       resetPID();
       return true;
    }
+   public boolean setTargetAbsolute(Position pos) {
+      return setTargetAbsolute(pos.X, pos.Y, pos.R);
+   }
 
    public void setTargetRotBySnapRelative(double R) {
       targetPos.R += R;
@@ -362,6 +378,7 @@ public class Navigator implements PartsInterface {
    }
 
    public void setTargetByDeltaRelative(double X, double Y, double R) {
+      if (robotPosition==null) return;
       double rot = robotPosition.R;
       targetPos.X = targetPos.X + (X * Math.cos(Math.toRadians(rot)) - Y * Math.sin(Math.toRadians(rot)));
       targetPos.Y = targetPos.Y + (X * Math.sin(Math.toRadians(rot)) + Y * Math.cos(Math.toRadians(rot)));
@@ -377,6 +394,10 @@ public class Navigator implements PartsInterface {
       this.driveSpeed = driveSpeed;
       this.driveAngle = driveAngle;
       this.rotate = rotate;
+
+      // Skip the fancy driving if no position is available
+      if (robotPosition==null) return;
+
       // Modify for field centric Drive
       if (useFieldCentricDrive) {
          this.driveAngle = driveAngle - storedHeading + deltaHeading;
@@ -403,6 +424,7 @@ public class Navigator implements PartsInterface {
    }
 
    public void handleRotate(double rotate) {
+      if (robotPosition==null) return;
       // overall plan here is to deal with IMU latency
       if (rotate != 0) {
          storedHeading = robotPosition.R;
@@ -419,7 +441,10 @@ public class Navigator implements PartsInterface {
    }
 
    private void updateRobotPosition() {
-      robotPosition = parts.robotPosition.clone();
+//      robotPosition = parts.robotPosition.clone();
+      // todo: consider... if position is null, should targetposition be reset?
+      if (parts.positionMgr.hasPosition()) robotPosition = parts.positionMgr.robotPosition.clone();
+      else robotPosition = null;
    }
 
    public void setRobotPosition(Position pos) {

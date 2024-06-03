@@ -70,6 +70,10 @@ public class PositionMgr implements PartsInterface {
    public void stop() {
    }
 
+   public Boolean hasPosition () {
+      return (robotPosition!=null);
+   }
+
    Position normalUpdate() {
       posSource = returnPrioritySource();
       switch (posSource) {

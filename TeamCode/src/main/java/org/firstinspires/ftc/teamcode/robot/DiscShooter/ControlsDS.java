@@ -33,19 +33,24 @@ public class ControlsDS extends Controls {
       parts.navigator.handleRotate(Rotate);
 
       // Toggle FCD
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.start))
-         parts.navigator.toggleFieldCentricDrive();
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.start)) {
+         parts.misc.displayMessage('F', parts.navigator.toggleFieldCentricDrive());
+      }
 
       // Toggle HeadingHold
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.back))
-         parts.navigator.toggleHeadingHold();
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.back)) {
+         parts.misc.displayMessage('H', parts.navigator.toggleHeadingHold());
+      }
 
       // Store heading correction
-      if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.right_stick_button))
+      if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.right_stick_button)) {
          parts.navigator.setDeltaHeading();
+         parts.misc.displayMessage('D', 1);
+      }
 
-      if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.left_stick_button))
-         parts.navigator.togglePositionHold();
+      if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.left_stick_button)) {
+         parts.misc.displayMessage('P', parts.navigator.togglePositionHold());
+      }
 //         navigator.toggleSnapToAngle();
 
       // This blob is for manually entering destinations by adjusting X, Y, Rot
