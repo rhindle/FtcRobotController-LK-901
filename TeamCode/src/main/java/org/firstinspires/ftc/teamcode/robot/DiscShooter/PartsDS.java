@@ -142,9 +142,14 @@ public class PartsDS extends Parts {
         }
 
         if (positionMgr.robotPosition!=null) {
-            neo.drawRectangle(2,5,2,5, Color.rgb(0,2,0));
+            if (apriltag.strongLocked) {
+                neo.drawRectangle(2, 5, 2, 5, Color.rgb(0, 2, 0));
+            } else {
+                neo.drawRectangle(2, 5, 2, 5, Color.rgb(2, 1, 0));
+            }
         } else {
             neo.drawRectangle(2,5,2,5, Color.rgb(2,0,0));
+            apriltag.strongLocked=false;  // if all is lost, allow a weak lock again
         }
     }
 

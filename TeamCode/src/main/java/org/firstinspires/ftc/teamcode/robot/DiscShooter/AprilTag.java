@@ -30,7 +30,7 @@ public class AprilTag implements PartsInterface {
     public Position tagRobotPosition;
     Position[] lastPositions = new Position[10];
     int lastPositionPointer=0;
-    public Position acceptableStDev = new Position(0.15,0.15,0.15);
+    public Position acceptableStDev = new Position(0.2,0.2,0.2);
     public boolean strongLocked = false;
     public double strongLockMaxAngle = 10.0;
 

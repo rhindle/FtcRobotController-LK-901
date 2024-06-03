@@ -23,7 +23,7 @@ public class Navigator implements PartsInterface {
    boolean useFieldCentricDrive = false; //true
    boolean useHeadingHold = true;
    boolean useHoldPosition = true;
-   boolean useAutoDistanceActivation = true;
+   boolean useAutoDistanceActivation = false; //true;
    boolean useSnapToAngle = false;
    long headingDelay = System.currentTimeMillis();
    long idleDelay = System.currentTimeMillis();
@@ -370,7 +370,7 @@ public class Navigator implements PartsInterface {
    }
 
    public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {
-      if (!(driveSpeed == 0 && rotate == 0)) {
+      if (!(driveSpeed == 0 && rotate == 0)) {   //todo: get rid of some of this old stuff
          idleDelay = System.currentTimeMillis() + 500;  //was 250 to match rotate?
          if (useAutoDistanceActivation) parts.sensors.readDistSensors(false);
       }
