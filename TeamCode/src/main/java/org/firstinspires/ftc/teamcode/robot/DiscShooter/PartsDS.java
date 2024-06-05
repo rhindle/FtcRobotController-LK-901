@@ -34,6 +34,7 @@ public class PartsDS extends Parts {
         positionMgr = new PositionMgr(this);
         navigator = new NavigatorDS(this);
         misc = new Misc(this);
+        shooter = new Shooter(this);
 
         if (useAprilTag) apriltag = new AprilTag(this);
         if (useODO) {
@@ -64,6 +65,7 @@ public class PartsDS extends Parts {
     public void preInit() {
         robot.initialize();
         positionMgr.initialize();
+        shooter.initialize();
 //        sensors.init();
         if (useSlamra) slamra.initialize();
         if (useAprilTag) apriltag.initialize();
@@ -95,6 +97,7 @@ public class PartsDS extends Parts {
             misc.clearMessage();
             neo.runLoop();
         }
+        shooter.initLoop();
     }
 
     @Override
@@ -112,6 +115,7 @@ public class PartsDS extends Parts {
             neo.drawRectangle(0,7,0,7, Color.rgb(1,1,1));
             neo.setUpdateLimit(1);
         }
+        shooter.preRun();
     }
 
     @Override
@@ -125,6 +129,7 @@ public class PartsDS extends Parts {
         positionMgr.runLoop();
         controls.runLoop();
         navigator.runLoop();
+        shooter.runLoop();
         if (useNeoMatrix) {
             misc.clearMessage();
             neo.runLoop();
@@ -163,6 +168,7 @@ public class PartsDS extends Parts {
     public void stop() {
         if (useSlamra) slamra.stop();
         if (useAprilTag) apriltag.stop();
+        shooter.stop();
     }
 
     int[][] textMatrix;

@@ -6,6 +6,7 @@ import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
 import org.firstinspires.ftc.teamcode.robot.DiscShooter.AprilTag;
 import org.firstinspires.ftc.teamcode.robot.DiscShooter.Misc;
+import org.firstinspires.ftc.teamcode.robot.DiscShooter.Shooter;
 
 public class Parts implements PartsInterface {
 
@@ -37,6 +38,7 @@ public class Parts implements PartsInterface {
    public NeoMatrix neo;
    public PositionMgr positionMgr;
    public Misc misc;
+   public Shooter shooter;
 
    public boolean isSetup = false;
    public robotType rType;

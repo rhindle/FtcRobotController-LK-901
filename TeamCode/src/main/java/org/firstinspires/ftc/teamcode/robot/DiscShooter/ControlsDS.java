@@ -33,9 +33,10 @@ public class ControlsDS extends Controls {
       parts.navigator.handleRotate(Rotate);
 
       // Toggle FCD
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.start)) {
-         parts.misc.displayMessage('F', parts.navigator.toggleFieldCentricDrive());
-      }
+      //todo: Field centric is broken right now; problem with the angle
+//      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.start)) {
+//         parts.misc.displayMessage('F', parts.navigator.toggleFieldCentricDrive());
+//      }
 
       // Toggle HeadingHold
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.back)) {
@@ -78,49 +79,62 @@ public class ControlsDS extends Controls {
 
       // AutoDrive Testing
 
-      liftSpeed = -gamepad2.left_stick_y;
+//      liftSpeed = -gamepad2.left_stick_y;
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_left));
-//         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_PREP_CAPTURE);
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_left))
+         parts.shooter.extendPusher();
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_down));
-//         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_PREP_DEPOSIT_LO);
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_down))
+         parts.shooter.closeGate();
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_right));
-//         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_PREP_DEPOSIT_MED);
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_right))
+         parts.shooter.retractPusher();
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_up));
-//         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_PREP_DEPOSIT_HI);
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_up))
+         parts.shooter.openGate();
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.back));
-//         lifter.action(LiftbotLifter.LiftActions.CANCEL);
-
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a));
-//         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_CAPTURE);
-
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b));
-//         lifter.action(LiftbotLifter.LiftActions.GRAB_TOGGLE);
-
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y));
-//         lifter.action(LiftbotLifter.LiftActions.LIFT_LOWER_TO_DEPOSIT);
-
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x));
-//         lifter.action(LiftbotLifter.LiftActions.LIFT_RAISE_AFTER_CAPTURE);
-
-      if (buttonMgr.isHeld(2, ButtonMgr.Buttons.left_bumper) &&
-              buttonMgr.wasTapped(2, ButtonMgr.Buttons.right_bumper));
-//         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_HOME);
-
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.right_bumper)) {
-         if (buttonMgr.isHeld(2, ButtonMgr.Buttons.left_bumper)) {
-//            lifter.action(LiftbotLifter.LiftActions.AUTOMATE_HOME);
-         } else {
-            // reserved for future use
-         }
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.back)) {
+         parts.shooter.cancelStateMachines();
       }
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.left_bumper));
-//         lifter.action(LiftbotLifter.LiftActions.LIFT_DOWNSTACK);
+      if (buttonMgr.wasPressed(2, ButtonMgr.Buttons.start))
+         parts.shooter.armShooter();
+      if (buttonMgr.wasReleased(2, ButtonMgr.Buttons.start))
+         parts.shooter.disarmShooter();
+
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a))
+         parts.shooter.statePushStep = 1;
+
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b))
+         parts.shooter.stateShoot1Step = 1;
+
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x))
+         parts.shooter.stateShoot3Step = 1;
+
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y))
+         parts.shooter.stateFullAuto = 1;
+
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.left_bumper))
+         parts.shooter.intakeReverse();
+
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.right_bumper))
+         parts.shooter.intakeOn();
+
+
+//      if (buttonMgr.isHeld(2, ButtonMgr.Buttons.left_bumper) &&
+//              buttonMgr.wasTapped(2, ButtonMgr.Buttons.right_bumper));
+////         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_HOME);
+//
+//      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.right_bumper)) {
+//         if (buttonMgr.isHeld(2, ButtonMgr.Buttons.left_bumper)) {
+////            lifter.action(LiftbotLifter.LiftActions.AUTOMATE_HOME);
+//         } else {
+//            // reserved for future use
+//         }
+//      }
+//
+//      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.left_bumper));
+////         lifter.action(LiftbotLifter.LiftActions.LIFT_DOWNSTACK);
 
 
    }
