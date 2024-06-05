@@ -250,6 +250,7 @@ public class AprilTag implements PartsInterface {
         // calculate the standard deviation
         Position stdevPosition = new Position();
         for (Position i : lastPositions) {
+            if (i==null) i=new Position();   // got a null reference after running for a while; whould track this down
             stdevPosition.X += Math.pow(i.X - meanPosition.X, 2);
             stdevPosition.Y += Math.pow(i.Y - meanPosition.Y, 2);
             stdevPosition.R += Math.pow(i.R - meanPosition.R, 2);

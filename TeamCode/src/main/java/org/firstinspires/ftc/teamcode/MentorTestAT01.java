@@ -87,7 +87,7 @@ public class MentorTestAT01 extends LinearOpMode {
 
    private void addTelemetryLoopStart() {
       TelemetryMgr.Message(2, "Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
-      TelemetryMgr.Message(2, "heading", JavaUtil.formatNumber(parts.robot.returnImuHeading(),2));
+      TelemetryMgr.Message(2, "IMU raw heading", JavaUtil.formatNumber(parts.robot.returnImuHeading(),2));
 //      TelemetryHandler.Message(3, "rangeL", String.format("%.01f in", parts.sensors.distL));
 //      TelemetryHandler.Message(3, "rangeM", String.format("%.01f in", parts.sensors.distM));
 //      TelemetryHandler.Message(3, "rangeR", String.format("%.01f in", parts.sensors.distR));
@@ -103,7 +103,10 @@ public class MentorTestAT01 extends LinearOpMode {
       TelemetryMgr.Message(4, "rotate", parts.controls.Rotate);
       TelemetryMgr.Message(4, "storedHeading", JavaUtil.formatNumber(parts.navigator.storedHeading, 2));
       TelemetryMgr.Message(4, "deltaHeading", JavaUtil.formatNumber(parts.navigator.deltaHeading, 2));
-      TelemetryMgr.Message(4, "IMU-Modified", JavaUtil.formatNumber(parts.robot.returnImuHeading()-parts.navigator.deltaHeading, 2));
+      TelemetryMgr.Message(4, "modifyHeading", JavaUtil.formatNumber(parts.navigator.modifyHeading, 2));
+//      TelemetryMgr.Message(4, "IMU-Modified", JavaUtil.formatNumber(parts.robot.returnImuHeading()-parts.navigator.deltaHeading, 2));
+      TelemetryMgr.Message(4, "IMU-Modified", JavaUtil.formatNumber(parts.robot.returnImuHeading() - parts.navigator.modifyHeading, 2));
+
 //        telemetry.addData("error", JavaUtil.formatNumber(currentError, 2));
 //        telemetry.addData("v0", JavaUtil.formatNumber(navigator.v0, 2));
 //        telemetry.addData("v1", JavaUtil.formatNumber(navigator.v2, 2));

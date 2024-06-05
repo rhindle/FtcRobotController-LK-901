@@ -34,9 +34,9 @@ public class ControlsDS extends Controls {
 
       // Toggle FCD
       //todo: Field centric is broken right now; problem with the angle
-//      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.start)) {
-//         parts.misc.displayMessage('F', parts.navigator.toggleFieldCentricDrive());
-//      }
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.start)) {
+         parts.misc.displayMessage('F', parts.navigator.toggleFieldCentricDrive());
+      }
 
       // Toggle HeadingHold
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.back)) {

@@ -141,7 +141,8 @@ public class PartsDS extends Parts {
             if (roboTag != null) {
                 if (useSlamra) slamra.setupFieldOffset(roboTag);
                 if (useODO) odometry.setupFieldOffset(roboTag);
-                navigator.deltaHeading = robot.returnImuHeading() - roboTag.R;
+                //navigator.deltaHeading = robot.returnImuHeading() - roboTag.R;
+                navigator.modifyHeading = robot.returnImuHeading() - roboTag.R;
             }
             if (apriltag.tagRobotPosition!=null){
                 neo.drawRectangle(3,4,3,4, Color.rgb(0,4,1));

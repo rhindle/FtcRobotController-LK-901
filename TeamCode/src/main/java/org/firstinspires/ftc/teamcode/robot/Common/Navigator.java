@@ -20,6 +20,7 @@ public class Navigator implements PartsInterface {
    double maxSpeed = 1;
    public double storedHeading = 0;
    public double deltaHeading = 0;
+   public double modifyHeading = 0;
    boolean useFieldCentricDrive = false; //true
    boolean useHeadingHold = true;
    boolean useHoldPosition = true;
