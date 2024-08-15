@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.Common;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 
 // 20240601 - Just started working on this
 public class PositionMgr implements PartsInterface {

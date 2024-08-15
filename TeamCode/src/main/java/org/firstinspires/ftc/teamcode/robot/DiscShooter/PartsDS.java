@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.robot.Common.NeoMatrix;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.PositionMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Slamra;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 
 public class PartsDS extends Parts {
     public PartsDS(LinearOpMode opMode, robotType rType) {

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 
 public class Shooter implements PartsInterface {
 

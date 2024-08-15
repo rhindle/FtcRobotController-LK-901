@@ -1,6 +1,10 @@
-package org.firstinspires.ftc.teamcode.robot.Common.Tools;
+package org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
+
+import androidx.annotation.NonNull;
 
 // testing - brought this in from Om's old code
 public class Position
@@ -91,3 +95,4 @@ public class Position
     }
 
 }
+

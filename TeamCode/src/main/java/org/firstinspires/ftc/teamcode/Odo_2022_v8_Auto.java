@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.robot.LegacyBots.Auto;
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.LegacyBots.Navigator3;
 import org.firstinspires.ftc.teamcode.robot.LegacyBots.Robot;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 
 @Autonomous(name = "3Odo_2022_v8_Auto", group = "")
 //@Disabled

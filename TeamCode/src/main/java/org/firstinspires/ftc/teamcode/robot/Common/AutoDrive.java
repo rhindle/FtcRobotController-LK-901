@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 
 public class AutoDrive implements PartsInterface {
 
@@ -190,41 +190,41 @@ public class AutoDrive implements PartsInterface {
       else robotPosition = null;
    }
 
-   public class PositionError {
-      Position errorXYR;
-      Vector errorXR;
-      public PositionError() {
-         errorXYR = new Position();
-         errorXR = new Vector();
-      }
-      public PositionError(Position pos, Vector vec) {
-         errorXYR = pos;
-         errorXR = vec;
-      }
-      public PositionError(Vector vec, double heading) {
-         errorXR = vec;
-         errorXYR = new Position( vec.X*Math.cos(Math.toRadians(vec.A)),
-                                  vec.X*Math.sin(Math.toRadians(vec.A)),
-                                    heading   );
-      }
-      public PositionError(Position pos) {
-         errorXYR = pos;
-         errorXR = new Vector(Math.sqrt(Math.pow(pos.X,2)+Math.pow(pos.Y,2)), Math.toDegrees(Math.atan2(pos.X, pos.Y)));
-         //=DEGREES(ATAN2(A6,B6))
-      }
-   }
-
-   public class Vector {
-      public double X, A;
-      public Vector(double X, double A){
-         this.X = X;
-         this.A = A;
-      }
-      public Vector(){
-         X = 0;
-         A = 0;
-      }
-   }
+//   public class PositionError {
+//      Position errorXYR;
+//      Vector errorXR;
+//      public PositionError() {
+//         errorXYR = new Position();
+//         errorXR = new Vector();
+//      }
+//      public PositionError(Position pos, Vector vec) {
+//         errorXYR = pos;
+//         errorXR = vec;
+//      }
+//      public PositionError(Vector vec, double heading) {
+//         errorXR = vec;
+//         errorXYR = new Position( vec.X*Math.cos(Math.toRadians(vec.A)),
+//                                  vec.X*Math.sin(Math.toRadians(vec.A)),
+//                                    heading   );
+//      }
+//      public PositionError(Position pos) {
+//         errorXYR = pos;
+//         errorXR = new Vector(Math.sqrt(Math.pow(pos.X,2)+Math.pow(pos.Y,2)), Math.toDegrees(Math.atan2(pos.X, pos.Y)));
+//         //=DEGREES(ATAN2(A6,B6))
+//      }
+//   }
+//
+//   public class Vector {
+//      public double X, A;
+//      public Vector(double X, double A){
+//         this.X = X;
+//         this.A = A;
+//      }
+//      public Vector(){
+//         X = 0;
+//         A = 0;
+//      }
+//   }
 
    public enum Status {
       IDLE,

@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.LegacyBots.Localizer2;
 import org.firstinspires.ftc.teamcode.robot.LegacyBots.Robot;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 
 @TeleOp (name="ZZ_TestBot_Lkdometry", group="Test")
 //@Disabled

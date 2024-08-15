@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.DrivePowers;
+
 public class Drivetrain {
 
     Parts parts;
@@ -27,6 +29,10 @@ public class Drivetrain {
         motorLR = parts.robot.motor2;
         motorRR = parts.robot.motor3;
         initMotors();
+    }
+
+    public void setDrivePowers (DrivePowers dPow) {
+        setDrivePowers(new double[] {dPow.v0, dPow.v1, dPow.v2, dPow.v3});
     }
 
     public void setDrivePowers (double[] mPow) {

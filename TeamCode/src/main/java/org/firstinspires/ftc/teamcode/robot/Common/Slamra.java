@@ -5,7 +5,7 @@ import com.spartronics4915.lib.T265Camera;
 import com.spartronics4915.lib.T265Helper;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 
 public class Slamra implements PartsInterface {
 
