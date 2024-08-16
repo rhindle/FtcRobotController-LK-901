@@ -17,6 +17,12 @@ public class Position
         this.R = R;
     }
 
+    public Position(double X, double Y){
+        this.X = X;
+        this.Y = Y;
+        this.R = 0;
+    }
+
     public Position(){
         X = 0;
         Y = 0;
