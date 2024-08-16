@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.DrivePowers;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
@@ -17,7 +18,7 @@ public class AutoDrive implements PartsInterface {
    int accurate = 1;  // 0 is loose, 1 is tight, more later?
 
    Status status;
-   public double v0, v2, v1, v3;
+   public DrivePowers driveP;
    double maxSpeed = 1;
    double motorMinPower = 0.025;
    double motorMaxPower = 1;
@@ -42,10 +43,7 @@ public class AutoDrive implements PartsInterface {
    }
 
    public void initialize(){
-      v0 = 0.0;
-      v1 = 0.0;
-      v2 = 0.0;
-      v3 = 0.0;
+      driveP = new DrivePowers();
    }
 
    public void preInit() {
@@ -102,17 +100,6 @@ public class AutoDrive implements PartsInterface {
 
       PIDTimeCurrent = System.currentTimeMillis();
 
-      /*
-      i += k_i * (current_error * (current_time - previous_time))
-
-      if i > max_i:
-      i = max_i
-      elif i < -max_i:
-      i = -max_i
-      */
-
-      // Still need to reset I if we're going to use it.
-
       if (Math.abs(navAngle-navAngleLast)>45) PIDmovement_calculated.i = 0;  // test - zero the I if we pass through an inflection
 
       PIDmovement_calculated.p = PIDmovement.p * errorDist;
@@ -154,17 +141,13 @@ public class AutoDrive implements PartsInterface {
       navAngle -= robotPosition.R;  // need to account for how the robot is oriented
       double autoSpeed = pDist * 1;  // 1 here is maxspeed; could be turned into a variable
       // the following adds the mecanum X, Y, and rotation motion components for each wheel
-      v0 = autoSpeed * (Math.cos(Math.toRadians(navAngle)) - Math.sin(Math.toRadians(navAngle))) + pRot;
-      v2 = autoSpeed * (Math.cos(Math.toRadians(navAngle)) + Math.sin(Math.toRadians(navAngle))) + pRot;
-      v1 = autoSpeed * (Math.cos(Math.toRadians(navAngle)) + Math.sin(Math.toRadians(navAngle))) - pRot;
-      v3 = autoSpeed * (Math.cos(Math.toRadians(navAngle)) - Math.sin(Math.toRadians(navAngle))) - pRot;
+      driveP.v0 = autoSpeed * (Math.cos(Math.toRadians(navAngle)) - Math.sin(Math.toRadians(navAngle))) + pRot;
+      driveP.v2 = autoSpeed * (Math.cos(Math.toRadians(navAngle)) + Math.sin(Math.toRadians(navAngle))) + pRot;
+      driveP.v1 = autoSpeed * (Math.cos(Math.toRadians(navAngle)) + Math.sin(Math.toRadians(navAngle))) - pRot;
+      driveP.v3 = autoSpeed * (Math.cos(Math.toRadians(navAngle)) - Math.sin(Math.toRadians(navAngle))) - pRot;
 
       // scale to no higher than 1
-      double highValue = JavaUtil.maxOfList(JavaUtil.createListWith(Math.abs(v0), Math.abs(v2), Math.abs(v1), Math.abs(v3), 1));
-      v0 /= highValue;
-      v2 /= highValue;
-      v1 /= highValue;
-      v3 /= highValue;
+      driveP.scaleMax(1);
    }
 
    public void setMaxSpeed(double maxSpeed) {
@@ -189,42 +172,6 @@ public class AutoDrive implements PartsInterface {
       if (parts.positionMgr.hasPosition()) robotPosition = parts.positionMgr.robotPosition.clone();
       else robotPosition = null;
    }
-
-//   public class PositionError {
-//      Position errorXYR;
-//      Vector errorXR;
-//      public PositionError() {
-//         errorXYR = new Position();
-//         errorXR = new Vector();
-//      }
-//      public PositionError(Position pos, Vector vec) {
-//         errorXYR = pos;
-//         errorXR = vec;
-//      }
-//      public PositionError(Vector vec, double heading) {
-//         errorXR = vec;
-//         errorXYR = new Position( vec.X*Math.cos(Math.toRadians(vec.A)),
-//                                  vec.X*Math.sin(Math.toRadians(vec.A)),
-//                                    heading   );
-//      }
-//      public PositionError(Position pos) {
-//         errorXYR = pos;
-//         errorXR = new Vector(Math.sqrt(Math.pow(pos.X,2)+Math.pow(pos.Y,2)), Math.toDegrees(Math.atan2(pos.X, pos.Y)));
-//         //=DEGREES(ATAN2(A6,B6))
-//      }
-//   }
-//
-//   public class Vector {
-//      public double X, A;
-//      public Vector(double X, double A){
-//         this.X = X;
-//         this.A = A;
-//      }
-//      public Vector(){
-//         X = 0;
-//         A = 0;
-//      }
-//   }
 
    public enum Status {
       IDLE,

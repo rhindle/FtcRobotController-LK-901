@@ -18,9 +18,6 @@ public class PositionMgr implements PartsInterface {
 //   public Position odoRobotOffset;
 //   public Position slamraRobotOffset;
 
-//   public int odoPriority = 1;
-//   public int slarmaPriority = 2;
-//   public int tagPriority = 3;
    public PosSource[] priorityList = {PosSource.ODO, PosSource.SLAMRA, PosSource.TAG};
    public Boolean prioritizeSlamraRforODO = false;      // use Slamra R instead of IMU for ODO
    public Boolean prioritizeIMUforSLAMRA = false;       // use IMU instead of Slarma R for SLAMRA
@@ -93,24 +90,6 @@ public class PositionMgr implements PartsInterface {
             return null;
       }
    }
-
-//   PosSource returnPrioritySource() {
-//      // This logic should really be cleaned up...
-//      // First deal with all nulls/
-//      if (odoPosition == null && slamraPosition == null && tagPosition == null) return PosSource.NONE;
-//      // Then deal with only one usable position
-//      if (odoPosition == null && tagPosition == null) return PosSource.SLAMRA;
-//      if (slamraPosition == null && tagPosition == null) return PosSource.ODO;
-//      if (odoPosition == null && slamraPosition == null) return PosSource.TAG;
-//      // Then deal with two usable positions
-//      if (odoPosition == null) { if (slarmaPriority < tagPriority) return PosSource.SLAMRA; else return PosSource.TAG; }
-//      if (slamraPosition == null) { if (odoPriority < tagPriority) return PosSource.ODO; else return PosSource.TAG; }
-//      if (tagPosition == null) { if (odoPriority < slarmaPriority) return PosSource.ODO; else return PosSource.SLAMRA; }
-//      // All three are valid, so one final test
-//      if (odoPriority < slarmaPriority && odoPriority < tagPriority) return PosSource.ODO;
-//      if (slarmaPriority < tagPriority) return PosSource.SLAMRA;
-//      return PosSource.TAG;
-//   }
 
    PosSource returnPrioritySource() {
       for (PosSource source : priorityList) {
