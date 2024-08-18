@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 public class Position
 {
     public double X, Y, R;
+//    long toleranceTime = 0;
 
     public Position(double X, double Y, double R){
         this.X = X;
@@ -109,5 +110,14 @@ public class Position
         Y += vec.Y();
     }
 
+    public boolean inTolerance (Position target, PositionTolerance tolerance) {
+        return tolerance.inTolerance(target,this);
+    }
+    public boolean inToleranceByTime (Position target, PositionTolerance tolerance, long duration) {
+        return tolerance.inToleranceByTime(target, this, duration);
+    }
+    public boolean inToleranceByTime (Position target, PositionTolerance tolerance) {
+        return tolerance.inToleranceByTime(target, this);
+    }
 }
 

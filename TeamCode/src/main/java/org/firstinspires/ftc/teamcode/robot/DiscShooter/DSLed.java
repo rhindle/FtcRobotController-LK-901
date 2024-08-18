@@ -5,13 +5,13 @@ import android.graphics.Color;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 
-public class Misc implements PartsInterface {
+public class DSLed implements PartsInterface {
 
    /* Public OpMode members. */
    public Parts parts;
 
    /* Constructor */
-   public Misc(Parts parts){
+   public DSLed(Parts parts){
       construct(parts);
    }
 

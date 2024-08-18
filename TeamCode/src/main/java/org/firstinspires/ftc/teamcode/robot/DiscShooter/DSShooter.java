@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 
-public class Shooter implements PartsInterface {
+public class DSShooter implements PartsInterface {
 
    /* Settings */
    final double pusherRetracted                 = 0;
@@ -47,7 +47,7 @@ public class Shooter implements PartsInterface {
    public Parts parts;
 
    /* Constructor */
-   public Shooter(Parts parts){
+   public DSShooter(Parts parts){
       construct(parts);
    }
 

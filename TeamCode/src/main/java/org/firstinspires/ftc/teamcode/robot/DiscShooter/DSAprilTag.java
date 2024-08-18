@@ -16,7 +16,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-public class AprilTag implements PartsInterface {
+public class DSAprilTag implements PartsInterface {
 
 //    LinearOpMode opMode;
     Parts parts;
@@ -33,7 +33,7 @@ public class AprilTag implements PartsInterface {
     public double strongLockMaxAngle = 10.0;
 
     /* Constructor */
-    public AprilTag(Parts parts){
+    public DSAprilTag(Parts parts){
         construct(parts);
     }
 

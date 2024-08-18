@@ -122,7 +122,7 @@ public class MentorTestAT01 extends LinearOpMode {
 //        telemetry.addData ("OdoXR", localizer.encoderXR);
 //        telemetry.addData ("X", JavaUtil.formatNumber(localizer.xPos, 2));
 //        telemetry.addData ("Y", JavaUtil.formatNumber(localizer.yPos, 2));
-      Position robo = parts.apriltag.getTagRobotPosition();
+      Position robo = parts.dsApriltag.getTagRobotPosition();
       if (robo!=null) TelemetryMgr.Message(3,String.format("robotPos XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", robo.X, robo.Y, robo.R));
       else TelemetryMgr.Message(3,"robotpos - no tag position");
 

@@ -33,10 +33,10 @@ public class PartsDS extends Parts {
 
         positionMgr = new PositionMgr(this);
         navigator = new NavigatorDS(this);
-        misc = new Misc(this);
-        shooter = new Shooter(this);
+        dsLed = new DSLed(this);
+        dsShooter = new DSShooter(this);
 
-        if (useAprilTag) apriltag = new AprilTag(this);
+        if (useAprilTag) dsApriltag = new DSAprilTag(this);
         if (useODO) {
             odometry = new OdometryDS(this);
             odometry.odoFieldStart = fieldStartPosition;
@@ -65,10 +65,10 @@ public class PartsDS extends Parts {
     public void preInit() {
         robot.initialize();
         positionMgr.initialize();
-        shooter.initialize();
+        dsShooter.initialize();
 //        sensors.init();
         if (useSlamra) slamra.initialize();
-        if (useAprilTag) apriltag.initialize();
+        if (useAprilTag) dsApriltag.initialize();
 
         if (useNeoMatrix) {
             neo.initialize();
@@ -87,17 +87,17 @@ public class PartsDS extends Parts {
     public void initLoop() {
         buttonMgr.runLoop();
         if (useSlamra) slamra.initLoop();
-        if (useAprilTag) apriltag.initLoop();
+        if (useAprilTag) dsApriltag.initLoop();
         positionMgr.initLoop();
         if (useNeoMatrix) {
             neo.applyPixelMapToBuffer(textMatrix,0,7, 0, true);
             neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
 //            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
             textMatrix = neo.shiftPixelMap(textMatrix,-8,0,true);
-            misc.clearMessage();
+            dsLed.clearMessage();
             neo.runLoop();
         }
-        shooter.initLoop();
+        dsShooter.initLoop();
     }
 
     @Override
@@ -115,7 +115,7 @@ public class PartsDS extends Parts {
             neo.drawRectangle(0,7,0,7, Color.rgb(1,1,1));
             neo.setUpdateLimit(1);
         }
-        shooter.preRun();
+        dsShooter.preRun();
     }
 
     @Override
@@ -125,28 +125,28 @@ public class PartsDS extends Parts {
         buttonMgr.runLoop();
         if (useODO) odometry.runLoop();
         if (useSlamra) slamra.runLoop();
-        if (useAprilTag) apriltag.runLoop();
+        if (useAprilTag) dsApriltag.runLoop();
         positionMgr.runLoop();
         controls.runLoop();
         navigator.runLoop();
-        shooter.runLoop();
+        dsShooter.runLoop();
         if (useNeoMatrix) {
-            misc.clearMessage();
+            dsLed.clearMessage();
             neo.runLoop();
         }
 
         //experiment follows, to be moved elsewhere eventually
         if (useAprilTag) {
-            Position roboTag = apriltag.getTagRobotPosition();
+            Position roboTag = dsApriltag.getTagRobotPosition();
             if (roboTag != null) {
                 if (useSlamra) slamra.setupFieldOffset(roboTag);
                 if (useODO) odometry.setupFieldOffset(roboTag);
                 //navigator.deltaHeading = robot.returnImuHeading() - roboTag.R;
                 navigator.modifyHeading = robot.returnImuHeading() - roboTag.R;
             }
-            if (apriltag.tagRobotPosition!=null){
+            if (dsApriltag.tagRobotPosition!=null){
                 neo.drawRectangle(3,4,3,4, Color.rgb(0,4,1));
-            } else if (apriltag.instantTagRobotPosition!=null) {
+            } else if (dsApriltag.instantTagRobotPosition!=null) {
                 neo.drawRectangle(3,4,3,4, Color.rgb(2,1,0));
             } else {
                 neo.drawRectangle(3,4,3,4, Color.rgb(2,0,0));
@@ -154,22 +154,22 @@ public class PartsDS extends Parts {
         }
 
         if (positionMgr.robotPosition!=null) {
-            if (apriltag.strongLocked) {
+            if (dsApriltag.strongLocked) {
                 neo.drawRectangle(2, 5, 2, 5, Color.rgb(0, 2, 0));
             } else {
                 neo.drawRectangle(2, 5, 2, 5, Color.rgb(2, 1, 0));
             }
         } else {
             neo.drawRectangle(2,5,2,5, Color.rgb(2,0,0));
-            apriltag.strongLocked=false;  // if all is lost, allow a weak lock again
+            dsApriltag.strongLocked=false;  // if all is lost, allow a weak lock again
         }
     }
 
     @Override
     public void stop() {
         if (useSlamra) slamra.stop();
-        if (useAprilTag) apriltag.stop();
-        shooter.stop();
+        if (useAprilTag) dsApriltag.stop();
+        dsShooter.stop();
     }
 
     int[][] textMatrix;

@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 
-public class SpeedControl implements PartsInterface {
+public class DSSpeedControl implements PartsInterface {
 
    /* The purpose of this class is to limit the speed of the robot as it gets near the perimeter of the field (to minimize slamming)
       This is accomplished by setting two square "fences" in the interior of the field. When the robot is outside the "fence",
@@ -19,7 +19,7 @@ public class SpeedControl implements PartsInterface {
    public Fence fenceOuter = new Fence(0.25, new Position(-12,35), new Position(-82,-35));
 
    /* Constructor */
-   public SpeedControl(Parts parts){
+   public DSSpeedControl(Parts parts){
       construct(parts);
    }
 

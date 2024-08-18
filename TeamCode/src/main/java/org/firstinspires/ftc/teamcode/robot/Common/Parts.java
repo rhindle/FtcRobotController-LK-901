@@ -4,9 +4,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
-import org.firstinspires.ftc.teamcode.robot.DiscShooter.AprilTag;
-import org.firstinspires.ftc.teamcode.robot.DiscShooter.Misc;
-import org.firstinspires.ftc.teamcode.robot.DiscShooter.Shooter;
+import org.firstinspires.ftc.teamcode.robot.DiscShooter.DSAprilTag;
+import org.firstinspires.ftc.teamcode.robot.DiscShooter.DSLed;
+import org.firstinspires.ftc.teamcode.robot.DiscShooter.DSMisc;
+import org.firstinspires.ftc.teamcode.robot.DiscShooter.DSShooter;
+import org.firstinspires.ftc.teamcode.robot.DiscShooter.DSSpeedControl;
 
 public class Parts implements PartsInterface {
 
@@ -34,11 +36,16 @@ public class Parts implements PartsInterface {
    public Odometry odometry;
    public Slamra slamra;
    public TelemetryMgr telemetryHandler;
-   public AprilTag apriltag;
    public NeoMatrix neo;
    public PositionMgr positionMgr;
-   public Misc misc;
-   public Shooter shooter;
+
+   //---DiscShooter Unique
+   public DSAprilTag dsApriltag;
+   public DSLed dsLed;
+   public DSShooter dsShooter;
+   public DSSpeedControl dsSpeedControl;
+   public DSMisc dsMisc;
+   //---
 
    public boolean isSetup = false;
    public robotType rType;

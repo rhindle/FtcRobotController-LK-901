@@ -35,22 +35,22 @@ public class ControlsDS extends Controls {
       // Toggle FCD
       //todo: Field centric is broken right now; problem with the angle
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.start)) {
-         parts.misc.displayMessage('F', parts.navigator.toggleFieldCentricDrive());
+         parts.dsLed.displayMessage('F', parts.navigator.toggleFieldCentricDrive());
       }
 
       // Toggle HeadingHold
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.back)) {
-         parts.misc.displayMessage('H', parts.navigator.toggleHeadingHold());
+         parts.dsLed.displayMessage('H', parts.navigator.toggleHeadingHold());
       }
 
       // Store heading correction
       if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.right_stick_button)) {
          parts.navigator.setDeltaHeading();
-         parts.misc.displayMessage('D', 1);
+         parts.dsLed.displayMessage('D', 1);
       }
 
       if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.left_stick_button)) {
-         parts.misc.displayMessage('P', parts.navigator.togglePositionHold());
+         parts.dsLed.displayMessage('P', parts.navigator.togglePositionHold());
       }
 //         navigator.toggleSnapToAngle();
 
@@ -82,43 +82,43 @@ public class ControlsDS extends Controls {
 //      liftSpeed = -gamepad2.left_stick_y;
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_left))
-         parts.shooter.extendPusher();
+         parts.dsShooter.extendPusher();
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_down))
-         parts.shooter.closeGate();
+         parts.dsShooter.closeGate();
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_right))
-         parts.shooter.retractPusher();
+         parts.dsShooter.retractPusher();
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_up))
-         parts.shooter.openGate();
+         parts.dsShooter.openGate();
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.back)) {
-         parts.shooter.cancelStateMachines();
+         parts.dsShooter.cancelStateMachines();
       }
 
       if (buttonMgr.wasPressed(2, ButtonMgr.Buttons.start))
-         parts.shooter.armShooter();
+         parts.dsShooter.armShooter();
       if (buttonMgr.wasReleased(2, ButtonMgr.Buttons.start))
-         parts.shooter.disarmShooter();
+         parts.dsShooter.disarmShooter();
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a))
-         parts.shooter.statePushStep = 1;
+         parts.dsShooter.statePushStep = 1;
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b))
-         parts.shooter.stateShoot1Step = 1;
+         parts.dsShooter.stateShoot1Step = 1;
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x))
-         parts.shooter.stateShoot3Step = 1;
+         parts.dsShooter.stateShoot3Step = 1;
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y))
-         parts.shooter.stateFullAuto = 1;
+         parts.dsShooter.stateFullAuto = 1;
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.left_bumper))
-         parts.shooter.intakeReverse();
+         parts.dsShooter.intakeReverse();
 
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.right_bumper))
-         parts.shooter.intakeOn();
+         parts.dsShooter.intakeOn();
 
 
 //      if (buttonMgr.isHeld(2, ButtonMgr.Buttons.left_bumper) &&

@@ -56,7 +56,7 @@ public class PositionMgr implements PartsInterface {
       if (parts.useSlamra) {
          slamraPosition = parts.slamra.isSlamraPositionGood() ? parts.slamra.slamraRobotPosition : null;
       }
-      if (parts.useAprilTag) tagPosition=parts.apriltag.tagRobotPosition;
+      if (parts.useAprilTag) tagPosition=parts.dsApriltag.tagRobotPosition;
       TelemetryMgr.Message(6, "pmgr:odo", (odoPosition==null) ? "(null)" : odoPosition.toString(2));
       TelemetryMgr.Message(6, "pmgr:slm", (slamraPosition==null) ? "(null)" : slamraPosition.toString(2));
       TelemetryMgr.Message(6, "pmgr:tag", (tagPosition==null) ? "(null)" : tagPosition.toString(2));
