@@ -4,8 +4,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 
-import androidx.annotation.NonNull;
-
 // testing - brought this in from Om's old code
 public class Position
 {
@@ -40,9 +38,9 @@ public class Position
 
     public Position clone(){ return new Position(X, Y, R);}
 
-    public Pose2d toPose2d(){
-        return new Pose2d(X, Y, Math.toRadians(R));
-    }
+//    public Pose2d toPose2d(){
+//        return new Pose2d(X, Y, Math.toRadians(R));
+//    }
 
     public void normalize() {
         R = Functions.normalizeAngle(R);
@@ -87,10 +85,10 @@ public class Position
         return diff;
     }
 
-    public boolean isPositionInRange(Position pos2, Position maxDiff){
-        Position diff = getAbsDiff(pos2);
-        return diff.X < maxDiff.X && diff.Y < maxDiff.Y && diff.R < maxDiff.R;
-    }
+//    public boolean isPositionInRange(Position pos2, Position maxDiff){
+//        Position diff = getAbsDiff(pos2);
+//        return diff.X < maxDiff.X && diff.Y < maxDiff.Y && diff.R < maxDiff.R;
+//    }
 
     public boolean isEqualTo (Position pos2) {
         return ((X == pos2.X) && (Y == pos2.Y) && (R == pos2.R));
@@ -98,6 +96,17 @@ public class Position
 
     public Position withR (double newR) {
         return new Position(X, Y, newR);
+    }
+
+    public void addVector (Vector2D vec) {
+        X += vec.X();
+        Y += vec.Y();
+    }
+
+    public void addVectorRelative (Vector2D vec) {
+        vec.angle += R;
+        X += vec.X();
+        Y += vec.Y();
     }
 
 }
