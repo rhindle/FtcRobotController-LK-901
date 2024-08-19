@@ -13,7 +13,7 @@ public class AutoDrive implements PartsInterface {
    /* Public OpMode members. */
    public Parts parts;
 
-   Position robotPosition = new Position();
+   public Position robotPosition = new Position();
    Position targetPos = new Position();
    int accurate = 1;  // 0 is loose, 1 is tight, more later?
 

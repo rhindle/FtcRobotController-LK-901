@@ -32,7 +32,9 @@ public class PartsDS extends Parts {
         drivetrain = new DrivetrainDS(this);
 
         positionMgr = new PositionMgr(this);
-        navigator = new NavigatorDS(this);
+        navigator = new NavigatorDS(this);  // being replaced
+        autoDrive = new AutoDriveDS(this);
+        userDrive = new UserDriveDS(this);
         dsLed = new DSLed(this);
         dsShooter = new DSShooter(this);
 
@@ -70,15 +72,16 @@ public class PartsDS extends Parts {
         if (useSlamra) slamra.initialize();
         if (useAprilTag) dsApriltag.initialize();
 
-        if (useNeoMatrix) {
-            neo.initialize();
-            //neo.setUpdateLimit(1);
-            neo.setUpdateLimit(0);
-            neo.setPreventTearing(true);
-            neo.setDimmingValue(192);
-            neo.drawRectangle(0, 7, 0, 7, Color.rgb(1, 1, 0));
-            textMatrix = neo.buildPixelMapFromString("abcd", marquis, Color.rgb(1,1,0), Color.rgb(0,0,0));
-        }
+        if (useNeoMatrix) dsLed.initialize();
+//        if (useNeoMatrix) {
+//            neo.initialize();
+//            //neo.setUpdateLimit(1);
+//            neo.setUpdateLimit(0);
+//            neo.setPreventTearing(true);
+//            neo.setDimmingValue(192);
+//            neo.drawRectangle(0, 7, 0, 7, Color.rgb(1, 1, 0));
+//            textMatrix = neo.buildPixelMapFromString("abcd", marquis, Color.rgb(1,1,0), Color.rgb(0,0,0));
+//        }
 
 
     }
@@ -89,14 +92,15 @@ public class PartsDS extends Parts {
         if (useSlamra) slamra.initLoop();
         if (useAprilTag) dsApriltag.initLoop();
         positionMgr.initLoop();
-        if (useNeoMatrix) {
-            neo.applyPixelMapToBuffer(textMatrix,0,7, 0, true);
-            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
+        if (useNeoMatrix) dsLed.initLoop();
+//        if (useNeoMatrix) {
+//            neo.applyPixelMapToBuffer(textMatrix,0,7, 0, true);
 //            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
-            textMatrix = neo.shiftPixelMap(textMatrix,-8,0,true);
-            dsLed.clearMessage();
-            neo.runLoop();
-        }
+////            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
+//            textMatrix = neo.shiftPixelMap(textMatrix,-8,0,true);
+//            dsLed.clearMessage();
+//            neo.runLoop();
+//        }
         dsShooter.initLoop();
     }
 
@@ -106,15 +110,20 @@ public class PartsDS extends Parts {
         if (useODO) odometry.initialize();
         navigator.initialize();
         navigator.setTargetAbsolute(-20,0,0);
+        autoDrive.initialize();
+//        autoDrive.setTargetAbsolute(-20,0,0);
 
         if (useODO) odometry.runLoop();  // get some things squared away before the real program runs
         navigator.runLoop();
+        autoDrive.runLoop();
+
         if (useSlamra) slamra.preRun();
-        if (useNeoMatrix) {
-            neo.clearMatrix();
-            neo.drawRectangle(0,7,0,7, Color.rgb(1,1,1));
-            neo.setUpdateLimit(1);
-        }
+        if (useNeoMatrix) dsLed.preRun();
+//        if (useNeoMatrix) {
+//            neo.clearMatrix();
+//            neo.drawRectangle(0,7,0,7, Color.rgb(1,1,1));
+//            neo.setUpdateLimit(1);
+//        }
         dsShooter.preRun();
     }
 
@@ -129,11 +138,14 @@ public class PartsDS extends Parts {
         positionMgr.runLoop();
         controls.runLoop();
         navigator.runLoop();
+        userDrive.runLoop();
+        autoDrive.runLoop();
         dsShooter.runLoop();
-        if (useNeoMatrix) {
-            dsLed.clearMessage();
-            neo.runLoop();
-        }
+        if (useNeoMatrix) dsLed.runLoop();
+//        if (useNeoMatrix) {
+//            dsLed.clearMessage();
+//            neo.runLoop();
+//        }
 
         //experiment follows, to be moved elsewhere eventually
         if (useAprilTag) {
@@ -143,6 +155,7 @@ public class PartsDS extends Parts {
                 if (useODO) odometry.setupFieldOffset(roboTag);
                 //navigator.deltaHeading = robot.returnImuHeading() - roboTag.R;
                 navigator.modifyHeading = robot.returnImuHeading() - roboTag.R;
+//                autoDrive.modifyHeading = robot.returnImuHeading() - roboTag.R;
             }
             if (dsApriltag.tagRobotPosition!=null){
                 neo.drawRectangle(3,4,3,4, Color.rgb(0,4,1));
@@ -171,17 +184,17 @@ public class PartsDS extends Parts {
         if (useAprilTag) dsApriltag.stop();
         dsShooter.stop();
     }
-
-    int[][] textMatrix;
-
-    public final char[][] marquis = {
-    {'a', 17, 128, 0, 0, 1, 128, 0, 34},
-    {'b', 34, 0, 128, 1, 0, 0, 128, 17},
-    {'c', 68, 0, 1, 128, 0, 0, 1, 136},
-    {'d', 136, 1, 0, 0, 128, 1, 0, 68},
-    {'e', 238, 1, 129, 129, 128, 1, 129, 221},
-    {'f', 221, 129, 1, 128, 129, 129, 1, 238},
-    {'g', 187, 129, 128, 1, 129, 129, 128, 119},
-    {'h', 119, 128, 129, 129, 1, 128, 129, 187} };
+//
+//    int[][] textMatrix;
+//
+//    public final char[][] marquis = {
+//    {'a', 17, 128, 0, 0, 1, 128, 0, 34},
+//    {'b', 34, 0, 128, 1, 0, 0, 128, 17},
+//    {'c', 68, 0, 1, 128, 0, 0, 1, 136},
+//    {'d', 136, 1, 0, 0, 128, 1, 0, 68},
+//    {'e', 238, 1, 129, 129, 128, 1, 129, 221},
+//    {'f', 221, 129, 1, 128, 129, 129, 1, 238},
+//    {'g', 187, 129, 128, 1, 129, 129, 128, 119},
+//    {'h', 119, 128, 129, 129, 1, 128, 129, 187} };
 
 }

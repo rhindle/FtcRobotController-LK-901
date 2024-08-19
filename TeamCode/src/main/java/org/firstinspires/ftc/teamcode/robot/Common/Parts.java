@@ -32,7 +32,9 @@ public class Parts implements PartsInterface {
    public Sensors sensors;
    public Controls controls;
    public Drivetrain drivetrain;
-   public Navigator navigator;
+   public Navigator navigator;  // needs to be replaced
+   public AutoDrive autoDrive;
+   public UserDrive userDrive;
    public Odometry odometry;
    public Slamra slamra;
    public TelemetryMgr telemetryHandler;

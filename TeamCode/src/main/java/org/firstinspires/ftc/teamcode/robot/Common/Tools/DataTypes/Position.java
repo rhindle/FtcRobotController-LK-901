@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 
 // testing - brought this in from Om's old code
 public class Position
 {
     public double X, Y, R;
-//    long toleranceTime = 0;
 
     public Position(double X, double Y, double R){
         this.X = X;
