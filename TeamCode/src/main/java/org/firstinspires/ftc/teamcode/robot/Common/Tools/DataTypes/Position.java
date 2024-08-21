@@ -107,6 +107,7 @@ public class Position
         Y += vec.Y();
     }
 
+    //todo: do these make sense? I can't remember why I'd want to compare to "this"
     public boolean inTolerance (Position target, PositionTolerance tolerance) {
         return tolerance.inTolerance(target,this);
     }

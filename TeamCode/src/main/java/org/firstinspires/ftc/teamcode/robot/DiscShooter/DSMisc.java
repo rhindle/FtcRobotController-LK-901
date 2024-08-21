@@ -19,13 +19,6 @@ public class DSMisc implements PartsInterface {
 
    NavigationTarget test = new NavigationTarget(new Position(-24,0,0), toleranceTransition,1.0,5000,true);
 
-//   public enum tolerance {
-//      IMPOSSIBLE,
-//      HIGH,
-//      MEDIUM,
-//      LOW
-//   }
-
    /* Constructor */
    public DSMisc(Parts parts){
       construct(parts);

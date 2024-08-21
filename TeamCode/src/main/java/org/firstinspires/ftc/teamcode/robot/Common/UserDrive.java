@@ -18,6 +18,7 @@ public class UserDrive implements PartsInterface {
    double maxSpeed = 1;
    long idleDelay = System.currentTimeMillis();
    long headingDelay = System.currentTimeMillis();
+   boolean isDriving = false;
 
    /* Constructor */
    public UserDrive(Parts parts){
@@ -42,6 +43,7 @@ public class UserDrive implements PartsInterface {
    }
 
    public void runLoop() {
+      userDrivePower();
    }
 
    public void stop() {
@@ -49,11 +51,28 @@ public class UserDrive implements PartsInterface {
 
    // Determine motor speeds when under driver control
    public void userDrivePower () {
-//      if (idleDelay > System.currentTimeMillis()) {  // todo:bring this back
-//         setTargetToCurrentPosition();
-//      }
 
-//      driveSpeed = Math.pow(driveSpeed, 1);
+      handleDriveIdle();  // todo: left off here
+      handleRotateIdle();
+
+      if (useHoldPosition) {
+         if (idleDelay <= System.currentTimeMillis()) {
+            // no driver input, so let autoDrive take over and do nothing else
+            parts.autoDrive.setTargetToCurrentPosition();
+            return;
+         }
+      }
+      if (useHeadingHold) {
+         // Correct the heading if not currently being controlled
+         if (headingDelay <= System.currentTimeMillis()) {
+//            this.rotate = parts.autoDrive.getHeadingError(storedHeading) / -15 * (driveSpeed + 0.2);   // base this on speed?
+            // start with the same proportional in autodrive
+            this.rotate = parts.autoDrive.PIDrotate.p * parts.autoDrive.getHeadingError(storedHeading);
+            // and then scale it (determined experimentally, scaled like old code)
+            this.rotate *= -2.5 * (driveSpeed + 0.2);
+         }
+      }
+
       driveP.v0 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) - Math.sin(Math.toRadians(driveAngle))) + rotate;
       driveP.v2 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) + Math.sin(Math.toRadians(driveAngle))) + rotate;
       driveP.v1 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) + Math.sin(Math.toRadians(driveAngle))) - rotate;
@@ -63,47 +82,33 @@ public class UserDrive implements PartsInterface {
       if (maxSpeed != 1) {
          driveP.scaleAverage(maxSpeed);
       }
-
       // scale to no higher than 1
       driveP.scaleMax(1);
+      parts.drivetrain.setDrivePowers(driveP);
    }
 
    public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {
-//      if (!(driveSpeed == 0 && rotate == 0)) {   //todo: get rid of some of this old stuff
-//         idleDelay = System.currentTimeMillis() + 500;  //was 250 to match rotate?
-////         if (useAutoDistanceActivation) parts.sensors.readDistSensors(false);
-//      }
-
+      // Controls uses this method to set drive parameters
       this.driveSpeed = driveSpeed;
       this.driveAngle = driveAngle;
       this.rotate = rotate;
 
-      // Skip the fancy driving if no position is available
-      if (parts.autoDrive.robotPosition == null) return;
+      isDriving = !(driveSpeed == 0 && rotate == 0);
+      if (isDriving) parts.autoDrive.isHolding = false;
 
-      handleDriveIdle();  // todo: left off here
-      handleRotateIdle();
+      // Skip the fancy driving if no position is available
+      if (parts.positionMgr.noPosition()) return;
 
       // Modify for field centric Drive
       if (useFieldCentricDrive) {
          this.driveAngle = driveAngle - storedHeading + deltaHeading;  //todo:verify this
       }
-//      // Modify for Snap to Angle
-//      if (useSnapToAngle) {
-//         snapToAngle();
-//      }
-      // Modify for Hold Angle
-      if (useHeadingHold) {  // || useSnapToAngle) {
-         // Correct the heading if not currently being controlled
-         // this should probably be incorporated into autodrive
-         if (headingDelay <= System.currentTimeMillis()) {  // shouldn't need to check if == 0
-            this.rotate = parts.autoDrive.getHeadingError(storedHeading) / -15 * (driveSpeed + 0.2);   // base this on speed?
-         }
-      }
    }
 
-   public void handleDriveIdle() {
-      if (parts.autoDrive.robotPosition == null) return;
+   public void handleDriveIdle() {  //todo: finish this method
+      // The purpose of this is to hold the robot position
+      // delayed 500ms after any movement input
+      if (parts.positionMgr.noPosition()) return;
       if (!(driveSpeed == 0 && rotate == 0)) {
          idleDelay = System.currentTimeMillis() + 500;  //was 250 to match rotate?
 //         setTargetToCurrentPosition(); ?????
@@ -116,15 +121,16 @@ public class UserDrive implements PartsInterface {
    }
 
    public void handleRotateIdle() { //(double rotate) {
-      if (parts.autoDrive.robotPosition == null) return;
-      // overall plan here is to deal with IMU latency
+      // The purpose of this is to deal with IMU latency (and robot inertia)
+      // by storing the heading delayed 250ms after any rotational input
+      if (parts.positionMgr.noPosition()) return;
       if (rotate != 0) {
-         storedHeading = parts.autoDrive.robotPosition.R;
-         headingDelay = System.currentTimeMillis() + 250;  // going to ignore the possibility of overflow
+         storedHeading = parts.positionMgr.robotPosition.R;
+         headingDelay = System.currentTimeMillis() + 250;
       }
       else if (headingDelay > System.currentTimeMillis()) {
          // keep re-reading until delay has passed
-         storedHeading = parts.autoDrive.robotPosition.R;
+         storedHeading = parts.positionMgr.robotPosition.R;
       }
    }
 

@@ -73,4 +73,11 @@ public class NavigationTarget {
         return new NavigationTarget(targetPos, tolerance, maxSpeed, timeLimit, noSlow);
     }
 
+    public boolean inTolerance (Position currentPos) {
+        return tolerance.inTolerance(targetPos, currentPos);
+    }
+    public boolean inToleranceByTime (Position currentPos) {
+        return tolerance.inToleranceByTime(targetPos, currentPos);
+    }
+
 }
