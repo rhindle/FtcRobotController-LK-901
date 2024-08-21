@@ -15,7 +15,9 @@ public class UserDrive implements PartsInterface {
    boolean useHoldPosition = true;
    public double storedHeading = 0;
    public double deltaHeading = 0;
-   double maxSpeed = 1;
+   double maxSpeedWithPos = 1;
+   double maxSpeedNoPos = 0.33;
+   double maxSpeed = maxSpeedWithPos;
    long idleDelay = System.currentTimeMillis();
    long headingDelay = System.currentTimeMillis();
    boolean isDriving = false;
@@ -54,6 +56,7 @@ public class UserDrive implements PartsInterface {
 
       handleDriveIdle();  // todo: left off here
       handleRotateIdle();
+      applySpeedFences();
 
       if (useHoldPosition) {
          if (idleDelay <= System.currentTimeMillis()) {
@@ -102,6 +105,15 @@ public class UserDrive implements PartsInterface {
       // Modify for field centric Drive
       if (useFieldCentricDrive) {
          this.driveAngle = driveAngle - storedHeading + deltaHeading;  //todo:verify this
+      }
+   }
+
+   public void applySpeedFences() {
+      if (parts.positionMgr.noPosition()) {
+         maxSpeed = maxSpeedNoPos;
+      }
+      else {
+         maxSpeed = maxSpeedWithPos * parts.dsSpeedControl.checkFences(driveAngle);
       }
    }
 
