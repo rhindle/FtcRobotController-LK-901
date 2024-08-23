@@ -62,7 +62,8 @@ public class Odometry implements PartsInterface {
       encoderY0 = odoY.getCurrentPosition() * (long)odoYdir;
       encoderXL0 = odoXL.getCurrentPosition() * (long)odoXLdir;
       encoderXR0 = odoXR.getCurrentPosition() * (long)odoXRdir;
-      imuHeading0 = parts.robot.returnImuHeading(true);
+//      imuHeading0 = parts.robot.returnImuHeading(true);
+      imuHeading0 = parts.imuMgr.returnImuHeadingRaw(true);
       odoHeading0 = getOdoHeading();
       globalHeading0 = imuHeading0;
 
@@ -84,7 +85,8 @@ public class Odometry implements PartsInterface {
 
    public void runLoop() {
       if (!parts.useODO) {
-         imuHeading = parts.robot.returnImuHeading();
+//         imuHeading = parts.robot.returnImuHeading();
+         imuHeading = parts.imuMgr.returnImuHeadingRaw();
          globalHeading = imuHeading;
          odoRobotPosition.R = globalHeading;
 //         parts.robotPosition = odoRobotPosition.clone();
@@ -97,7 +99,8 @@ public class Odometry implements PartsInterface {
       encoderXR = odoXR.getCurrentPosition() * (long)odoXRdir;
 
       /* Update heading */
-      imuHeading = parts.robot.returnImuHeading();
+//      imuHeading = parts.robot.returnImuHeading();
+      imuHeading = parts.imuMgr.returnImuHeadingRaw();
       odoHeading = getOdoHeading();
       globalHeading = fusedHeading();
 

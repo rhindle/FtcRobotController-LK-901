@@ -40,6 +40,7 @@ public class Parts implements PartsInterface {
    public TelemetryMgr telemetryHandler;
    public NeoMatrix neo;
    public PositionMgr positionMgr;
+   public IMUmgr imuMgr;
 
    //---DiscShooter Unique
    public DSAprilTag dsApriltag;

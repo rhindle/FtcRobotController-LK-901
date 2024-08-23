@@ -54,7 +54,8 @@ public class MentorTestBot01 extends LinearOpMode {
 
             // Prompt user to press start button.
             telemetry.addData(">", "Press Play to start");
-            telemetry.addData(">", "Robot Heading = %.1f", parts.robot.returnImuHeading(true));
+//            telemetry.addData(">", "Robot Heading = %.1f", parts.robot.returnImuHeading(true));
+            telemetry.addData(">", "Robot Heading = %.1f", parts.imuMgr.returnImuHeadingRaw(true));
             telemetry.addData("Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
 
             if (parts.useSlamra) parts.slamra.runLoop();
@@ -96,7 +97,8 @@ public class MentorTestBot01 extends LinearOpMode {
 
     private void addTelemetryLoopStart() {
         telemetry.addData("Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
-        telemetry.addData("heading", JavaUtil.formatNumber(parts.robot.returnImuHeading(),2));
+//        telemetry.addData("heading", JavaUtil.formatNumber(parts.robot.returnImuHeading(),2));
+        telemetry.addData("heading", JavaUtil.formatNumber(parts.imuMgr.returnImuHeadingRaw(),2));
         telemetry.addData("rangeL", String.format("%.01f in", parts.sensors.distL));
         telemetry.addData("rangeM", String.format("%.01f in", parts.sensors.distM));
         telemetry.addData("rangeR", String.format("%.01f in", parts.sensors.distR));

@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot.Common;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -23,7 +25,7 @@ import java.util.List;
 
 public class Robot implements PartsInterface {
     /* Public OpMode members. */
-    public boolean disableIMUupdate = false;
+//    public boolean disableIMUupdate = false;
 
     public DcMotorEx    motor0   = null;
     public DcMotorEx    motor1   = null;
@@ -70,7 +72,12 @@ public class Robot implements PartsInterface {
     public AnalogInput  analog3 = null;
     // Add B here as needed
 
-    public BNO055IMU sensorIMU      = null;
+//    public BNO055IMU sensorIMU      = null;
+    public IMU sensorIMU        = null;
+    public RevHubOrientationOnRobot hubOrientation = new RevHubOrientationOnRobot(
+        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+    );
 
     // Bulk Reads - Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
     List<LynxModule> allHubs = null;  // gets populated in construct()
@@ -81,8 +88,8 @@ public class Robot implements PartsInterface {
     LinearOpMode opMode;
     HardwareMap hardwareMap;
 
-    Orientation angles;
-    double imuHeading;
+//    Orientation angles;
+//    double imuHeading;
 
     /* Constructor */
     public Robot(Parts parts){
@@ -115,35 +122,38 @@ public class Robot implements PartsInterface {
         for (LynxModule module : allHubs) {
             module.clearBulkCache();
         }
-        // Read IMU - once per cycle!
-        if (!disableIMUupdate) updateImuHeading();
+//        // Read IMU - once per cycle!
+//        if (!disableIMUupdate) updateImuHeading();
     }
 
     public void stop() {
     }
 
-    private void updateImuHeading() {
-        imuHeading =  imuHeading(true);
-    }
-
-    private double imuHeading() {
-        return imuHeading(false);
-    }
-    private double imuHeading(boolean readme) {
-        if (readme) angles = sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        return angles.firstAngle;
-    }
-
-    public double returnImuHeading() {
-        return imuHeading;
-    }
-    public double returnImuHeading(boolean forceRead) {
-        if (forceRead) updateImuHeading();
-        return imuHeading;
-    }
+//    private void updateImuHeading() {
+//        imuHeading =  imuHeading(true);
+//    }
+//
+//    private double imuHeading() {
+//        return imuHeading(false);
+//    }
+//    private double imuHeading(boolean readme) {
+//        if (readme) angles = sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//        return angles.firstAngle;
+//    }
+//
+//    public double returnImuHeading() {
+//        return imuHeading;
+//    }
+//    public double returnImuHeading(boolean forceRead) {
+//        if (forceRead) updateImuHeading();
+//        return imuHeading;
+//    }
 
     /* Initialize standard Hardware interfaces */
     public void init() {
+
+        settingOptions();
+
         // Bulk Reads - Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
         // Bulk Reads - Important Step 3: Option B. Set all Expansion hubs to use the MANUAL Bulk Caching mode
         for (LynxModule module : allHubs) {
@@ -158,10 +168,19 @@ public class Robot implements PartsInterface {
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "sensorIMU".
-        sensorIMU = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
-        sensorIMU.initialize(parameters);
+
+        // Initialize IMU directly
+        sensorIMU = hardwareMap.get(IMU.class, "imu");
+        sensorIMU.initialize(
+            new IMU.Parameters(
+                hubOrientation
+            )
+        );
+
+//        sensorIMU = hardwareMap.get(BNO055IMU.class, "imu");
+//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+//        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
+//        sensorIMU.initialize(parameters);
 
         initOptions();
     }
@@ -248,6 +267,13 @@ public class Robot implements PartsInterface {
         analog1 = hardwareMap.get(AnalogInput.class, "analog1");
         analog2 = hardwareMap.get(AnalogInput.class, "analog2");
         analog3 = hardwareMap.get(AnalogInput.class, "analog3");
+    }
+
+    public void settingOptions() {
+        hubOrientation = new RevHubOrientationOnRobot(
+            RevHubOrientationOnRobot.LogoFacingDirection.UP,
+            RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+        );
     }
 
     public void initOptions() {

@@ -5,6 +5,7 @@ import android.graphics.Color;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.IMUmgr;
 import org.firstinspires.ftc.teamcode.robot.Common.NeoMatrix;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.PositionMgr;
@@ -31,6 +32,7 @@ public class PartsDS extends Parts {
         controls = new ControlsDS(this);
         drivetrain = new DrivetrainDS(this);
 
+        imuMgr = new IMUmgr(this);
         positionMgr = new PositionMgr(this);
         navigator = new NavigatorDS(this);  // being replaced
         autoDrive = new AutoDriveDS(this);
@@ -66,6 +68,7 @@ public class PartsDS extends Parts {
     @Override
     public void preInit() {
         robot.initialize();
+        imuMgr.initialize();
         positionMgr.initialize();
         dsShooter.initialize();
 //        sensors.init();
@@ -88,6 +91,7 @@ public class PartsDS extends Parts {
 
     @Override
     public void initLoop() {
+        imuMgr.runLoop();
         buttonMgr.runLoop();
         if (useSlamra) slamra.initLoop();
         if (useAprilTag) dsApriltag.initLoop();
@@ -107,6 +111,7 @@ public class PartsDS extends Parts {
     @Override
     public void preRun() {
         drivetrain.initialize();
+        imuMgr.runLoop();
         if (useODO) odometry.initialize();
         navigator.initialize();
         navigator.setTargetAbsolute(-20,0,0);
@@ -130,6 +135,7 @@ public class PartsDS extends Parts {
     @Override
     public void runLoop() {
         robot.runLoop();
+        imuMgr.runLoop();
 //        sensors.loop();
         buttonMgr.runLoop();
         if (useODO) odometry.runLoop();
@@ -149,13 +155,15 @@ public class PartsDS extends Parts {
 
         //experiment follows, to be moved elsewhere eventually
         if (useAprilTag) {
-            Position roboTag = dsApriltag.getTagRobotPosition();
-            if (roboTag != null) {
-                if (useSlamra) slamra.setupFieldOffset(roboTag);
-                if (useODO) odometry.setupFieldOffset(roboTag);
-                //navigator.deltaHeading = robot.returnImuHeading() - roboTag.R;
-                navigator.modifyHeading = robot.returnImuHeading() - roboTag.R;
-//                autoDrive.modifyHeading = robot.returnImuHeading() - roboTag.R;
+            Position roboTagPosition = dsApriltag.getTagRobotPosition();
+            if (roboTagPosition != null) {
+                if (useSlamra) slamra.setupFieldOffset(roboTagPosition);
+                if (useODO) odometry.setupFieldOffset(roboTagPosition);
+                imuMgr.setupFieldOffset(roboTagPosition);
+                //navigator.deltaHeading = robot.returnImuHeading() - roboTagPosition.R;
+//                navigator.modifyHeading = robot.returnImuHeading() - roboTagPosition.R;
+                navigator.modifyHeading = imuMgr.returnImuHeadingRaw() - roboTagPosition.R;
+//                autoDrive.modifyHeading = robot.returnImuHeading() - roboTagPosition.R;
             }
             if (dsApriltag.tagRobotPosition!=null){
                 neo.drawRectangle(3,4,3,4, Color.rgb(0,4,1));
