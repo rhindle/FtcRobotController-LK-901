@@ -171,7 +171,7 @@ public class Navigator implements PartsInterface {
       PIDmovement_calculated.i = Math.max(Math.min(PIDmovement_calculated.i,1),-1);
       PIDmovement_calculated.d = PIDmovement.d * (errorDist - errorDistLast) / ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
 
-      if (parts.useDriveEncoders) {
+      if (parts.useDrivetrainEncoders) {
          pDist = PIDmovement_calculated.p;
       } else {
          pDist = PIDmovement_calculated.p +  PIDmovement_calculated.i +  PIDmovement_calculated.d;
@@ -184,7 +184,7 @@ public class Navigator implements PartsInterface {
       PIDrotate_calculated.i = Math.max(Math.min(PIDrotate_calculated.i,1),-1);
       PIDrotate_calculated.d = PIDrotate.d * (errorDist - errorRotLast) / ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
 
-      if (parts.useDriveEncoders) {
+      if (parts.useDrivetrainEncoders) {
          pRot =  PIDrotate_calculated.p;
       } else {
          pRot =  PIDrotate_calculated.p +  PIDrotate_calculated.i +  PIDrotate_calculated.d;

@@ -7,8 +7,8 @@ import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.Slamra;
 
 public class PartsGC extends Parts {
-    public PartsGC(LinearOpMode opMode, robotType rType) {
-        super(opMode, rType);
+    public PartsGC(LinearOpMode opMode) {
+        super(opMode);
     }
 
     @Override
@@ -38,15 +38,15 @@ public class PartsGC extends Parts {
             slamra.slamraRobotOffset = slamraRobotOffset;//.clone();
         }
 
-        switch (rType) {
-            case GOCANUM:
-                break;
-            case ANDYMARK:
-                break;
-            case GENERIC:
-                break;
-            default:
-        }
+//        switch (rType) {
+//            case GOCANUM:
+//                break;
+//            case ANDYMARK:
+//                break;
+//            case GENERIC:
+//                break;
+//            default:
+//        }
     }
 
     @Override
@@ -82,6 +82,7 @@ public class PartsGC extends Parts {
         if (useSlamra) slamra.runLoop();
         controls.runLoop();
         navigator.runLoop();
+        drivetrain.runLoop();
     }
 
     @Override

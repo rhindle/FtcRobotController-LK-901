@@ -30,13 +30,15 @@ public class MentorTestAT01 extends LinearOpMode {
    @Override
    public void runOpMode() {
 
-      parts = new PartsDS(this, Parts.robotType.GOCANUM);
+//      parts = new PartsDS(this, Parts.robotType.GOCANUM);
+      parts = new PartsDS(this);
 
       parts.useODO = false;
       parts.useSlamra = true; //true;
       parts.useNeoMatrix = true;
       parts.useAprilTag = true;
-      //robot.reverseDrive = true;  // for AndyMark test
+      parts.useDrivetrainEncoders = true;
+      parts.reverseDrive = false;  // true for AndyMark
       parts.useDistanceSensors = false; //true; //false;
       //parts.fieldStartPosition = new Position (36,63,-90);
       parts.odoRobotOffset = new Position (2.25,0,0);

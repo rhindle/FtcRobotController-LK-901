@@ -13,6 +13,13 @@ public class DrivePowers {
         this.v3 = v3;
     }
 
+    public DrivePowers(double[] powers) {
+        v0 = powers[0];
+        v1 = powers[1];
+        v2 = powers[2];
+        v3 = powers[3];
+    }
+
     public DrivePowers() {
         v0 = 0;
         v1 = 0;

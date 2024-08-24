@@ -10,11 +10,12 @@ import org.firstinspires.ftc.teamcode.robot.Common.NeoMatrix;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.PositionMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Slamra;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.NavigationTarget;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 
 public class PartsDS extends Parts {
-    public PartsDS(LinearOpMode opMode, robotType rType) {
-        super(opMode, rType);
+    public PartsDS(LinearOpMode opMode) {
+        super(opMode);
     }
 
     @Override
@@ -28,17 +29,17 @@ public class PartsDS extends Parts {
         robot = new RobotDS(this);
         buttonMgr = new ButtonMgr(opMode);
 //        sensors = new SensorsDS(this);
-//      controls = new Controls_2(this);
         controls = new ControlsDS(this);
         drivetrain = new DrivetrainDS(this);
 
         imuMgr = new IMUmgr(this);
         positionMgr = new PositionMgr(this);
-        navigator = new NavigatorDS(this);  // being replaced
+//        navigator = new NavigatorDS(this);  // being replaced
         autoDrive = new AutoDriveDS(this);
         userDrive = new UserDriveDS(this);
         dsLed = new DSLed(this);
         dsShooter = new DSShooter(this);
+        dsMisc = new DSMisc(this);
 
         if (useAprilTag) dsApriltag = new DSAprilTag(this);
         if (useODO) {
@@ -54,15 +55,15 @@ public class PartsDS extends Parts {
 
         if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 16);
 
-        switch (rType) {
-            case GOCANUM:
-                break;
-            case ANDYMARK:
-                break;
-            case GENERIC:
-                break;
-            default:
-        }
+//        switch (rType) {
+//            case GOCANUM:
+//                break;
+//            case ANDYMARK:
+//                break;
+//            case GENERIC:
+//                break;
+//            default:
+//        }
     }
 
     @Override
@@ -113,13 +114,15 @@ public class PartsDS extends Parts {
         drivetrain.initialize();
         imuMgr.runLoop();
         if (useODO) odometry.initialize();
-        navigator.initialize();
-        navigator.setTargetAbsolute(-20,0,0);
+//        navigator.initialize();
+//        navigator.setTargetAbsolute(-20,0,0);
+        userDrive.initialize();
         autoDrive.initialize();
+        autoDrive.setNavTarget(new NavigationTarget(new Position(-20,0,0), dsMisc.toleranceHigh));
 //        autoDrive.setTargetAbsolute(-20,0,0);
 
         if (useODO) odometry.runLoop();  // get some things squared away before the real program runs
-        navigator.runLoop();
+//        navigator.runLoop();
         autoDrive.runLoop();
 
         if (useSlamra) slamra.preRun();
@@ -143,9 +146,10 @@ public class PartsDS extends Parts {
         if (useAprilTag) dsApriltag.runLoop();
         positionMgr.runLoop();
         controls.runLoop();
-        navigator.runLoop();
+//        navigator.runLoop();
         userDrive.runLoop();
         autoDrive.runLoop();
+        drivetrain.runLoop();
         dsShooter.runLoop();
         if (useNeoMatrix) dsLed.runLoop();
 //        if (useNeoMatrix) {
@@ -162,7 +166,7 @@ public class PartsDS extends Parts {
                 imuMgr.setupFieldOffset(roboTagPosition);
                 //navigator.deltaHeading = robot.returnImuHeading() - roboTagPosition.R;
 //                navigator.modifyHeading = robot.returnImuHeading() - roboTagPosition.R;
-                navigator.modifyHeading = imuMgr.returnImuHeadingRaw() - roboTagPosition.R;
+//!!!!!!!!                navigator.modifyHeading = imuMgr.returnImuHeadingRaw() - roboTagPosition.R;
 //                autoDrive.modifyHeading = robot.returnImuHeading() - roboTagPosition.R;
             }
             if (dsApriltag.tagRobotPosition!=null){
@@ -191,6 +195,7 @@ public class PartsDS extends Parts {
         if (useSlamra) slamra.stop();
         if (useAprilTag) dsApriltag.stop();
         dsShooter.stop();
+        drivetrain.stop();
     }
 //
 //    int[][] textMatrix;

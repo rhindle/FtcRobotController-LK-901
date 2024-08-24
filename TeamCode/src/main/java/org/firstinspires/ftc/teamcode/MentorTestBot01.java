@@ -30,7 +30,8 @@ public class MentorTestBot01 extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        parts = new PartsGC(this, Parts.robotType.GOCANUM);
+//        parts = new PartsGC(this, Parts.robotType.GOCANUM);
+        parts = new PartsGC(this);
 
         parts.useODO = true;
         parts.useSlamra = true; //true;

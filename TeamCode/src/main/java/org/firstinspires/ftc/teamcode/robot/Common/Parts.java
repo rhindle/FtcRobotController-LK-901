@@ -16,12 +16,12 @@ public class Parts implements PartsInterface {
    public boolean useODO = false; //true;
    public boolean reverseDrive = false;
    public boolean useDistanceSensors = true;
-   public boolean useDriveEncoders = true;
+   public boolean useDrivetrainEncoders = true;
    public boolean useSlamra = false;
    public boolean useAprilTag = false;
    public boolean useNeoMatrix = false;
    public Position robotPosition = new Position();
-   public Position slamraPosition;
+//   public Position slamraPosition;
    public Position fieldStartPosition; // = new Position();
    public Position odoRobotOffset;
    public Position slamraRobotOffset;
@@ -29,18 +29,21 @@ public class Parts implements PartsInterface {
    public LinearOpMode opMode;
    public Robot robot;
    public ButtonMgr buttonMgr;
-   public Sensors sensors;
    public Controls controls;
    public Drivetrain drivetrain;
-   public Navigator navigator;  // needs to be replaced
-   public AutoDrive autoDrive;
-   public UserDrive userDrive;
+   public IMUmgr imuMgr;
    public Odometry odometry;
    public Slamra slamra;
+   public PositionMgr positionMgr;
+   public AutoDrive autoDrive;
+   public UserDrive userDrive;
+   public Sensors sensors;
    public TelemetryMgr telemetryHandler;
    public NeoMatrix neo;
-   public PositionMgr positionMgr;
-   public IMUmgr imuMgr;
+
+   //---Legacy need to phase out
+   public Navigator navigator;
+   //---
 
    //---DiscShooter Unique
    public DSAprilTag dsApriltag;
@@ -51,16 +54,16 @@ public class Parts implements PartsInterface {
    //---
 
    public boolean isSetup = false;
-   public robotType rType;
+//   public robotType rType;
 
    /* Constructor */
-   public Parts(LinearOpMode opMode, robotType rType){
-      construct(opMode, rType);
+   public Parts(LinearOpMode opMode){
+      construct(opMode);
    }
 
-   void construct(LinearOpMode opMode, robotType rType){
+   void construct(LinearOpMode opMode){
       this.opMode = opMode;
-      this.rType = rType;
+//      this.rType = rType;
       telemetryHandler = new TelemetryMgr(opMode);
    }
 
@@ -137,10 +140,10 @@ public class Parts implements PartsInterface {
 //      if (useSlamra) slamra.onStop();
    }
 
-   public enum robotType {
-      GOCANUM,
-      ANDYMARK,
-      GENERIC
-   }
+//   public enum robotType {
+//      GOCANUM,
+//      ANDYMARK,
+//      GENERIC
+//   }
 
 }

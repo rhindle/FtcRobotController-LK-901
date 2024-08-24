@@ -12,7 +12,7 @@ public class NavigationTarget {
     // add pid coefficients?
 
     public NavigationTarget(Position targetPos, PositionTolerance tolerance, double maxSpeed, long timeLimit, boolean noSlow) {
-        if (tolerance==null) tolerance=new PositionTolerance(2, 2, 125);
+        if (tolerance==null) tolerance=new PositionTolerance(2, 2, 125);   //todo: determine if this is a good default
         if (maxSpeed==0) maxSpeed = 1;
         this.targetPos = targetPos;
         this.tolerance = tolerance;

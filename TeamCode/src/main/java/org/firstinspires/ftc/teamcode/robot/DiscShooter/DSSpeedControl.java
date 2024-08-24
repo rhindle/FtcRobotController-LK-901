@@ -49,6 +49,10 @@ public class DSSpeedControl implements PartsInterface {
       return checkFences(parts.positionMgr.robotPosition, direction);
    }
 
+   public double checkFences (double direction, boolean fieldCentric) {
+      return checkFences(parts.positionMgr.robotPosition, direction, fieldCentric);
+   }
+
    public double checkFences (Position currentPosition, double direction) {
       // assumes that the controls (and thus direction) are robot centric (vs. field centric)
       // which means the direction has to be manipulated to a field centric direction

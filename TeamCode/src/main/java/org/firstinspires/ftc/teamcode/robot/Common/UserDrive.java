@@ -8,19 +8,19 @@ public class UserDrive implements PartsInterface {
    /* Public OpMode members. */
    public Parts parts;
 
-   public DrivePowers driveP;
+   public DrivePowers drivePowers;
    double driveSpeed, driveAngle, rotate;
    boolean useFieldCentricDrive = false;
    boolean useHeadingHold = true;
    boolean useHoldPosition = true;
+   boolean isDriving = false;
    public double storedHeading = 0;
    public double deltaHeading = 0;
-   double maxSpeedWithPos = 1;
-   double maxSpeedNoPos = 0.33;
-   double maxSpeed = maxSpeedWithPos;
+   double speedMaximumWithPosition = 1;
+   double speedMaximumNoPosition = 0.33;
+   double speedMaximum = speedMaximumWithPosition;
    long idleDelay = System.currentTimeMillis();
    long headingDelay = System.currentTimeMillis();
-   boolean isDriving = false;
 
    /* Constructor */
    public UserDrive(Parts parts){
@@ -32,7 +32,7 @@ public class UserDrive implements PartsInterface {
    }
 
    public void initialize(){
-      driveP = new DrivePowers();
+      drivePowers = new DrivePowers();
    }
 
    public void preInit() {
@@ -76,18 +76,18 @@ public class UserDrive implements PartsInterface {
          }
       }
 
-      driveP.v0 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) - Math.sin(Math.toRadians(driveAngle))) + rotate;
-      driveP.v2 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) + Math.sin(Math.toRadians(driveAngle))) + rotate;
-      driveP.v1 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) + Math.sin(Math.toRadians(driveAngle))) - rotate;
-      driveP.v3 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) - Math.sin(Math.toRadians(driveAngle))) - rotate;
+      drivePowers.v0 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) - Math.sin(Math.toRadians(driveAngle))) + rotate;
+      drivePowers.v2 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) + Math.sin(Math.toRadians(driveAngle))) + rotate;
+      drivePowers.v1 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) + Math.sin(Math.toRadians(driveAngle))) - rotate;
+      drivePowers.v3 = driveSpeed * (Math.cos(Math.toRadians(driveAngle)) - Math.sin(Math.toRadians(driveAngle))) - rotate;
 
       // scale so average motor speed is not more than maxSpeed, but only if maxspeed <> 1
-      if (maxSpeed != 1) {
-         driveP.scaleAverage(maxSpeed);
+      if (speedMaximum != 1) {
+         drivePowers.scaleAverage(speedMaximum);
       }
       // scale to no higher than 1
-      driveP.scaleMax(1);
-      parts.drivetrain.setDrivePowers(driveP);
+      drivePowers.scaleMax(1);
+      parts.drivetrain.setDrivePowers(drivePowers);
    }
 
    public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {
@@ -97,23 +97,27 @@ public class UserDrive implements PartsInterface {
       this.rotate = rotate;
 
       isDriving = !(driveSpeed == 0 && rotate == 0);
-      if (isDriving) parts.autoDrive.isHolding = false;
+      if (isDriving) {
+         parts.autoDrive.cancelNavigation();
+//         parts.autoDrive.isHolding = false;
+//         parts.autoDrive.isNavigating = false;
+      }
 
       // Skip the fancy driving if no position is available
       if (parts.positionMgr.noPosition()) return;
 
       // Modify for field centric Drive
       if (useFieldCentricDrive) {
-         this.driveAngle = driveAngle - storedHeading + deltaHeading;  //todo:verify this
+         this.driveAngle = driveAngle - storedHeading + deltaHeading;  //todo: verify this (rework based on IMUmgr?)
       }
    }
 
    public void applySpeedFences() {
       if (parts.positionMgr.noPosition()) {
-         maxSpeed = maxSpeedNoPos;
+         speedMaximum = speedMaximumNoPosition;
       }
       else {
-         maxSpeed = maxSpeedWithPos * parts.dsSpeedControl.checkFences(driveAngle);
+         speedMaximum = speedMaximumWithPosition * parts.dsSpeedControl.checkFences(driveAngle, useFieldCentricDrive);  //todo: verify this
       }
    }
 
@@ -146,8 +150,8 @@ public class UserDrive implements PartsInterface {
       }
    }
 
-   public void setMaxSpeed(double maxSpeed) {
-      this.maxSpeed = maxSpeed;
+   public void setSpeedMaximum(double speedMaximum) {
+      this.speedMaximum = speedMaximum;
    }
 
 }
