@@ -10,7 +10,7 @@ public class Controls implements PartsInterface {
    public Gamepad gamepad1;
    public Gamepad gamepad2;
    public ButtonMgr buttonMgr;
-   public double DriveSpeed, DriveAngle, Rotate, liftSpeed;
+   public double driveSpeed, driveAngle, rotate, liftSpeed;
 
    /* Constructor */
    public Controls(Parts parts){

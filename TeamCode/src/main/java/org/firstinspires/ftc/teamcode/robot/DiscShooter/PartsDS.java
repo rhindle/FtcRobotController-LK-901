@@ -39,6 +39,7 @@ public class PartsDS extends Parts {
         userDrive = new UserDriveDS(this);
         dsLed = new DSLed(this);
         dsShooter = new DSShooter(this);
+        dsSpeedControl = new DSSpeedControl(this);
         dsMisc = new DSMisc(this);
 
         if (useAprilTag) dsApriltag = new DSAprilTag(this);
@@ -148,6 +149,7 @@ public class PartsDS extends Parts {
         controls.runLoop();
 //        navigator.runLoop();
         userDrive.runLoop();
+        dsSpeedControl.runLoop();
         autoDrive.runLoop();
         drivetrain.runLoop();
         dsShooter.runLoop();

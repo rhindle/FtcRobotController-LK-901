@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
+import org.firstinspires.ftc.teamcode.robot.Common.i2c.DFR304Range;
 import org.firstinspires.ftc.teamcode.robot.Common.i2c.QwiicLEDStick;
 
 import java.util.List;
@@ -54,6 +55,7 @@ public class Robot implements PartsInterface {
     public DistanceSensor sensor2MLeft = null;
     public DistanceSensor sensor2MMiddle = null;
     public DistanceSensor sensor2MRight = null;
+    public DFR304Range ultraSensor = null;
     public QwiicLEDStick qled = null;
 
     public DigitalChannel   digital0 = null;
@@ -277,6 +279,12 @@ public class Robot implements PartsInterface {
     }
 
     public void initOptions() {
+//        ultraSensor = hardwareMap.get(DFR304Range.class, "uSensor");
+//        DFR304Range.Parameters uParameters = new DFR304Range.Parameters();
+//        uParameters.maxRange = DFR304Range.MaxRange.CM500;
+//        uParameters.measureMode = DFR304Range.MeasureMode.PASSIVE;
+//        ultraSensor.initialize(uParameters);
+
         //i2c sensors
 //        sensorColor = hwMap.get(ColorSensor.class, "sensorColorRange");
 //        sensorDistance = hwMap.get(DistanceSensor.class, "sensorColorRange");

@@ -134,6 +134,7 @@ public class TelemetryMgr {
         CONTROLS,
         APRILTAG,
         APRILTAG_EXT,
+        SPEED,
         NAVIGATOR;   //navigator is deprecated
    }
 }

@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode.robot.DiscShooter;
 
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.DrivePowers;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 
 public class DSSpeedControl implements PartsInterface {
 
@@ -15,6 +19,10 @@ public class DSSpeedControl implements PartsInterface {
    /* Public OpMode members. */
    public Parts parts;
 
+   public DrivePowers drivePowers;
+   public double speedMaximum;
+//   public double speedMaximumWithPosition = 1;
+   public double speedMaximumNoPosition = 0.33;
    public Fence fenceInner = new Fence(0.5, new Position(-24,23), new Position(-70,-23));
    public Fence fenceOuter = new Fence(0.25, new Position(-12,35), new Position(-82,-35));
 
@@ -40,9 +48,33 @@ public class DSSpeedControl implements PartsInterface {
    }
 
    public void runLoop() {
+      if (!parts.userDrive.isDriving) return;
+      // if UserDrive is driving robot, adjust the powers as necessary and send them to drivetrain again
+      drivePowers=parts.userDrive.drivePowers.clone();
+      //speedMaximum=parts.userDrive.speedMaximum;
+      speedMaximum = 1;
+      applySpeedFences();
+      if (speedMaximum != 1) {
+         drivePowers.scaleAverage(speedMaximum);
+      }
+      parts.drivetrain.setDrivePowers(drivePowers);
+      TelemetryMgr.message(Category.DRIVETRAIN,"dt-fnc", drivePowers.toString(2));
    }
 
    public void stop() {
+   }
+
+   public void applySpeedFences() {
+      // note: speed is already scaled to speedMaximum in UserDrive
+      if (parts.positionMgr.noPosition()) {
+         speedMaximum = speedMaximumNoPosition;
+         TelemetryMgr.message(Category.SPEED,"SpdCtrl - No Position", JavaUtil.formatNumber(speedMaximum, 2));
+      }
+      else {
+//         speedMaximum = parts.userDrive.speedMaximumWithPosition * checkFences(driveAngle, useFieldCentricDrive);  //todo: verify this
+         // this will be 1 or a lesser value from the fences above
+         speedMaximum = checkFences(parts.userDrive.driveAngle, parts.userDrive.useFieldCentricDrive);
+      }
    }
 
    public double checkFences (double direction) {
@@ -59,8 +91,15 @@ public class DSSpeedControl implements PartsInterface {
       direction += currentPosition.R;
       double outerSpeed = fencedSpeed(currentPosition, direction, fenceOuter);
       double innerSpeed = fencedSpeed(currentPosition, direction, fenceInner);
-      if (outerSpeed != 1) return outerSpeed;
-      if (innerSpeed != 1) return innerSpeed;
+      if (outerSpeed != 1) {
+         TelemetryMgr.message(Category.SPEED,"SpdCtrl - Outer Fence", JavaUtil.formatNumber(outerSpeed, 2));
+         return outerSpeed;
+      }
+      if (innerSpeed != 1) {
+         TelemetryMgr.message(Category.SPEED,"SpdCtrl - Inner Fence", JavaUtil.formatNumber(innerSpeed, 2));
+         return innerSpeed;
+      }
+      TelemetryMgr.message(Category.SPEED,"SpdCtrl - No Fence XX", JavaUtil.formatNumber(1,2));
       return 1;
    }
 
@@ -109,6 +148,7 @@ public class DSSpeedControl implements PartsInterface {
          this.yMin = bottomRight.Y;
       }
 
+      // If this gets used, need to change the logic in fencedSpeed()
       public Fence(double outsideSpeed, double insideSpeed, Position topLeft, Position bottomRight) {
          this.outsideSpeed = outsideSpeed;
          this.insideSpeed = insideSpeed;
@@ -118,12 +158,5 @@ public class DSSpeedControl implements PartsInterface {
          this.yMin = bottomRight.Y;
       }
 
-//      public Fence() {
-//         speed = 1;
-//         xMax = 0;
-//         xMin = 0;
-//         yMax = 0;
-//         yMin = 0;
-//      }
    }
 }

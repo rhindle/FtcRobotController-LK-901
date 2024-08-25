@@ -85,14 +85,14 @@ public class Odometry implements PartsInterface {
    }
 
    public void runLoop() {
-      if (!parts.useODO) {
-//         imuHeading = parts.robot.returnImuHeading();
-         imuHeading = parts.imuMgr.returnImuHeadingRaw();
-         globalHeading = imuHeading;
-         odoRobotPosition.R = globalHeading;
-//         parts.robotPosition = odoRobotPosition.clone();
-         return;
-      }
+//      if (!parts.useODO) {  //todo: this doesn't seem necessary; probably some legacy garbage?
+////         imuHeading = parts.robot.returnImuHeading();
+//         imuHeading = parts.imuMgr.returnImuHeadingRaw();
+//         globalHeading = imuHeading;
+//         odoRobotPosition.R = globalHeading;
+////         parts.robotPosition = odoRobotPosition.clone();
+//         return;
+//      }
 
       /* Update encoder readings */
       encoderY = odoY.getCurrentPosition() * (long)odoYdir;

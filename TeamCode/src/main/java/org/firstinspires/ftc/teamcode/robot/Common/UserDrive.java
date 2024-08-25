@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.DrivePowers;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 
 public class UserDrive implements PartsInterface {
 
@@ -9,16 +10,17 @@ public class UserDrive implements PartsInterface {
    public Parts parts;
 
    public DrivePowers drivePowers;
-   double driveSpeed, driveAngle, rotate;
-   boolean useFieldCentricDrive = false;
-   boolean useHeadingHold = true;
-   boolean useHoldPosition = true;
-   boolean isDriving = false;
+   public double driveSpeed, driveAngle, rotate;
+   public boolean useFieldCentricDrive = false;
+   public boolean useHeadingHold = true;
+   public boolean useHoldPosition = true;
+   public boolean isDriving = false;
    public double storedHeading = 0;
    public double deltaHeading = 0;
-   double speedMaximumWithPosition = 1;
-   double speedMaximumNoPosition = 0.33;
-   double speedMaximum = speedMaximumWithPosition;
+//   public double speedMaximumWithPosition = 1;
+//   public double speedMaximumNoPosition = 0.33;
+//   public double speedMaximum = speedMaximumWithPosition;
+   public double speedMaximum = 1;
    long idleDelay = System.currentTimeMillis();
    long headingDelay = System.currentTimeMillis();
 
@@ -56,7 +58,7 @@ public class UserDrive implements PartsInterface {
 
       handleDriveIdle();  // todo: left off here
       handleRotateIdle();
-      applySpeedFences();
+//      applySpeedFences();
 
       if (useHoldPosition) {
          if (idleDelay <= System.currentTimeMillis()) {
@@ -88,6 +90,7 @@ public class UserDrive implements PartsInterface {
       // scale to no higher than 1
       drivePowers.scaleMax(1);
       parts.drivetrain.setDrivePowers(drivePowers);
+      TelemetryMgr.message(Category.DRIVETRAIN, "dt-usr", drivePowers.toString(2));
    }
 
    public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {
@@ -111,15 +114,15 @@ public class UserDrive implements PartsInterface {
          this.driveAngle = driveAngle - storedHeading + deltaHeading;  //todo: verify this (rework based on IMUmgr?)
       }
    }
-
-   public void applySpeedFences() {
-      if (parts.positionMgr.noPosition()) {
-         speedMaximum = speedMaximumNoPosition;
-      }
-      else {
-         speedMaximum = speedMaximumWithPosition * parts.dsSpeedControl.checkFences(driveAngle, useFieldCentricDrive);  //todo: verify this
-      }
-   }
+//
+//   public void applySpeedFences() {
+//      if (parts.positionMgr.noPosition()) {
+//         speedMaximum = speedMaximumNoPosition;
+//      }
+//      else {
+//         speedMaximum = speedMaximumWithPosition * parts.dsSpeedControl.checkFences(driveAngle, useFieldCentricDrive);  //todo: verify this
+//      }
+//   }
 
    public void handleDriveIdle() {  //todo: finish this method
       // The purpose of this is to hold the robot position

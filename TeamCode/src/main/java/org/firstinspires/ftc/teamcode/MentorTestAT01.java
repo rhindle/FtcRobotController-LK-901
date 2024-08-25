@@ -105,9 +105,9 @@ public class MentorTestAT01 extends LinearOpMode {
    }
 
    private void addTelemetryLoopEnd() {
-      TelemetryMgr.message(Category.CONTROLS, "r (magnitude)", parts.controls.DriveSpeed);
-      TelemetryMgr.message(Category.CONTROLS, "robotAngle", parts.controls.DriveAngle);
-      TelemetryMgr.message(Category.CONTROLS, "rotate", parts.controls.Rotate);
+      TelemetryMgr.message(Category.CONTROLS, "r (magnitude)", parts.controls.driveSpeed);
+      TelemetryMgr.message(Category.CONTROLS, "robotAngle", parts.controls.driveAngle);
+      TelemetryMgr.message(Category.CONTROLS, "rotate", parts.controls.rotate);
       TelemetryMgr.message(Category.USERDRIVE, "storedHeading", JavaUtil.formatNumber(parts.userDrive.storedHeading, 2));
       TelemetryMgr.message(Category.USERDRIVE, "deltaHeading", JavaUtil.formatNumber(parts.userDrive.deltaHeading, 2));
 //      TelemetryMgr.message(Category.USERDRIVE, "modifyHeading", JavaUtil.formatNumber(parts.autoDrive.modifyHeading, 2));

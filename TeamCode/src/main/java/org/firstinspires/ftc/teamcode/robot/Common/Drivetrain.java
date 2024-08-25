@@ -48,12 +48,18 @@ public class Drivetrain {
 
     public void applyDrivePowers() {
 
+        TelemetryMgr.message(Category.DRIVETRAIN, "dt-raw", drivePowers.toString(2));
         if (efficient) drivePowers = adjustPowers(drivePowers, drivePowersLast);
+        TelemetryMgr.message(Category.DRIVETRAIN, "dt-adj", drivePowers.toString(2));
         motorLF.setPower(drivePowers.v0);
         motorRF.setPower(drivePowers.v1);
         motorLR.setPower(drivePowers.v2);
         motorRR.setPower(drivePowers.v3);
         drivePowersLast = drivePowers.clone();
+    }
+
+    public DrivePowers getDrivePowers() {
+        return drivePowers;
     }
 
     public void setDrivePowers (DrivePowers drivePowers) {
