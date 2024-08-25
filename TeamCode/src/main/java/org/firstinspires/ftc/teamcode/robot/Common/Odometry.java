@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 
 public class Odometry implements PartsInterface {
 
@@ -162,7 +163,7 @@ public class Odometry implements PartsInterface {
       myHeading = getAvgHeading(globalHeading0, globalHeading);
 
 //      telemetry.addData ("My Average Heading", myHeading);
-      TelemetryMgr.Message(6,"My Average Heading", myHeading);
+      TelemetryMgr.message(Category.ODOMETRY,"My Average Heading", myHeading);
 
       xPos = xPos + deltaEncX * Math.cos(Math.toRadians(myHeading));
       yPos = yPos + deltaEncX * Math.sin(Math.toRadians(myHeading));
@@ -252,10 +253,10 @@ public class Odometry implements PartsInterface {
    }
 
    public void addTeleOpTelemetry() {
-      TelemetryMgr.Message(6, "odo-fldof", odoFieldOffset.toString(2));
-      TelemetryMgr.Message(6, "odo-raw__", odoRawPose.toString(2));
-      TelemetryMgr.Message(6, "odo-robot", odoRobotPose.toString(2));
-      TelemetryMgr.Message(6, "odo-final", odoFinalPose.toString(2));
+      TelemetryMgr.message(Category.ODOMETRY, "odo-fldof", odoFieldOffset.toString(2));
+      TelemetryMgr.message(Category.ODOMETRY, "odo-raw__", odoRawPose.toString(2));
+      TelemetryMgr.message(Category.ODOMETRY, "odo-robot", odoRobotPose.toString(2));
+      TelemetryMgr.message(Category.ODOMETRY, "odo-final", odoFinalPose.toString(2));
    }
 
    public void configureEncoders() {

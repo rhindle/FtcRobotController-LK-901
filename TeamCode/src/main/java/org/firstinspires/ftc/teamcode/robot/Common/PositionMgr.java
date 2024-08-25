@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 
 // 20240601 - Just started working on this
 public class PositionMgr implements PartsInterface {
@@ -57,11 +58,11 @@ public class PositionMgr implements PartsInterface {
          slamraPosition = parts.slamra.isSlamraPositionGood() ? parts.slamra.slamraRobotPosition : null;
       }
       if (parts.useAprilTag) tagPosition=parts.dsApriltag.tagRobotPosition;
-      TelemetryMgr.Message(6, "pmgr:odo", (odoPosition==null) ? "(null)" : odoPosition.toString(2));
-      TelemetryMgr.Message(6, "pmgr:slm", (slamraPosition==null) ? "(null)" : slamraPosition.toString(2));
-      TelemetryMgr.Message(6, "pmgr:tag", (tagPosition==null) ? "(null)" : tagPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "pmgr:odo", (odoPosition==null) ? "(null)" : odoPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "pmgr:slm", (slamraPosition==null) ? "(null)" : slamraPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "pmgr:tag", (tagPosition==null) ? "(null)" : tagPosition.toString(2));
       robotPosition = normalUpdate();
-      TelemetryMgr.Message(6, "pmgr:fnl", (robotPosition==null) ? "(null)" : robotPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "pmgr:fnl", (robotPosition==null) ? "(null)" : robotPosition.toString(2));
    }
 
    public void stop() {

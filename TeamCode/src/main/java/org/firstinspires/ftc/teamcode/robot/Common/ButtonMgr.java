@@ -132,7 +132,9 @@ public class ButtonMgr {
         left_bumper,
         right_bumper,
         left_stick_button,
-        right_stick_button;
+        right_stick_button,
+        left_trigger,
+        right_trigger;
     }
 
     public static class cButton {
@@ -201,6 +203,8 @@ public class ButtonMgr {
                 case right_bumper:        return gpad.right_bumper;
                 case left_stick_button:   return gpad.left_stick_button;
                 case right_stick_button:  return gpad.right_stick_button;
+                case left_trigger:        return gpad.left_trigger==1;
+                case right_trigger:       return gpad.right_trigger==1;
                 default:                  return false;  //something bad happened
             }
         }

@@ -70,7 +70,7 @@ public class DSShooter implements PartsInterface {
    }
 
    public void runLoop() {
-      TelemetryMgr.Message(4, "SpinnerRPM", getSpinnerRPM());
+      TelemetryMgr.message(TelemetryMgr.Category.BASIC, "SpinnerRPM", getSpinnerRPM());
       stateMachineAutoPush();
       stateMachineShoot1();
       stateMachineShoot3();

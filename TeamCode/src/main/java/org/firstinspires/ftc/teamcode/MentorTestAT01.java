@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.robot.DiscShooter.PartsDS;
 
@@ -50,11 +51,13 @@ public class MentorTestAT01 extends LinearOpMode {
       parts.preInit();
 
       TelemetryMgr.setDebugLevel(10);
+//      TelemetryMgr.enableCategories(new TelemetryMgr.Category[] {TelemetryMgr.Category.AUTODRIVE});
+      TelemetryMgr.enableAllCategories();
       while (!isStarted()) {
-         TelemetryMgr.Message(1, ">", "Press Play to start");
+         TelemetryMgr.message(Category.MANDATORY, ">", "Press Play to start");
 //         TelemetryMgr.Message(1, ">", "Robot Heading = %.1f", parts.robot.returnImuHeading(true));
-         TelemetryMgr.Message(1, ">", "Robot Heading = %.1f", parts.imuMgr.returnImuHeadingRaw(true));
-         TelemetryMgr.Message(1, "Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
+         TelemetryMgr.message(Category.MANDATORY, ">", "Robot Heading = %.1f", parts.imuMgr.returnImuHeadingRaw(true));
+         TelemetryMgr.message(Category.MANDATORY, "Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
 
          parts.initLoop();
 
@@ -89,9 +92,9 @@ public class MentorTestAT01 extends LinearOpMode {
    }
 
    private void addTelemetryLoopStart() {
-      TelemetryMgr.Message(2, "Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
+      TelemetryMgr.message(Category.BASIC, "Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
 //      TelemetryMgr.Message(2, "IMU raw heading", JavaUtil.formatNumber(parts.robot.returnImuHeading(),2));
-      TelemetryMgr.Message(2, "IMU raw heading", JavaUtil.formatNumber(parts.imuMgr.returnImuHeadingRaw(),2));
+      TelemetryMgr.message(Category.BASIC, "IMU raw heading", JavaUtil.formatNumber(parts.imuMgr.returnImuHeadingRaw(),2));
 //      TelemetryHandler.Message(3, "rangeL", String.format("%.01f in", parts.sensors.distL));
 //      TelemetryHandler.Message(3, "rangeM", String.format("%.01f in", parts.sensors.distM));
 //      TelemetryHandler.Message(3, "rangeR", String.format("%.01f in", parts.sensors.distR));
@@ -102,15 +105,15 @@ public class MentorTestAT01 extends LinearOpMode {
    }
 
    private void addTelemetryLoopEnd() {
-      TelemetryMgr.Message(4, "r (magnitude)", parts.controls.DriveSpeed);
-      TelemetryMgr.Message(4, "robotAngle", parts.controls.DriveAngle);
-      TelemetryMgr.Message(4, "rotate", parts.controls.Rotate);
-      TelemetryMgr.Message(4, "storedHeading", JavaUtil.formatNumber(parts.navigator.storedHeading, 2));
-      TelemetryMgr.Message(4, "deltaHeading", JavaUtil.formatNumber(parts.navigator.deltaHeading, 2));
-      TelemetryMgr.Message(4, "modifyHeading", JavaUtil.formatNumber(parts.navigator.modifyHeading, 2));
+      TelemetryMgr.message(Category.CONTROLS, "r (magnitude)", parts.controls.DriveSpeed);
+      TelemetryMgr.message(Category.CONTROLS, "robotAngle", parts.controls.DriveAngle);
+      TelemetryMgr.message(Category.CONTROLS, "rotate", parts.controls.Rotate);
+      TelemetryMgr.message(Category.USERDRIVE, "storedHeading", JavaUtil.formatNumber(parts.userDrive.storedHeading, 2));
+      TelemetryMgr.message(Category.USERDRIVE, "deltaHeading", JavaUtil.formatNumber(parts.userDrive.deltaHeading, 2));
+//      TelemetryMgr.message(Category.USERDRIVE, "modifyHeading", JavaUtil.formatNumber(parts.autoDrive.modifyHeading, 2));
 //      TelemetryMgr.Message(4, "IMU-Modified", JavaUtil.formatNumber(parts.robot.returnImuHeading()-parts.navigator.deltaHeading, 2));
 //      TelemetryMgr.Message(4, "IMU-Modified", JavaUtil.formatNumber(parts.robot.returnImuHeading() - parts.navigator.modifyHeading, 2));
-      TelemetryMgr.Message(4, "IMU-Modified", JavaUtil.formatNumber(parts.imuMgr.returnImuHeadingRaw() - parts.navigator.modifyHeading, 2));
+      TelemetryMgr.message(Category.IMU, "IMU-Modified", JavaUtil.formatNumber(parts.imuMgr.returnImuHeadingRaw() - parts.navigator.modifyHeading, 2));
 
 
 //        telemetry.addData("error", JavaUtil.formatNumber(currentError, 2));
@@ -129,8 +132,8 @@ public class MentorTestAT01 extends LinearOpMode {
 //        telemetry.addData ("X", JavaUtil.formatNumber(localizer.xPos, 2));
 //        telemetry.addData ("Y", JavaUtil.formatNumber(localizer.yPos, 2));
       Position robo = parts.dsApriltag.getTagRobotPosition();
-      if (robo!=null) TelemetryMgr.Message(3,String.format("robotPos XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", robo.X, robo.Y, robo.R));
-      else TelemetryMgr.Message(3,"robotpos - no tag position");
+      if (robo!=null) TelemetryMgr.message(Category.APRILTAG, String.format("robotPos XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", robo.X, robo.Y, robo.R));
+      else TelemetryMgr.message(Category.APRILTAG,"robotpos - no tag position");
 
    }
 

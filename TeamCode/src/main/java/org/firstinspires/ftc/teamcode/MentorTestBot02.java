@@ -48,10 +48,10 @@ public class MentorTestBot02 extends LinearOpMode {
 
       TelemetryMgr.setDebugLevel(10);
       while (!isStarted()) {
-         TelemetryMgr.Message(1, ">", "Press Play to start");
+         TelemetryMgr.message(1, ">", "Press Play to start");
 //         TelemetryMgr.Message(1, ">", "Robot Heading = %.1f", parts.robot.returnImuHeading(true));
          telemetry.addData(">", "Robot Heading = %.1f", parts.imuMgr.returnImuHeadingRaw(true));
-         TelemetryMgr.Message(1, "Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
+         TelemetryMgr.message(1, "Drive Type:", parts.reverseDrive ? "AndyMark" : "GobildaBot");
 
          parts.initLoop();
 
@@ -98,9 +98,9 @@ public class MentorTestBot02 extends LinearOpMode {
    }
 
    private void addTelemetryLoopStart() {
-      TelemetryMgr.Message(2, "Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
+      TelemetryMgr.message(2, "Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
 //      TelemetryMgr.Message(2, "heading", JavaUtil.formatNumber(parts.robot.returnImuHeading(),2));
-      TelemetryMgr.Message(2, "heading", JavaUtil.formatNumber(parts.imuMgr.returnImuHeadingRaw(),2));
+      TelemetryMgr.message(2, "heading", JavaUtil.formatNumber(parts.imuMgr.returnImuHeadingRaw(),2));
 //      TelemetryHandler.Message(3, "rangeL", String.format("%.01f in", parts.sensors.distL));
 //      TelemetryHandler.Message(3, "rangeM", String.format("%.01f in", parts.sensors.distM));
 //      TelemetryHandler.Message(3, "rangeR", String.format("%.01f in", parts.sensors.distR));
@@ -111,11 +111,11 @@ public class MentorTestBot02 extends LinearOpMode {
    }
 
    private void addTelemetryLoopEnd() {
-      TelemetryMgr.Message(4, "r (magnitude)", parts.controls.DriveSpeed);
-      TelemetryMgr.Message(4, "robotAngle", parts.controls.DriveAngle);
-      TelemetryMgr.Message(4, "rotate", parts.controls.Rotate);
-      TelemetryMgr.Message(4, "storedHeading", JavaUtil.formatNumber(parts.navigator.storedHeading, 2));
-      TelemetryMgr.Message(4, "deltaHeading", JavaUtil.formatNumber(parts.navigator.deltaHeading, 2));
+      TelemetryMgr.message(4, "r (magnitude)", parts.controls.DriveSpeed);
+      TelemetryMgr.message(4, "robotAngle", parts.controls.DriveAngle);
+      TelemetryMgr.message(4, "rotate", parts.controls.Rotate);
+      TelemetryMgr.message(4, "storedHeading", JavaUtil.formatNumber(parts.navigator.storedHeading, 2));
+      TelemetryMgr.message(4, "deltaHeading", JavaUtil.formatNumber(parts.navigator.deltaHeading, 2));
 //        telemetry.addData("error", JavaUtil.formatNumber(currentError, 2));
 //        telemetry.addData("v0", JavaUtil.formatNumber(navigator.v0, 2));
 //        telemetry.addData("v1", JavaUtil.formatNumber(navigator.v2, 2));

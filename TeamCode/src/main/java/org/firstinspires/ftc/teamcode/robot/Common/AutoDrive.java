@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.NavigationTar
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 
 import androidx.annotation.NonNull;
 
@@ -73,7 +74,7 @@ public class AutoDrive implements PartsInterface {
             status=Status.IDLE;
          }
       }
-      TelemetryMgr.Message(4, "AutoDrive", status);
+      TelemetryMgr.message(Category.AUTODRIVE, "AutoDrive", status);
    }
 
    public void stop() {
@@ -177,11 +178,11 @@ public class AutoDrive implements PartsInterface {
       errorLast = error.clone();
       navAngleLast = navAngle;
 
-      TelemetryMgr.Message(7, "NavDistance", JavaUtil.formatNumber(error.dist, 2));
-      TelemetryMgr.Message(7, "NavAngle", JavaUtil.formatNumber(navAngle, 2));
-      TelemetryMgr.Message(7, "NavRotation", JavaUtil.formatNumber(error.rot, 2));
-      TelemetryMgr.Message(7, "pDist", JavaUtil.formatNumber(powerTranslate, 2));
-      TelemetryMgr.Message(7, "pRot", JavaUtil.formatNumber(powerRotate, 2));
+      TelemetryMgr.message(Category.AUTODRIVE, "NavDistance", JavaUtil.formatNumber(error.dist, 2));
+      TelemetryMgr.message(Category.AUTODRIVE, "NavAngle", JavaUtil.formatNumber(navAngle, 2));
+      TelemetryMgr.message(Category.AUTODRIVE, "NavRotation", JavaUtil.formatNumber(error.rot, 2));
+      TelemetryMgr.message(Category.AUTODRIVE, "NavPowTrans", JavaUtil.formatNumber(powerTranslate, 2));
+      TelemetryMgr.message(Category.AUTODRIVE, "NavPowerRot", JavaUtil.formatNumber(powerRotate, 2));
 
       /* Calculate and set the drivetrain powers */
       navAngle -= parts.positionMgr.robotPosition.R;  // need to account for how the robot is oriented
@@ -214,8 +215,8 @@ public class AutoDrive implements PartsInterface {
       error.y = navTarget.targetPos.Y - parts.positionMgr.robotPosition.Y;  // error in y
       error.rot = getHeadingError(navTarget.targetPos.R);  // error in rotation   //20221222 added deltaheading!?
       error.dist = Math.sqrt(Math.pow(error.x,2) + Math.pow(error.y,2));  // distance (error) from xy destination
-      TelemetryMgr.Message(7, "DeltaX", JavaUtil.formatNumber(error.x, 2));
-      TelemetryMgr.Message(7, "DeltaY", JavaUtil.formatNumber(error.y, 2));
+      TelemetryMgr.message(Category.AUTODRIVE, "DeltaX", JavaUtil.formatNumber(error.x, 2));
+      TelemetryMgr.message(Category.AUTODRIVE, "DeltaY", JavaUtil.formatNumber(error.y, 2));
    }
 
    // Get heading error
@@ -252,6 +253,30 @@ public class AutoDrive implements PartsInterface {
       timeNavStart = System.currentTimeMillis();
       isNavigating = true;
       isHolding = hold;
+      resetPID();
+   }
+
+   public void setTargetByRobotDelta(double X, double Y, double R) {
+      //if (parts.positionMgr.noPosition()) return;
+//      double rot = parts.positionMgr.robotPosition.R;
+//      Position targetPos = navTarget.targetPos.clone();
+//      targetPos.X = targetPos.X + (X * Math.cos(Math.toRadians(targetPos.R)) - Y * Math.sin(Math.toRadians(rot)));
+//      targetPos.Y = targetPos.Y + (X * Math.sin(Math.toRadians(targetPos.R)) + Y * Math.cos(Math.toRadians(rot)));
+      navTarget.targetPos.X = navTarget.targetPos.X + (X * Math.cos(Math.toRadians(navTarget.targetPos.R)) - Y * Math.sin(Math.toRadians(navTarget.targetPos.R)));
+      navTarget.targetPos.Y = navTarget.targetPos.Y + (X * Math.sin(Math.toRadians(navTarget.targetPos.R)) + Y * Math.cos(Math.toRadians(navTarget.targetPos.R)));
+      navTarget.targetPos.R += R;
+      resetPID();
+   }
+
+   public void setTargetByFieldDelta(double X, double Y, double R) {
+      //if (parts.positionMgr.noPosition()) return;
+//      double rot = parts.positionMgr.robotPosition.R;
+//      Position targetPos = navTarget.targetPos.clone();
+//      targetPos.X = targetPos.X + (X * Math.cos(Math.toRadians(targetPos.R)) - Y * Math.sin(Math.toRadians(rot)));
+//      targetPos.Y = targetPos.Y + (X * Math.sin(Math.toRadians(targetPos.R)) + Y * Math.cos(Math.toRadians(rot)));
+      navTarget.targetPos.X += X;
+      navTarget.targetPos.Y += Y;
+      navTarget.targetPos.R += R;
       resetPID();
    }
 

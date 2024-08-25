@@ -5,6 +5,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -46,13 +47,13 @@ public class IMUmgr implements PartsInterface {
       // Read IMU - once per cycle!
       if (!disableIMUupdate) {
          updateImuHeading();
-         TelemetryMgr.Message(0, "Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
-         TelemetryMgr.Message(0, "robotHeading", "%.2f Deg. (Heading)", imuRobotHeading);
-         TelemetryMgr.Message(9,"Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
-         TelemetryMgr.Message(9,"Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
-         TelemetryMgr.Message(9,"Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
-         TelemetryMgr.Message(9,"Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
-         TelemetryMgr.Message(9,"Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
+         TelemetryMgr.message(Category.IMU, "Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
+         TelemetryMgr.message(Category.IMU_EXT, "robotHeading", "%.2f Deg. (Heading)", imuRobotHeading);
+         TelemetryMgr.message(Category.IMU_EXT,"Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
+         TelemetryMgr.message(Category.IMU_EXT,"Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
+         TelemetryMgr.message(Category.IMU_EXT,"Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
+         TelemetryMgr.message(Category.IMU_EXT,"Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
+         TelemetryMgr.message(Category.IMU_EXT,"Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
       }
    }
 

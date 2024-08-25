@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 
 public class Navigator implements PartsInterface {
 
@@ -99,8 +100,8 @@ public class Navigator implements PartsInterface {
          return;
       }
 
-      TelemetryMgr.Message(7,"PIDmov", "PID = %.4f, %.4f, %.4f", PIDmovement.p, PIDmovement.i, PIDmovement.d);
-      TelemetryMgr.Message(7, "PIDrot", "PID = %.4f, %.4f, %.4f", PIDrotate.p, PIDrotate.i, PIDrotate.d);
+      TelemetryMgr.message(Category.NAVIGATOR,"PIDmov", "PID = %.4f, %.4f, %.4f", PIDmovement.p, PIDmovement.i, PIDmovement.d);
+      TelemetryMgr.message(Category.NAVIGATOR, "PIDrot", "PID = %.4f, %.4f, %.4f", PIDrotate.p, PIDrotate.i, PIDrotate.d);
 
       // State machine-ish.  Needs embetterment.  This will determine motor powers then set them
       if (navigate == 1) {
@@ -125,8 +126,8 @@ public class Navigator implements PartsInterface {
       double errorDist, deltaX, deltaY, errorRot, pDist, pRot, navAngle;
       deltaX = targetPos.X - robotPosition.X;  // error in x
       deltaY = targetPos.Y - robotPosition.Y;  // error in y
-      TelemetryMgr.Message(7, "DeltaX", JavaUtil.formatNumber(deltaX, 2));
-      TelemetryMgr.Message(7, "DeltaY", JavaUtil.formatNumber(deltaY, 2));
+      TelemetryMgr.message(Category.NAVIGATOR, "DeltaX", JavaUtil.formatNumber(deltaX, 2));
+      TelemetryMgr.message(Category.NAVIGATOR, "DeltaY", JavaUtil.formatNumber(deltaY, 2));
       errorRot = getError(targetPos.R);  // error in rotation   //20221222 added deltaheading!?
       errorDist = Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));  // distance (error) from xy destination
 
@@ -196,11 +197,11 @@ public class Navigator implements PartsInterface {
       errorRotLast = errorRot;
       navAngleLast = navAngle;
 
-      TelemetryMgr.Message(7, "NavDistance", JavaUtil.formatNumber(errorDist, 2));
-      TelemetryMgr.Message(7, "NavAngle", JavaUtil.formatNumber(navAngle, 2));
-      TelemetryMgr.Message(7, "NavRotation", JavaUtil.formatNumber(errorRot, 2));
-      TelemetryMgr.Message(7, "pDist", JavaUtil.formatNumber(pDist, 2));
-      TelemetryMgr.Message(7, "pRot", JavaUtil.formatNumber(pRot, 2));
+      TelemetryMgr.message(Category.NAVIGATOR, "NavDistance", JavaUtil.formatNumber(errorDist, 2));
+      TelemetryMgr.message(Category.NAVIGATOR, "NavAngle", JavaUtil.formatNumber(navAngle, 2));
+      TelemetryMgr.message(Category.NAVIGATOR, "NavRotation", JavaUtil.formatNumber(errorRot, 2));
+      TelemetryMgr.message(Category.NAVIGATOR, "pDist", JavaUtil.formatNumber(pDist, 2));
+      TelemetryMgr.message(Category.NAVIGATOR, "pRot", JavaUtil.formatNumber(pRot, 2));
 
       navAngle -= robotPosition.R;  // need to account for how the robot is oriented
       double autoSpeed = pDist * 1;  // 1 here is maxspeed; could be turned into a variable

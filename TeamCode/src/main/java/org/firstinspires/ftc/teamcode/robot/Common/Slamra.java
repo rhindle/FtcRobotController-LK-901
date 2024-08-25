@@ -6,6 +6,7 @@ import com.spartronics4915.lib.T265Helper;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 
 public class Slamra implements PartsInterface {
 
@@ -142,11 +143,11 @@ public class Slamra implements PartsInterface {
 	}
 
 	public void addTeleOpTelemetry() {
-		TelemetryMgr.Message(6, "slm-fldof", slamraFieldOffset.toString(2));
-		TelemetryMgr.Message(6, "slm-raw__", slamraRawPose.toString(2));
-		TelemetryMgr.Message(6, "slm-robot", slamraRobotPose.toString(2));
-		TelemetryMgr.Message(6, "slm-final", slamraFinalPose.toString(2));
-		TelemetryMgr.Message(2, "slamra stuck", timesStuck);
+		TelemetryMgr.message(Category.SLAMRA, "slm-fldof", slamraFieldOffset.toString(2));
+		TelemetryMgr.message(Category.SLAMRA, "slm-raw__", slamraRawPose.toString(2));
+		TelemetryMgr.message(Category.SLAMRA, "slm-robot", slamraRobotPose.toString(2));
+		TelemetryMgr.message(Category.SLAMRA, "slm-final", slamraFinalPose.toString(2));
+		TelemetryMgr.message(Category.SLAMRA, "slamra stuck", timesStuck);
 //		TelemetryMgr.Message(6,"last pos", lastPos.toString(2));
 	}
 }

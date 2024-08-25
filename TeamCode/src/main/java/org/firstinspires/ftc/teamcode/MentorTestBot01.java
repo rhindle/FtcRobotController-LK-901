@@ -110,7 +110,7 @@ public class MentorTestBot01 extends LinearOpMode {
     }
 
     private void addTelemetryLoopEnd() {
-        TelemetryMgr.Message(1, "!!", "!!!TEST !!!!!!!!!!!!!!!!!!!!");
+//        TelemetryMgr.message(1, "!!", "!!!TEST !!!!!!!!!!!!!!!!!!!!");
         telemetry.addData("r (magnitude)", parts.controls.DriveSpeed);
         telemetry.addData("robotAngle", parts.controls.DriveAngle);
         telemetry.addData("rotate", parts.controls.Rotate);

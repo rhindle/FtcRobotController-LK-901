@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.Common;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.DrivePowers;
+import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 
 public class Drivetrain {
 
@@ -46,6 +47,7 @@ public class Drivetrain {
     }
 
     public void applyDrivePowers() {
+
         if (efficient) drivePowers = adjustPowers(drivePowers, drivePowersLast);
         motorLF.setPower(drivePowers.v0);
         motorRF.setPower(drivePowers.v1);

@@ -50,4 +50,11 @@ public class DrivePowers {
         return new DrivePowers(v0, v1, v2, v3);
     }
 
+    public String toString(int decimals){
+        return      "v0:" + String.format("%."+ decimals +"f", v0)
+                + ", v1:" + String.format("%."+ decimals +"f", v1)
+                + ", v2:" + String.format("%."+ decimals +"f", v2)
+                + ", v3:" + String.format("%."+ decimals +"f", v3);
+    }
+
 }
