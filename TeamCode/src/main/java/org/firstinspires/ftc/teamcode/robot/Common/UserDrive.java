@@ -15,6 +15,7 @@ public class UserDrive implements PartsInterface {
    public boolean useHeadingHold = true;
    public boolean useHoldPosition = true;
    public boolean isDriving = false;
+   boolean useHoldOK = false;
    public double storedHeading = 0;
    public double deltaHeading = 0;
 //   public double speedMaximumWithPosition = 1;
@@ -56,6 +57,12 @@ public class UserDrive implements PartsInterface {
    // Determine motor speeds when under driver control
    public void userDrivePower () {
 
+      if (parts.autoDrive.isNavigating) {
+         TelemetryMgr.message(Category.DRIVETRAIN, "dt-usr : autoDrive is Navigating");
+         if (parts.positionMgr.hasPosition()) storedHeading = parts.positionMgr.robotPosition.R;
+         return;
+      }
+
       handleDriveIdle();  // todo: left off here
       handleRotateIdle();
 //      applySpeedFences();
@@ -63,7 +70,11 @@ public class UserDrive implements PartsInterface {
       if (useHoldPosition) {
          if (idleDelay <= System.currentTimeMillis()) {
             // no driver input, so let autoDrive take over and do nothing else
-            parts.autoDrive.setTargetToCurrentPosition();
+            if (useHoldOK) {
+               parts.autoDrive.setTargetToCurrentPosition();
+               useHoldOK = false;
+            }
+            TelemetryMgr.message(Category.DRIVETRAIN, "dt-usr : Not Driving");
             return;
          }
       }
@@ -100,6 +111,7 @@ public class UserDrive implements PartsInterface {
       this.rotate = rotate;
 
       isDriving = !(driveSpeed == 0 && rotate == 0);
+      TelemetryMgr.message(Category.USERDRIVE, "isDriving", isDriving);
       if (isDriving) {
          parts.autoDrive.cancelNavigation();
 //         parts.autoDrive.isHolding = false;
@@ -127,12 +139,14 @@ public class UserDrive implements PartsInterface {
    public void handleDriveIdle() {  //todo: finish this method
       // The purpose of this is to hold the robot position
       // delayed 500ms after any movement input
-      if (parts.positionMgr.noPosition()) return;
+//      if (parts.positionMgr.noPosition()) return;
       if (!(driveSpeed == 0 && rotate == 0)) {
          idleDelay = System.currentTimeMillis() + 500;  //was 250 to match rotate?
+         useHoldOK = true;
 //         setTargetToCurrentPosition(); ?????
          //deactivate autodrive???  But may still want autoheading???
       }
+      if (parts.positionMgr.noPosition()) return;
       if (idleDelay < System.currentTimeMillis() && useHoldPosition) {
 //         setTargetToCurrentPosition();
          //activate autodrive???
@@ -142,19 +156,61 @@ public class UserDrive implements PartsInterface {
    public void handleRotateIdle() { //(double rotate) {
       // The purpose of this is to deal with IMU latency (and robot inertia)
       // by storing the heading delayed 250ms after any rotational input
-      if (parts.positionMgr.noPosition()) return;
+//      if (parts.positionMgr.noPosition()) return;
+      // Will use the img heading if position not available //todo: deal with cases where imu not being read
       if (rotate != 0) {
-         storedHeading = parts.positionMgr.robotPosition.R;
+         storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading;
          headingDelay = System.currentTimeMillis() + 250;
       }
       else if (headingDelay > System.currentTimeMillis()) {
          // keep re-reading until delay has passed
-         storedHeading = parts.positionMgr.robotPosition.R;
+         storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading;
       }
    }
 
+//   public void handleRotateIdle() { //(double rotate) {
+//      // The purpose of this is to deal with IMU latency (and robot inertia)
+//      // by storing the heading delayed 250ms after any rotational input
+//      if (parts.positionMgr.noPosition()) return;
+//      if (rotate != 0) {
+//         storedHeading = parts.positionMgr.robotPosition.R;
+//         headingDelay = System.currentTimeMillis() + 250;
+//      }
+//      else if (headingDelay > System.currentTimeMillis()) {
+//         // keep re-reading until delay has passed
+//         storedHeading = parts.positionMgr.robotPosition.R;
+//      }
+//   }
+
    public void setSpeedMaximum(double speedMaximum) {
       this.speedMaximum = speedMaximum;
+   }
+
+   /* Everything below pasted blindly, need to doublecheck */  //todo: review all this
+
+   public boolean toggleFieldCentricDrive() {
+      useFieldCentricDrive = !useFieldCentricDrive;
+      return useFieldCentricDrive;
+   }
+
+   public boolean toggleHeadingHold() {
+      if (parts.positionMgr.noPosition()) {
+         useHeadingHold = false;
+         return useHeadingHold;
+      }
+      useHeadingHold = !useHeadingHold;
+      storedHeading = parts.positionMgr.robotPosition.R;
+      return useHeadingHold;
+   }
+
+   public void setDeltaHeading() {
+      deltaHeading = storedHeading;
+   }
+
+   public boolean togglePositionHold() {
+      useHoldPosition = !useHoldPosition;
+      if (useHoldPosition) parts.autoDrive.setTargetToCurrentPosition();
+      return useHoldPosition;
    }
 
 }

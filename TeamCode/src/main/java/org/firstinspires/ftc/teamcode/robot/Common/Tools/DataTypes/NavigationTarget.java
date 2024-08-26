@@ -14,6 +14,7 @@ public class NavigationTarget {
     public NavigationTarget(Position targetPos, PositionTolerance tolerance, double maxSpeed, long timeLimit, boolean noSlow) {
         if (tolerance==null) tolerance=new PositionTolerance(2, 2, 125);   //todo: determine if this is a good default
         if (maxSpeed==0) maxSpeed = 1;
+        if (timeLimit==0) timeLimit = 10000;  //todo: inserted for debugging
         this.targetPos = targetPos;
         this.tolerance = tolerance;
         this.maxSpeed = maxSpeed;

@@ -27,6 +27,8 @@ public class Drivetrain {
 
     public void initialize() {
         initMotors();
+        drivePowers = new DrivePowers();
+        drivePowersLast = new DrivePowers();
     }
 
     public void preInit() {

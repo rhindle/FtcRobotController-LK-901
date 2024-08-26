@@ -18,6 +18,8 @@ public class PartsDS extends Parts {
         super(opMode);
     }
 
+    boolean firstLock = true;
+
     @Override
     public void setup(){
         // We do this after the construct because we may want to adjust some settings before creating all the sub-parts
@@ -173,6 +175,10 @@ public class PartsDS extends Parts {
             }
             if (dsApriltag.tagRobotPosition!=null){
                 neo.drawRectangle(3,4,3,4, Color.rgb(0,4,1));
+                if (firstLock && !userDrive.isDriving) {   //todo:make this better
+                    firstLock = false;
+                    autoDrive.setNavTarget(new NavigationTarget(new Position(-20,0,0), dsMisc.toleranceHigh));
+                }
             } else if (dsApriltag.instantTagRobotPosition!=null) {
                 neo.drawRectangle(3,4,3,4, Color.rgb(2,1,0));
             } else {

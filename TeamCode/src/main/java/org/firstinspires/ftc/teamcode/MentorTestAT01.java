@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.robot.DiscShooter.PartsDS;
 
-@TeleOp(name = "AA_MentorTestAT01", group = "")
+@TeleOp(name = "AA_MentorTestAT01a", group = "")
 //@Disabled
 public class MentorTestAT01 extends LinearOpMode {
 
@@ -72,7 +72,7 @@ public class MentorTestAT01 extends LinearOpMode {
 
       parts.preRun();
 
-      parts.navigator.setMaxSpeed(maxSpeed);
+//      parts.navigator.setMaxSpeed(maxSpeed);
       //navigator.setDeltaHeading();
 
       TelemetryMgr.setDebugLevel(10);
@@ -113,7 +113,8 @@ public class MentorTestAT01 extends LinearOpMode {
 //      TelemetryMgr.message(Category.USERDRIVE, "modifyHeading", JavaUtil.formatNumber(parts.autoDrive.modifyHeading, 2));
 //      TelemetryMgr.Message(4, "IMU-Modified", JavaUtil.formatNumber(parts.robot.returnImuHeading()-parts.navigator.deltaHeading, 2));
 //      TelemetryMgr.Message(4, "IMU-Modified", JavaUtil.formatNumber(parts.robot.returnImuHeading() - parts.navigator.modifyHeading, 2));
-      TelemetryMgr.message(Category.IMU, "IMU-Modified", JavaUtil.formatNumber(parts.imuMgr.returnImuHeadingRaw() - parts.navigator.modifyHeading, 2));
+//      TelemetryMgr.message(Category.IMU, "IMU-Modified", JavaUtil.formatNumber(parts.imuMgr.returnImuHeadingRaw() - parts.navigator.modifyHeading, 2));
+      TelemetryMgr.message(Category.IMU, "IMU-Modified", JavaUtil.formatNumber(parts.imuMgr.returnImuRobotHeading(),2));
 
 
 //        telemetry.addData("error", JavaUtil.formatNumber(currentError, 2));

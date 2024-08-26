@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot.Common;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
@@ -15,7 +18,7 @@ public class IMUmgr implements PartsInterface {
    public Parts parts;
 
    public boolean disableIMUupdate = false;
-//   Orientation angles;
+   Orientation angles;
    double imuHeadingRaw;
    double imuFieldOffset = 0;
    public double imuRobotHeading;
@@ -47,13 +50,13 @@ public class IMUmgr implements PartsInterface {
       // Read IMU - once per cycle!
       if (!disableIMUupdate) {
          updateImuHeading();
-         TelemetryMgr.message(Category.IMU, "Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
+//         TelemetryMgr.message(Category.IMU, "Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
          TelemetryMgr.message(Category.IMU_EXT, "robotHeading", "%.2f Deg. (Heading)", imuRobotHeading);
-         TelemetryMgr.message(Category.IMU_EXT,"Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
-         TelemetryMgr.message(Category.IMU_EXT,"Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
-         TelemetryMgr.message(Category.IMU_EXT,"Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
-         TelemetryMgr.message(Category.IMU_EXT,"Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
-         TelemetryMgr.message(Category.IMU_EXT,"Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
+//         TelemetryMgr.message(Category.IMU_EXT,"Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
+//         TelemetryMgr.message(Category.IMU_EXT,"Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
+//         TelemetryMgr.message(Category.IMU_EXT,"Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
+//         TelemetryMgr.message(Category.IMU_EXT,"Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
+//         TelemetryMgr.message(Category.IMU_EXT,"Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
       }
    }
 
@@ -76,11 +79,13 @@ public class IMUmgr implements PartsInterface {
 //      if (readme) angles = parts.robot.sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 //      return angles.firstAngle;
 
-      // Retrieve Rotational Angles and Velocities
-      if (readme) orientation = parts.robot.sensorIMU.getRobotYawPitchRollAngles();
-//      angularVelocity = parts.robot.sensorIMU.getRobotAngularVelocity(AngleUnit.DEGREES);
+      if (readme) angles = parts.robot.sensorIMU.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+      return angles.firstAngle;
 
-      return orientation.getYaw(AngleUnit.DEGREES);
+//      // Retrieve Rotational Angles and Velocities
+//      if (readme) orientation = parts.robot.sensorIMU.getRobotYawPitchRollAngles();
+////      angularVelocity = parts.robot.sensorIMU.getRobotAngularVelocity(AngleUnit.DEGREES);
+//      return orientation.getYaw(AngleUnit.DEGREES);
    }
 
    public double returnImuHeadingRaw() {

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.NavigationTarget;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 
@@ -270,7 +271,7 @@ public class DSShooter implements PartsInterface {
    public void stateMachineFullAuto() {
 
       if (stateFullAuto == -9) {
-         parts.navigator.setAutoDrive(false);
+         parts.autoDrive.setAutoDrive(false);
       }
       if (stateFullAuto < 1 || stateFullAuto > 999) return;  // not running
 
@@ -290,13 +291,15 @@ public class DSShooter implements PartsInterface {
       }
 
       if (stateFullAuto == 2) {                                    // navigate to launch position
-         parts.navigator.setTargetAbsolute(autoLaunchPos);
-         parts.navigator.setAccuracy(1);
-         parts.navigator.setAutoDrive(true);
+//         parts.navigator.setTargetAbsolute(autoLaunchPos);
+//         parts.navigator.setAccuracy(1);
+//         parts.navigator.setAutoDrive(true);
+         parts.autoDrive.setNavTarget(new NavigationTarget(autoLaunchPos, parts.dsMisc.toleranceHigh));
          stateFullAuto++;
       }
       if (stateFullAuto == 3) {                                   // wait until reach position then start shooting
-         if (parts.navigator.isOnTargetByAccuracy()) {
+//         if (parts.navigator.isOnTargetByAccuracy()) {
+         if (parts.autoDrive.onTargetByAccuracy) {
             stateShoot3Step = 1;
             stateFullAuto++;
          }
@@ -307,7 +310,8 @@ public class DSShooter implements PartsInterface {
       }
       if (stateFullAuto == 5) {
          if (stateShoot3Step == 1000) {
-            parts.navigator.setAutoDrive(false);
+//            parts.navigator.setAutoDrive(false);
+            parts.autoDrive.setAutoDrive(false);
             closeGate();
             spinnerOff();
             retractPusher();

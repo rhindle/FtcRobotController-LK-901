@@ -4,6 +4,8 @@ import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.Controls;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.NavigationTarget;
+import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
 
 public class ControlsDS extends Controls {
@@ -17,7 +19,7 @@ public class ControlsDS extends Controls {
    @Override
    public void runLoop() {
       userInput();
-      parts.navigator.setUserDriveSettings(driveSpeed, driveAngle, rotate);
+      parts.userDrive.setUserDriveSettings(driveSpeed, driveAngle, rotate);
    }
 
    @Override
@@ -30,32 +32,33 @@ public class ControlsDS extends Controls {
       driveAngle = Math.atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y) / Math.PI * 180;
       // Get rotation from right stick
       rotate = Math.pow(gamepad1.right_stick_x, 1);
-      parts.navigator.handleRotate(rotate);
+//      parts.navigator.handleRotate(rotate);
 
       // Toggle FCD
       //todo: Field centric is broken right now; problem with the angle
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.start)) {
-         parts.dsLed.displayMessage('F', parts.navigator.toggleFieldCentricDrive());
+         parts.dsLed.displayMessage('F', parts.userDrive.toggleFieldCentricDrive());
       }
 
       // Toggle HeadingHold
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.back)) {
-         parts.dsLed.displayMessage('H', parts.navigator.toggleHeadingHold());
+         parts.dsLed.displayMessage('H', parts.userDrive.toggleHeadingHold());
       }
 
       // Store heading correction
       if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.right_stick_button)) {
-         parts.navigator.setDeltaHeading();
+         parts.userDrive.setDeltaHeading();
          parts.dsLed.displayMessage('D', 1);
       }
 
       if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.left_stick_button)) {
-         parts.dsLed.displayMessage('P', parts.navigator.togglePositionHold());
+         parts.dsLed.displayMessage('P', parts.userDrive.togglePositionHold());
       }
 //         navigator.toggleSnapToAngle();
 
       // This blob is for manually entering destinations by adjusting X, Y, Rot
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_up));
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_up))
+           parts.autoDrive.setNavTarget(new NavigationTarget(new Position(-20,0,0), parts.dsMisc.toleranceHigh));
 //         navigator.setTargetByDeltaRelative(2,0,0);
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_down));
 //         navigator.setTargetByDeltaRelative(-2,0,0);

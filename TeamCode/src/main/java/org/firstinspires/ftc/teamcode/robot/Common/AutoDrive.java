@@ -51,6 +51,8 @@ public class AutoDrive implements PartsInterface {
 
    public void initialize(){
       drivePowers = new DrivePowers();
+      error = new Error();
+      errorLast = new Error();
    }
 
    public void preInit() {
@@ -67,18 +69,35 @@ public class AutoDrive implements PartsInterface {
       if (isNavigating || isHolding) {
          status=isNavigating ? Status.DRIVING : Status.HOLDING;  //todo: is this needed?
          autoDrivePower();
+//         parts.userDrive.storedHeading = parts.positionMgr.robotPosition.R;
       }
       else {
          if (status!=Status.SUCCESS && status!=Status.TIMEOUT && status!=Status.CANCELED && status!=Status.LOST) {
             // todo: not sure LOST belongs, because that implies navigation can resume? See also refuseNavigation().
             status=Status.IDLE;
          }
+         dummyTelemetry();
       }
+      TelemetryMgr.message(Category.AUTODRIVE, "isNavigating", isNavigating);
+      TelemetryMgr.message(Category.AUTODRIVE, "isHolding", isHolding);
+      TelemetryMgr.message(Category.AUTODRIVE, "isLate", isLate);
+      TelemetryMgr.message(Category.AUTODRIVE, "onTargetByAccuracy", onTargetByAccuracy);
       TelemetryMgr.message(Category.AUTODRIVE, "AutoDrive", status);
    }
 
    public void stop() {
       cancelNavigation();
+   }
+
+   public void dummyTelemetry() {
+      //placeholder telemetry so it won't bounce around
+      TelemetryMgr.message(Category.AUTODRIVE, "DeltaX");
+      TelemetryMgr.message(Category.AUTODRIVE, "DeltaY");
+      TelemetryMgr.message(Category.AUTODRIVE, "NavDistance");
+      TelemetryMgr.message(Category.AUTODRIVE, "NavAngle");
+      TelemetryMgr.message(Category.AUTODRIVE, "NavRotation");
+      TelemetryMgr.message(Category.AUTODRIVE, "NavPowTrans");
+      TelemetryMgr.message(Category.AUTODRIVE, "NavPowerRot");
    }
 
    public void autoDrivePower () {
@@ -89,6 +108,7 @@ public class AutoDrive implements PartsInterface {
          //todo: make sure this doesn't leave motors running [now check the work]
          status=Status.LOST;
          parts.drivetrain.stopDriveMotors();
+         dummyTelemetry();
          return;
       }
 
@@ -98,6 +118,8 @@ public class AutoDrive implements PartsInterface {
          status=Status.TIMEOUT;
          if (abortOnTimeout) {
             cancelNavigation();
+            status=Status.TIMEOUT;  //todo:remove maybe?
+            dummyTelemetry();
             return;
          }
       } else isLate=false;
@@ -221,9 +243,10 @@ public class AutoDrive implements PartsInterface {
 
    // Get heading error
    public double getHeadingError(double targetAngle) {
-      if (parts.positionMgr.noPosition()) return 0;
+//      if (parts.positionMgr.noPosition()) return 0;
       double robotError;
-      robotError = targetAngle - parts.positionMgr.robotPosition.R;
+//      robotError = targetAngle - parts.positionMgr.robotPosition.R;
+      robotError = targetAngle - (parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading);
       return Functions.normalizeAngle(robotError);
    }
 
@@ -244,16 +267,21 @@ public class AutoDrive implements PartsInterface {
    }
 
    public void setNavTarget(NavigationTarget navTarget) {
-      setTarget(navTarget, true);
+      setNavTarget(navTarget, true);
    }
 
-   public void setTarget(NavigationTarget target, boolean hold) {
+   public void setNavTarget(NavigationTarget target, boolean hold) {
       //if (parts.positionMgr.noPosition()) return;  //todo:Is this necessary? Or just rely on the loop's checks
       this.navTarget = target;
       timeNavStart = System.currentTimeMillis();
       isNavigating = true;
       isHolding = hold;
       resetPID();
+   }
+
+   // included for legacy reasons, but should be phased out
+   public void setTarget(Position target) {
+      setNavTarget(new NavigationTarget(target));
    }
 
    public void setTargetByRobotDelta(double X, double Y, double R) {
@@ -285,6 +313,12 @@ public class AutoDrive implements PartsInterface {
       isNavigating = false;
       isHolding = false;
       parts.drivetrain.stopDriveMotors();
+   }
+
+   public void setAutoDrive(boolean boo) {
+//      if (boo) navigate = 1; else navigate = 0;
+      if (!boo) isNavigating = false;
+      else if (parts.positionMgr.hasPosition()) isNavigating = true;
    }
 
    public enum Status {
