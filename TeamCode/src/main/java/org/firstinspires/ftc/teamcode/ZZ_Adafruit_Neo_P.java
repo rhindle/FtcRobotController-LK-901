@@ -6,9 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Common.NeoMatrix;
-import org.firstinspires.ftc.teamcode.robot.LegacyBots.Robot;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.NeoMatrix;
+import org.firstinspires.ftc.teamcode.RobotParts.LegacyBots.Robot;
 
 @TeleOp (name="AA_Adafruit_Neo_P", group="Test")
 //@Disabled

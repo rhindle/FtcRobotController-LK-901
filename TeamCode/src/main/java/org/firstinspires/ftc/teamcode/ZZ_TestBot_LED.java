@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.LegacyBots.Robot;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.RobotParts.LegacyBots.Robot;
 
 //import com.qualcomm.robotcore.util.Range;
 //import java.util.Locale;

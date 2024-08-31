@@ -4,12 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.robot.LegacyBots.Auto;
-import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.LegacyBots.Navigator3;
-import org.firstinspires.ftc.teamcode.robot.LegacyBots.Robot;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.Functions;
+import org.firstinspires.ftc.teamcode.RobotParts.LegacyBots.Auto;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.RobotParts.LegacyBots.Navigator3;
+import org.firstinspires.ftc.teamcode.RobotParts.LegacyBots.Robot;
+import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
+import org.firstinspires.ftc.teamcode.Tools.Functions;
 
 @Autonomous(name = "3Odo_2022_v8_Auto2", group = "")
 //@Disabled

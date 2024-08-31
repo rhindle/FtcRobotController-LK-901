@@ -11,9 +11,9 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.LegacyBots.Robot;
-import org.firstinspires.ftc.teamcode.robot.Common.i2c.QwiicLEDStick;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.RobotParts.LegacyBots.Robot;
+import org.firstinspires.ftc.teamcode.Tools.i2c.QwiicLEDStick;
 
 @TeleOp (name="ZZ_TestBot_LoopTime", group="Test")
 //@Disabled

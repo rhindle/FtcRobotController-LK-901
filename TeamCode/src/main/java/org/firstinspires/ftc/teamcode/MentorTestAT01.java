@@ -5,12 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.teamcode.robot.Common.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Common.Parts;
-import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr;
-import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
-import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
-import org.firstinspires.ftc.teamcode.robot.DiscShooter.PartsDS;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.Parts;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.TelemetryMgr;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.TelemetryMgr.Category;
+import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
+import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.PartsDS;
 
 @TeleOp(name = "AA_MentorTestAT01a", group = "")
 //@Disabled
