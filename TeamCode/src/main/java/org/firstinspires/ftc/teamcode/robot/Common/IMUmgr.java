@@ -76,8 +76,10 @@ public class IMUmgr implements PartsInterface {
       return imuHeading(false);
    }
    private double imuHeading(boolean readme) {
-//      if (readme) angles = parts.robot.sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-//      return angles.firstAngle;
+
+      // Old IMU code
+      //      if (readme) angles = parts.robot.sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+      //      return angles.firstAngle;
 
       if (readme) angles = parts.robot.sensorIMU.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
       return angles.firstAngle;

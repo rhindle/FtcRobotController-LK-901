@@ -4,7 +4,6 @@ import org.firstinspires.ftc.teamcode.robot.Common.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.robot.Common.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 
-// 20240601 - Just started working on this
 public class PositionMgr implements PartsInterface {
 
    /* Public OpMode members. */
@@ -13,11 +12,6 @@ public class PositionMgr implements PartsInterface {
    public Position odoPosition;
    public Position slamraPosition;
    public Position tagPosition;
-   //public Position encoderPosition;
-
-   public Position fieldStartPosition;
-//   public Position odoRobotOffset;
-//   public Position slamraRobotOffset;
 
    public PosSource[] priorityList = {PosSource.ODO, PosSource.SLAMRA, PosSource.TAG};
    public Boolean prioritizeSlamraRforODO = false;      // use Slamra R instead of IMU for ODO

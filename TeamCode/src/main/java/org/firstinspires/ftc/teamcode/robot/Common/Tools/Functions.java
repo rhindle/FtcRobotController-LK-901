@@ -7,7 +7,7 @@ public class Functions {
     private static ElapsedTime timerLoop = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private static double timeLoop;
 
-    // Hypotenuse function I used in Blocky?
+    // Hypotenuse function originally used in Blocky
     public static double mathHypotenuse(float arg0, float arg1) {
         return Math.sqrt(Math.pow(arg0, 2) + Math.pow(arg1, 2));
     }

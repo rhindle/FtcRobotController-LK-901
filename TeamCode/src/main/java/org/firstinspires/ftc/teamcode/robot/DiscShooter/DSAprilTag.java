@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.robot.DiscShooter;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.teamcode.robot.Common.Parts;
 import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr;
 import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
@@ -19,7 +21,6 @@ import java.util.List;
 
 public class DSAprilTag implements PartsInterface {
 
-//    LinearOpMode opMode;
     Parts parts;
 
     private static final boolean USE_WEBCAM = false;  // true for webcam, false for phone camera
@@ -32,6 +33,7 @@ public class DSAprilTag implements PartsInterface {
     public Position acceptableStDev = new Position(0.2,0.2,0.2);
     public boolean strongLocked = false;
     public double strongLockMaxAngle = 10.0;
+    public Position camOffset = new Position(-1,3,0);
 
     /* Constructor */
     public DSAprilTag(Parts parts){
@@ -74,7 +76,7 @@ public class DSAprilTag implements PartsInterface {
     }
 
     private void lkAprilTag() {
-        AprilTagMetadata myAprilTagMetadata, myAprilTagMetadata2;
+        AprilTagMetadata myAprilTagMetadata; //, myAprilTagMetadata2;
         AprilTagLibrary.Builder myAprilTagLibraryBuilder;
         AprilTagProcessor.Builder myAprilTagProcessorBuilder;
         AprilTagLibrary myAprilTagLibrary;
@@ -82,7 +84,17 @@ public class DSAprilTag implements PartsInterface {
         myAprilTagLibraryBuilder = new AprilTagLibrary.Builder();
         myAprilTagLibraryBuilder.addTags(AprilTagGameDatabase.getCenterStageTagLibrary());
 
-        myAprilTagMetadata = new AprilTagMetadata(20, "LAK 36h11 ID20", 5, DistanceUnit.INCH);
+        //myAprilTagMetadata = new AprilTagMetadata(20, "LAK 36h11 ID20", 5, DistanceUnit.INCH);
+        // since we didn't provide a VectorF fieldPosition or Quaternion fieldOrientation, this will be at origin (0,0,0)
+        //todo: update metadata to match the field position (and fix the quaternion)
+        // see: https://www.andre-gaschler.com/rotationconverter/
+        // archived at: http://www.ftc14273.org/rotationconverter/
+        myAprilTagMetadata = new AprilTagMetadata(20,
+                "LAK 36h11 ID20",
+                5,
+                new VectorF(0f, 0f, 6.25f),
+                DistanceUnit.INCH,
+                Quaternion.identityQuaternion());
 
         myAprilTagLibraryBuilder.addTag(myAprilTagMetadata);
 
@@ -153,10 +165,7 @@ public class DSAprilTag implements PartsInterface {
                 TelemetryMgr.message(Category.APRILTAG,String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 TelemetryMgr.message(Category.APRILTAG_EXT,String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
 
-                //Vector3 camOffset = new Vector3(-3.25,4,0);
-                //Position camOffset = new Position(-6,-2,0);
-                Position camOffset = new Position(-1,3,0);
-
+                // todo: clean up AprilTag work
                 // raw camera values (ftcPose in it's native coordinate system) of XY
                 Position camRaw = new Position(detection.ftcPose.x, detection.ftcPose.y, 0);
                 TelemetryMgr.message(Category.APRILTAG_EXT,String.format("camRaw   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camRaw.X, camRaw.Y, camRaw.R));
@@ -206,21 +215,6 @@ public class DSAprilTag implements PartsInterface {
             for (int j=0; j<6; j++) {
                 TelemetryMgr.message(Category.APRILTAG_EXT,"X");
             }
-//            TelemetryMgr.message(5,"X");
-//            TelemetryMgr.message(5,"X");
-//            TelemetryMgr.message(5,"X");
-//            TelemetryMgr.message(5,"X");
-//            TelemetryMgr.message(5,"X");
-//            TelemetryMgr.message(5,"X");
-//            TelemetryMgr.message(5,"X");
-//            TelemetryMgr.message(5,"X");
-//            TelemetryMgr.message(5,"X");
-//            TelemetryMgr.message(7,"X");
-//            TelemetryMgr.message(7,"X");
-//            TelemetryMgr.message(7,"X");
-//            TelemetryMgr.message(7,"X");
-//            TelemetryMgr.message(7,"X");
-//            TelemetryMgr.message(7,"X");
         }
 
         // Add "key" information to telemetry
@@ -229,11 +223,6 @@ public class DSAprilTag implements PartsInterface {
         TelemetryMgr.message(Category.APRILTAG,"RBE = Range, Bearing & Elevation");
 
     }   // end method telemetryAprilTag()
-
-//    void lkUpdateOdoRobotPose() {
-//        //pos1 = odoRawPose, pos2 = odoRobotOffset
-//        lkOdoRobotPose = lkTransformPosition(lkOdoRawPose, lkOdoRobotOffset);
-//    }
 
     void processTagPosition() {
         int length=lastPositions.length;

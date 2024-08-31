@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.robot.DiscShooter.DSSpeedControl;
 public class Parts implements PartsInterface {
 
    /* Public OpMode members. */
-   public boolean useODO = false; //true;
+   public boolean useODO = false;
    public boolean reverseDrive = false;
    public boolean useDistanceSensors = true;
    public boolean useDrivetrainEncoders = true;
@@ -21,8 +21,7 @@ public class Parts implements PartsInterface {
    public boolean useAprilTag = false;
    public boolean useNeoMatrix = false;
    public Position robotPosition = new Position();
-//   public Position slamraPosition;
-   public Position fieldStartPosition; // = new Position();
+   public Position fieldStartPosition;
    public Position odoRobotOffset;
    public Position slamraRobotOffset;
 
@@ -54,7 +53,6 @@ public class Parts implements PartsInterface {
    //---
 
    public boolean isSetup = false;
-//   public robotType rType;
 
    /* Constructor */
    public Parts(LinearOpMode opMode){
@@ -63,87 +61,28 @@ public class Parts implements PartsInterface {
 
    void construct(LinearOpMode opMode){
       this.opMode = opMode;
-//      this.rType = rType;
       telemetryHandler = new TelemetryMgr(opMode);
    }
 
    public void setup(){
-//      // We do this after the construct because we may want to adjust some settings before creating all the sub-parts
-//      if (isSetup) {
-//         //throw new RuntimeException("Parts can only be setup once");
-//         return;
-//      }
-//      isSetup = true;
-//      robot = new Robot(this);
-//      buttonMgr = new ButtonMgr(opMode);
-//      sensors = new Sensors(this);
-////      controls = new Controls_2(this);
-//      controls = new Controls(this);
-//      drivetrain = new Drivetrain(this);
-//
-//      odometry = new Odometry_(this);
-//      odometry.odoFieldStart = fieldStartPosition;//.clone();
-//      odometry.odoRobotOffset = odoRobotOffset;//.clone();
-//
-//      navigator = new Navigator(this);
-//
-//      if (useSlamra) {
-//         slamra = new Slamra(this);
-//         slamra.slamraFieldStart = fieldStartPosition;//.clone();
-//         slamra.slamraRobotOffset = slamraRobotOffset;//.clone();
-//      }
-//
-//      switch (rType) {
-//         case GOCANUM:
-//            break;
-//         case ANDYMARK:
-//            break;
-//         case GENERIC:
-//            break;
-//         default:
-//      }
    }
 
    public void initialize() {
    }
 
    public void preInit() {
-//      robot.init();
-//      sensors.init();
-//      if (useSlamra) slamra.init();
    }
 
    public void initLoop() {
    }
 
    public void preRun() {
-//      drivetrain.init();
-//      odometry.init();
-//      navigator.init();
-//
-//      odometry.loop();  // get some things squared away before the real program runs
-//      navigator.loop();
-//      if (useSlamra) slamra.onStart();
    }
 
    public void runLoop() {
-//      robot.loop();
-//      sensors.loop();
-//      buttonMgr.loop();
-//      odometry.loop();
-//      if (useSlamra) slamra.loop();
-//      controls.loop();
-//      navigator.loop();
    }
 
    public void stop() {
-//      if (useSlamra) slamra.onStop();
    }
-
-//   public enum robotType {
-//      GOCANUM,
-//      ANDYMARK,
-//      GENERIC
-//   }
 
 }

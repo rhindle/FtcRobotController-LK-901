@@ -279,6 +279,8 @@ public class Robot implements PartsInterface {
     }
 
     public void initOptions() {
+        /* Following left as examples for subclass @override method */
+
 //        ultraSensor = hardwareMap.get(DFR304Range.class, "uSensor");
 //        DFR304Range.Parameters uParameters = new DFR304Range.Parameters();
 //        uParameters.maxRange = DFR304Range.MaxRange.CM500;

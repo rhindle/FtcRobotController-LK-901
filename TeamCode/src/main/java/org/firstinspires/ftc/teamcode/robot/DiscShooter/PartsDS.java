@@ -30,13 +30,11 @@ public class PartsDS extends Parts {
         isSetup = true;
         robot = new RobotDS(this);
         buttonMgr = new ButtonMgr(opMode);
-//        sensors = new SensorsDS(this);
         controls = new ControlsDS(this);
         drivetrain = new DrivetrainDS(this);
 
         imuMgr = new IMUmgr(this);
         positionMgr = new PositionMgr(this);
-//        navigator = new NavigatorDS(this);  // being replaced
         autoDrive = new AutoDriveDS(this);
         userDrive = new UserDriveDS(this);
         dsLed = new DSLed(this);
@@ -57,16 +55,6 @@ public class PartsDS extends Parts {
         }
 
         if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 16);
-
-//        switch (rType) {
-//            case GOCANUM:
-//                break;
-//            case ANDYMARK:
-//                break;
-//            case GENERIC:
-//                break;
-//            default:
-//        }
     }
 
     @Override
@@ -75,22 +63,9 @@ public class PartsDS extends Parts {
         imuMgr.initialize();
         positionMgr.initialize();
         dsShooter.initialize();
-//        sensors.init();
         if (useSlamra) slamra.initialize();
         if (useAprilTag) dsApriltag.initialize();
-
         if (useNeoMatrix) dsLed.initialize();
-//        if (useNeoMatrix) {
-//            neo.initialize();
-//            //neo.setUpdateLimit(1);
-//            neo.setUpdateLimit(0);
-//            neo.setPreventTearing(true);
-//            neo.setDimmingValue(192);
-//            neo.drawRectangle(0, 7, 0, 7, Color.rgb(1, 1, 0));
-//            textMatrix = neo.buildPixelMapFromString("abcd", marquis, Color.rgb(1,1,0), Color.rgb(0,0,0));
-//        }
-
-
     }
 
     @Override
@@ -101,14 +76,6 @@ public class PartsDS extends Parts {
         if (useAprilTag) dsApriltag.initLoop();
         positionMgr.initLoop();
         if (useNeoMatrix) dsLed.initLoop();
-//        if (useNeoMatrix) {
-//            neo.applyPixelMapToBuffer(textMatrix,0,7, 0, true);
-//            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
-////            neo.applyPixelMapToBuffer(neo.reversePixelMap(textMatrix),8,15, 0, true);
-//            textMatrix = neo.shiftPixelMap(textMatrix,-8,0,true);
-//            dsLed.clearMessage();
-//            neo.runLoop();
-//        }
         dsShooter.initLoop();
     }
 
@@ -117,24 +84,15 @@ public class PartsDS extends Parts {
         drivetrain.initialize();
         imuMgr.runLoop();
         if (useODO) odometry.initialize();
-//        navigator.initialize();
-//        navigator.setTargetAbsolute(-20,0,0);
         userDrive.initialize();
         autoDrive.initialize();
         autoDrive.setNavTarget(new NavigationTarget(new Position(-20,0,0), dsMisc.toleranceHigh));
-//        autoDrive.setTargetAbsolute(-20,0,0);
 
-        if (useODO) odometry.runLoop();  // get some things squared away before the real program runs
-//        navigator.runLoop();
+        if (useODO) odometry.runLoop();  // get some things squared away before the regular runLoops start
         autoDrive.runLoop();
 
         if (useSlamra) slamra.preRun();
         if (useNeoMatrix) dsLed.preRun();
-//        if (useNeoMatrix) {
-//            neo.clearMatrix();
-//            neo.drawRectangle(0,7,0,7, Color.rgb(1,1,1));
-//            neo.setUpdateLimit(1);
-//        }
         dsShooter.preRun();
     }
 
@@ -142,36 +100,27 @@ public class PartsDS extends Parts {
     public void runLoop() {
         robot.runLoop();
         imuMgr.runLoop();
-//        sensors.loop();
         buttonMgr.runLoop();
         if (useODO) odometry.runLoop();
         if (useSlamra) slamra.runLoop();
         if (useAprilTag) dsApriltag.runLoop();
         positionMgr.runLoop();
         controls.runLoop();
-//        navigator.runLoop();
         userDrive.runLoop();
         dsSpeedControl.runLoop();
         autoDrive.runLoop();
         drivetrain.runLoop();
         dsShooter.runLoop();
         if (useNeoMatrix) dsLed.runLoop();
-//        if (useNeoMatrix) {
-//            dsLed.clearMessage();
-//            neo.runLoop();
-//        }
 
-        //experiment follows, to be moved elsewhere eventually
+        //experiment follows, to be moved elsewhere eventually  //todo:move this (including firstlock variable)
         if (useAprilTag) {
             Position roboTagPosition = dsApriltag.getTagRobotPosition();
             if (roboTagPosition != null) {
                 if (useSlamra) slamra.setupFieldOffset(roboTagPosition);
                 if (useODO) odometry.setupFieldOffset(roboTagPosition);
                 imuMgr.setupFieldOffset(roboTagPosition);
-                //navigator.deltaHeading = robot.returnImuHeading() - roboTagPosition.R;
-//                navigator.modifyHeading = robot.returnImuHeading() - roboTagPosition.R;
-//!!!!!!!!                navigator.modifyHeading = imuMgr.returnImuHeadingRaw() - roboTagPosition.R;
-//                autoDrive.modifyHeading = robot.returnImuHeading() - roboTagPosition.R;
+                //  autoDrive.modifyHeading = robot.returnImuHeading() - roboTagPosition.R; // saving for reference
             }
             if (dsApriltag.tagRobotPosition!=null){
                 neo.drawRectangle(3,4,3,4, Color.rgb(0,4,1));
@@ -205,17 +154,5 @@ public class PartsDS extends Parts {
         dsShooter.stop();
         drivetrain.stop();
     }
-//
-//    int[][] textMatrix;
-//
-//    public final char[][] marquis = {
-//    {'a', 17, 128, 0, 0, 1, 128, 0, 34},
-//    {'b', 34, 0, 128, 1, 0, 0, 128, 17},
-//    {'c', 68, 0, 1, 128, 0, 0, 1, 136},
-//    {'d', 136, 1, 0, 0, 128, 1, 0, 68},
-//    {'e', 238, 1, 129, 129, 128, 1, 129, 221},
-//    {'f', 221, 129, 1, 128, 129, 129, 1, 238},
-//    {'g', 187, 129, 128, 1, 129, 129, 128, 119},
-//    {'h', 119, 128, 129, 129, 1, 128, 129, 187} };
 
 }

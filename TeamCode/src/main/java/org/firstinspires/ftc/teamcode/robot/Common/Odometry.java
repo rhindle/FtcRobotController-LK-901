@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.robot.Common.TelemetryMgr.Category;
 public class Odometry implements PartsInterface {
 
    public Parts parts;
-//   Telemetry telemetry;
 
    public DcMotorEx odoXL, odoY, odoXR;
    public byte odoXLdir, odoYdir, odoXRdir;
@@ -45,17 +44,14 @@ public class Odometry implements PartsInterface {
 
    void construct(Parts parts){
       this.parts = parts;
-//      this.telemetry = parts.opMode.telemetry;
    }
 
    public void initialize() {
 //      odoRobotPosition = odoFieldStart.clone();  //TODO: deal with odoFieldStart set to null
       if (odoFieldStart!=null) odoRobotPosition = odoFieldStart.clone();
       else odoRobotPosition = new Position ();
-//           parts.robotPosition = odoRobotPosition.clone();
       if (!parts.useODO) {
          odoRobotPosition = new Position(0,0, odoRobotPosition.R);
-//         parts.robotPosition = odoRobotPosition.clone();
          return;
       }
       configureEncoders();
@@ -63,7 +59,6 @@ public class Odometry implements PartsInterface {
       encoderY0 = odoY.getCurrentPosition() * (long)odoYdir;
       encoderXL0 = odoXL.getCurrentPosition() * (long)odoXLdir;
       encoderXR0 = odoXR.getCurrentPosition() * (long)odoXRdir;
-//      imuHeading0 = parts.robot.returnImuHeading(true);
       imuHeading0 = parts.imuMgr.returnImuHeadingRaw(true);
       odoHeading0 = getOdoHeading();
       globalHeading0 = imuHeading0;
@@ -71,7 +66,6 @@ public class Odometry implements PartsInterface {
       // odo start position is 0,0,0; imu should also read 0.  odoRawPose is already 0,0,0
       odoRobotPose = getOdoRobotPose();
       odoFinalPose = getOdoFinalPose();
-//      setOdoFieldOffset();
       setupFieldOffset();
    }
 
@@ -85,22 +79,12 @@ public class Odometry implements PartsInterface {
    }
 
    public void runLoop() {
-//      if (!parts.useODO) {  //todo: this doesn't seem necessary; probably some legacy garbage?
-////         imuHeading = parts.robot.returnImuHeading();
-//         imuHeading = parts.imuMgr.returnImuHeadingRaw();
-//         globalHeading = imuHeading;
-//         odoRobotPosition.R = globalHeading;
-////         parts.robotPosition = odoRobotPosition.clone();
-//         return;
-//      }
-
       /* Update encoder readings */
       encoderY = odoY.getCurrentPosition() * (long)odoYdir;
       encoderXL = odoXL.getCurrentPosition() * (long)odoXLdir;
       encoderXR = odoXR.getCurrentPosition() * (long)odoXRdir;
 
       /* Update heading */
-//      imuHeading = parts.robot.returnImuHeading();
       imuHeading = parts.imuMgr.returnImuHeadingRaw();
       odoHeading = getOdoHeading();
       globalHeading = fusedHeading();
@@ -113,8 +97,6 @@ public class Odometry implements PartsInterface {
 
       /* Update robot position */
       odoRobotPosition = odoFinalPose.clone();
-//      parts.robotPosition = odoRobotPosition.clone();
-
    }
 
    public void stop() {
@@ -162,7 +144,6 @@ public class Odometry implements PartsInterface {
 
       myHeading = getAvgHeading(globalHeading0, globalHeading);
 
-//      telemetry.addData ("My Average Heading", myHeading);
       TelemetryMgr.message(Category.ODOMETRY,"My Average Heading", myHeading);
 
       xPos = xPos + deltaEncX * Math.cos(Math.toRadians(myHeading));
@@ -225,12 +206,10 @@ public class Odometry implements PartsInterface {
 
    public void setupFieldOffset(Position fieldPosition) {
       odoFieldOffset = zeroPos;    // clear any existing offset
-//      updateOdoRobotPose();
       odoFieldOffset = getOdoFieldOffset(odoRobotPose, fieldPosition);
    }
    public void setupFieldOffset() {
       odoFieldOffset = zeroPos;    // clear any existing offset
-//      updateOdoRobotPose();
       if (odoFieldStart!=null) odoFieldOffset = getOdoFieldOffset(odoRobotPose, odoFieldStart);
       // if the field offset is 0,0,0, it can be known that it was not properly offset
    }

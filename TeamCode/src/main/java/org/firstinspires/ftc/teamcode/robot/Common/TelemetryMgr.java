@@ -19,9 +19,6 @@ public class TelemetryMgr {
         TelemetryMgr.opMode = opMode;
 
         showCategory = new boolean[Category.values().length];
-//        Arrays.fill(showCategory, false);
-//        showCategory[Category.MANDATORY.ordinal()] = true;
-//        showCategory[Category.BASIC.ordinal()] = true;
         enableDefaultCategories();
     }
 
@@ -97,8 +94,6 @@ public class TelemetryMgr {
 
     public static void disableEXTCategories () {
         for (int i=0; i<showCategory.length; i++) {
-//            String name = Category.values()[i].name();
-//            if (name.contains("_EXT")) showCategory[i]=false;
             if (Category.values()[i].name().contains("_EXT")) showCategory[i]=false;
         }
     }

@@ -12,6 +12,7 @@ public class RobotDS extends Robot {
 
     @Override
     public void settingOptions() {
+        // This is relevant if using the new method getRobotYawPitchRollAngles(); see IMUmgr class
         hubOrientation = new RevHubOrientationOnRobot(
             RevHubOrientationOnRobot.LogoFacingDirection.UP,
             RevHubOrientationOnRobot.UsbFacingDirection.FORWARD

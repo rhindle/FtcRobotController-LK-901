@@ -8,7 +8,7 @@ public class PositionTolerance {
     double R;
     double dist;
     boolean xyPreferred;
-    long toleranceTime = 0; //System.currentTimeMillis();
+    long toleranceTime = 0;
     long dwell = 0;
 
     public PositionTolerance(double X, double Y, double R, double dist, boolean xyPreferred, long dwell) {
@@ -25,7 +25,6 @@ public class PositionTolerance {
     }
 
     public PositionTolerance(double X, double Y, double R, long time) {
-        //dist = Math.sqrt(X*X + Y*Y);
         this(X, Y, R, Math.sqrt(X*X + Y*Y), true, time);
     }
     public PositionTolerance(double X, double Y, double R) {
@@ -36,13 +35,7 @@ public class PositionTolerance {
         this(dist, dist, R, dist, false, time);
     }
     public PositionTolerance(double dist, double R) {
-//        this(dist, R, 0);
         this(dist, dist, R, dist, false, 0);
-//        this.dist = Math.abs(dist);
-//        this.R = Math.abs(R);
-//        xyPreferred = false;
-//        this.X = this.dist;
-//        this.Y = this.dist;
     }
 
     public PositionTolerance(double X, double Y, double R, double dist, long time) {
@@ -50,11 +43,6 @@ public class PositionTolerance {
     }
     public PositionTolerance(double X, double Y, double R, double dist) {
         this(X, Y, R, dist, true, 0);
-//        this.X = Math.abs(X);
-//        this.Y = Math.abs(Y);
-//        this.R = Math.abs(R);
-//        this.dist = Math.abs(dist);
-//        xyPreferred = true;
     }
 
     public PositionTolerance(Position pos, long time) {
@@ -69,11 +57,6 @@ public class PositionTolerance {
     }
     public PositionTolerance(Vector2D vec, double R) {
         this(vec.distance, vec.distance, R, vec.distance, false, 0);
-//        this.dist = Math.abs(vec.distance);
-//        this.R = Math.abs(R);
-//        xyPreferred = false;
-//        this.X = this.dist;
-//        this.Y = this.dist;
     }
 
     public PositionTolerance(Position pos, Vector2D vec, long time) {
@@ -81,11 +64,6 @@ public class PositionTolerance {
     }
     public PositionTolerance(Position pos, Vector2D vec) {
         this(pos.X, pos.Y, pos.R, vec.distance, true, 0);
-//        X = Math.abs(pos.X);
-//        Y = Math.abs(pos.Y);
-//        R = Math.abs(pos.R);
-//        this.dist = Math.abs(vec.distance);
-//        xyPreferred = true;
     }
 
     public Position toPosition() {
@@ -96,13 +74,6 @@ public class PositionTolerance {
     public PositionTolerance clone() {
         return new PositionTolerance(X, Y, R, dist, xyPreferred, dwell);
     }
-
-//    public PositionTolerance(Position target, Position current) {
-//        XYR = target.clone();
-//        XYR.subtract(current);
-//        XYR.normalize();
-//        dist = new Vector2D().fromXY(XYR.X, XYR.Y);
-//    }
 
     public boolean inTolerance (Position target, Position current) {
         Position posError = target.clone();

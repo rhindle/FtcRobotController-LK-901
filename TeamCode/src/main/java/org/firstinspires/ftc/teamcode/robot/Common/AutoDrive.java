@@ -17,10 +17,6 @@ public class AutoDrive implements PartsInterface {
    /* Public OpMode members. */
    public Parts parts;
 
-//   public Position robotPosition = new Position();
-//   Position targetPos = new Position();
-//   int accurate = 1;  // 0 is loose, 1 is tight, more later?
-
    Status status;
    public DrivePowers drivePowers;
    double speedMaximum = 1;
@@ -69,7 +65,6 @@ public class AutoDrive implements PartsInterface {
       if (isNavigating || isHolding) {
          status=isNavigating ? Status.DRIVING : Status.HOLDING;  //todo: is this needed?
          autoDrivePower();
-//         parts.userDrive.storedHeading = parts.positionMgr.robotPosition.R;
       }
       else {
          if (status!=Status.SUCCESS && status!=Status.TIMEOUT && status!=Status.CANCELED && status!=Status.LOST) {
@@ -135,35 +130,6 @@ public class AutoDrive implements PartsInterface {
       } else status=Status.DRIVING;
 
       if (!isNavigating && !isHolding) return;
-
-
-////      double errorDist, errorX, errorY, errorRot, pDist, pRot, navAngle;
-//
-////      errorX = targetPos.X - parts.positionMgr.robotPosition.X;  // error in x
-////      errorY = targetPos.Y - parts.positionMgr.robotPosition.Y;  // error in y
-////      TelemetryMgr.Message(7, "DeltaX", JavaUtil.formatNumber(errorX, 2));
-////      TelemetryMgr.Message(7, "DeltaY", JavaUtil.formatNumber(errorY, 2));
-////      errorRot = getHeadingError(targetPos.R);  // error in rotation   //20221222 added deltaheading!?
-////      errorDist = Math.sqrt(Math.pow(errorX,2) + Math.pow(errorY,2));  // distance (error) from xy destination
-//
-//      //exit criteria if destination has been adequately reached   //todo: replace all this
-//      onTargetByAccuracy = false;
-//      if (accurate==0 && error.dist<2) {  // no rotation component here
-//         onTargetByAccuracy = true;
-//      }
-//      if (error.dist<0.5 && Math.abs(error.rot)<0.2) {
-//         onTargetByAccuracy = true;
-//      }
-//      if (accurate==2 && error.dist<1 && Math.abs(error.rot)<1) {
-//         onTargetByAccuracy = true;
-//      }
-//      if (accurate==3 && error.dist<2 && Math.abs(error.rot)<5) {  // ~ like 0 but still gets proportional
-//         onTargetByAccuracy = true;
-//      }
-//      if (onTargetByAccuracy) {
-////         navStep++;
-//         return;
-//      }
 
       updateError();
       navAngle = Math.toDegrees(Math.atan2(error.y,error.x));  // angle to xy destination (vector when combined with distance)
@@ -233,10 +199,10 @@ public class AutoDrive implements PartsInterface {
    }
 
    public void updateError() {
-      error.x = navTarget.targetPos.X - parts.positionMgr.robotPosition.X;  // error in x
-      error.y = navTarget.targetPos.Y - parts.positionMgr.robotPosition.Y;  // error in y
-      error.rot = getHeadingError(navTarget.targetPos.R);  // error in rotation   //20221222 added deltaheading!?
-      error.dist = Math.sqrt(Math.pow(error.x,2) + Math.pow(error.y,2));  // distance (error) from xy destination
+      error.x = navTarget.targetPos.X - parts.positionMgr.robotPosition.X;
+      error.y = navTarget.targetPos.Y - parts.positionMgr.robotPosition.Y;
+      error.rot = getHeadingError(navTarget.targetPos.R);
+      error.dist = Math.sqrt(Math.pow(error.x,2) + Math.pow(error.y,2));
       TelemetryMgr.message(Category.AUTODRIVE, "DeltaX", JavaUtil.formatNumber(error.x, 2));
       TelemetryMgr.message(Category.AUTODRIVE, "DeltaY", JavaUtil.formatNumber(error.y, 2));
    }
@@ -245,7 +211,6 @@ public class AutoDrive implements PartsInterface {
    public double getHeadingError(double targetAngle) {
 //      if (parts.positionMgr.noPosition()) return 0;
       double robotError;
-//      robotError = targetAngle - parts.positionMgr.robotPosition.R;
       robotError = targetAngle - (parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading);
       return Functions.normalizeAngle(robotError);
    }
@@ -286,10 +251,6 @@ public class AutoDrive implements PartsInterface {
 
    public void setTargetByRobotDelta(double X, double Y, double R) {
       //if (parts.positionMgr.noPosition()) return;
-//      double rot = parts.positionMgr.robotPosition.R;
-//      Position targetPos = navTarget.targetPos.clone();
-//      targetPos.X = targetPos.X + (X * Math.cos(Math.toRadians(targetPos.R)) - Y * Math.sin(Math.toRadians(rot)));
-//      targetPos.Y = targetPos.Y + (X * Math.sin(Math.toRadians(targetPos.R)) + Y * Math.cos(Math.toRadians(rot)));
       navTarget.targetPos.X = navTarget.targetPos.X + (X * Math.cos(Math.toRadians(navTarget.targetPos.R)) - Y * Math.sin(Math.toRadians(navTarget.targetPos.R)));
       navTarget.targetPos.Y = navTarget.targetPos.Y + (X * Math.sin(Math.toRadians(navTarget.targetPos.R)) + Y * Math.cos(Math.toRadians(navTarget.targetPos.R)));
       navTarget.targetPos.R += R;
@@ -298,10 +259,6 @@ public class AutoDrive implements PartsInterface {
 
    public void setTargetByFieldDelta(double X, double Y, double R) {
       //if (parts.positionMgr.noPosition()) return;
-//      double rot = parts.positionMgr.robotPosition.R;
-//      Position targetPos = navTarget.targetPos.clone();
-//      targetPos.X = targetPos.X + (X * Math.cos(Math.toRadians(targetPos.R)) - Y * Math.sin(Math.toRadians(rot)));
-//      targetPos.Y = targetPos.Y + (X * Math.sin(Math.toRadians(targetPos.R)) + Y * Math.cos(Math.toRadians(rot)));
       navTarget.targetPos.X += X;
       navTarget.targetPos.Y += Y;
       navTarget.targetPos.R += R;
@@ -316,7 +273,6 @@ public class AutoDrive implements PartsInterface {
    }
 
    public void setAutoDrive(boolean boo) {
-//      if (boo) navigate = 1; else navigate = 0;
       if (!boo) isNavigating = false;
       else if (parts.positionMgr.hasPosition()) isNavigating = true;
    }

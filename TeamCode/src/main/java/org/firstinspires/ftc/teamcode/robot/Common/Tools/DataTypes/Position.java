@@ -36,10 +36,6 @@ public class Position
 
     public Position clone(){ return new Position(X, Y, R);}
 
-//    public Pose2d toPose2d(){
-//        return new Pose2d(X, Y, Math.toRadians(R));
-//    }
-
     public void normalize() {
         R = Functions.normalizeAngle(R);
     }
@@ -82,11 +78,6 @@ public class Position
         diff.abs();
         return diff;
     }
-
-//    public boolean isPositionInRange(Position pos2, Position maxDiff){
-//        Position diff = getAbsDiff(pos2);
-//        return diff.X < maxDiff.X && diff.Y < maxDiff.Y && diff.R < maxDiff.R;
-//    }
 
     public boolean isEqualTo (Position pos2) {
         return ((X == pos2.X) && (Y == pos2.Y) && (R == pos2.R));

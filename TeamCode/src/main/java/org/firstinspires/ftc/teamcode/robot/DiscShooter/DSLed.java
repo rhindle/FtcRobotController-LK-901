@@ -54,7 +54,7 @@ public class DSLed implements PartsInterface {
    public void stop() {
    }
 
-   long clearMessageTimer = 0; //System.currentTimeMillis();
+   long clearMessageTimer = 0;
    int messageDisplayTime = 1000;
 
    public void displayMessage (char msgChar, boolean boo) {
