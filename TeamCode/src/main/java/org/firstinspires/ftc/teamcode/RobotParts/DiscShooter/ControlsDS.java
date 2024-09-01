@@ -105,16 +105,16 @@ public class ControlsDS extends Controls {
          parts.dsShooter.disarmShooter();
 
       if (buttonMgr.wasTapped(2, Buttons.a))
-         parts.dsShooter.statePushStep = 1;
+         parts.dsShooter.startPush();
 
       if (buttonMgr.wasTapped(2, Buttons.b))
-         parts.dsShooter.stateShoot1Step = 1;
+         parts.dsShooter.startShoot1();
 
       if (buttonMgr.wasTapped(2, Buttons.x))
-         parts.dsShooter.stateShoot3Step = 1;
+         parts.dsShooter.startShoot3();
 
       if (buttonMgr.wasTapped(2, Buttons.y))
-         parts.dsShooter.stateFullAuto = 1;
+         parts.dsShooter.startFullAuto();
 
       if (buttonMgr.wasTapped(2, Buttons.left_bumper))
          parts.dsShooter.intakeReverse();

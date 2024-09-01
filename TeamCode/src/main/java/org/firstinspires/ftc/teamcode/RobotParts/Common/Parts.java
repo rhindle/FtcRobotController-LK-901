@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.DSAprilTag;
 import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.DSLed;
 import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.DSMisc;
-import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.DSShooter;
+import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.Shooter.DSShooter;
 import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.DSSpeedControl;
 
 public class Parts implements PartsInterface {
