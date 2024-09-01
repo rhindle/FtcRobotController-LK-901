@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.RobotParts.Common;
 
+import org.firstinspires.ftc.teamcode.Tools.DataTypes.DriveData;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.DrivePowers;
 import org.firstinspires.ftc.teamcode.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.TelemetryMgr.Category;
@@ -98,6 +99,10 @@ public class UserDrive implements PartsInterface {
       drivePowers.scaleMax(1);
       parts.drivetrain.setDrivePowers(drivePowers);
       TelemetryMgr.message(Category.DRIVETRAIN, "dt-usr", drivePowers.toString(2));
+   }
+
+   public void setUserDriveSettings(DriveData driveData) {
+      setUserDriveSettings(driveData.driveSpeed, driveData.driveAngle, driveData.rotate);
    }
 
    public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {

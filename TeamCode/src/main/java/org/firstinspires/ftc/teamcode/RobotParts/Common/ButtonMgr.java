@@ -113,6 +113,22 @@ public class ButtonMgr {
         return controlData[getIndex(controller, button)];
     }
 
+    public boolean getState(int controller, Buttons button, State state) {
+        switch (state) {
+            //must match the elements in the Actions enum
+            case isPressed:         return controlData[getIndex(controller, button)].lastStatus;
+            case wasPressed:        return controlData[getIndex(controller, button)].wasPressed;
+            case wasReleased:       return controlData[getIndex(controller, button)].wasReleased;
+            case wasTapped:         return controlData[getIndex(controller, button)].wasTapped;
+            case isHeld:            return controlData[getIndex(controller, button)].isHeld;
+            case wasHeld:           return controlData[getIndex(controller, button)].wasHeld;
+            case wasSingleTapped:   return controlData[getIndex(controller, button)].wasSingleTapped;
+            case wasDoubleTapped:   return controlData[getIndex(controller, button)].wasDoubleTapped;
+            case isSingleTapHeld:   return controlData[getIndex(controller, button)].isSingleTapHeld;
+            default:                return false;
+        }
+    }
+
     class ControlData {
         int index;
         Buttons name;
@@ -155,7 +171,7 @@ public class ButtonMgr {
                 gpad = gamepad1;
             }
             switch (Buttons.values()[index]) {
-                //must match the elements in the Buttons enum
+                //MUST match the elements in the Buttons enum
                 case dpad_up:             return gpad.dpad_up;
                 case dpad_down:           return gpad.dpad_down;
                 case dpad_left:           return gpad.dpad_left;
@@ -263,5 +279,17 @@ public class ButtonMgr {
         right_stick_button,
         left_trigger,
         right_trigger;
+    }
+
+    public enum State {
+        isPressed,
+        wasPressed,
+        wasReleased,
+        wasTapped,
+        isHeld,
+        wasHeld,
+        wasSingleTapped,
+        wasDoubleTapped,
+        isSingleTapHeld;
     }
 }

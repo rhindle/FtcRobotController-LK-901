@@ -14,16 +14,17 @@ class Shoot3 {
         if (state == 1) {                                       // cancel other state machines if needed
             if (Shoot1.isRunning()) {
                 DSShooter.cancelTimer = System.currentTimeMillis() + 1000;
-                Shoot1.stop();
+                Shoot1.softStop();
             }
             if (System.currentTimeMillis() >= DSShooter.cancelTimer) state++;
         }
         if (state == 2) {                 // open gate, start spinner
             Pusher.stop();   // cancel any ongoing pusher movement
             cycleCount = 0;
-            DSShooter.openGate();
-            DSShooter.spinnerOn();
-            DSShooter.retractPusher();
+            DSShooter.armShooter();
+//            DSShooter.openGate();
+//            DSShooter.spinnerOn();
+//            DSShooter.retractPusher();
             state++;
         }
         if (state == 3) {                 // wait for gate up, spinner at rpm
@@ -56,6 +57,12 @@ class Shoot3 {
         DSShooter.spinnerOff();
         DSShooter.retractPusher();
         // do we want to close the gate?  Ring might be in there...
+        state = -1;
+    }
+
+    public static void softStop() {
+        // don't spin down!
+        DSShooter.retractPusher();
         state = -1;
     }
 

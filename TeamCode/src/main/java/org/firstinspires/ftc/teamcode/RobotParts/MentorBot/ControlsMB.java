@@ -15,7 +15,7 @@ public class ControlsMB extends Controls {
    @Override
    public void runLoop() {
       userInput();
-      parts.navigator.setUserDriveSettings(driveSpeed, driveAngle, rotate);
+      parts.navigator.setUserDriveSettings(driveData.driveSpeed, driveData.driveAngle, driveData.rotate);
    }
 
    @Override
@@ -23,12 +23,13 @@ public class ControlsMB extends Controls {
 
       // TeleOp / normal drive
 
+      // todo: upgrade this like ControlsDS
       // Get speed and direction from left stick
-      driveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y)));
-      driveAngle = Math.atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y) / Math.PI * 180;
+      driveData.driveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y)));
+      driveData.driveAngle = Math.atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y) / Math.PI * 180;
       // Get rotation from right stick
-      rotate = Math.pow(gamepad1.right_stick_x, 1);
-      parts.navigator.handleRotate(rotate);
+      driveData.rotate = Math.pow(gamepad1.right_stick_x, 1);
+      parts.navigator.handleRotate(driveData.rotate);
 
       // Toggle FCD
       if (buttonMgr.wasTapped(1, Buttons.start))

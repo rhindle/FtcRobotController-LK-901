@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoControllerEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Tools.PartsInterface;
@@ -271,6 +272,14 @@ public class Robot implements PartsInterface {
             RevHubOrientationOnRobot.LogoFacingDirection.UP,
             RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
         );
+    }
+
+    public void disableServo(Servo servo) {
+        ServoControllerEx controller = (ServoControllerEx) servo.getController();
+        int servoPort = servo.getPortNumber();
+        controller.setServoPwmDisable(servoPort);
+//        if (controller.isServoPwmEnabled(servoPort)) controller.setServoPwmDisable(servoPort);
+//        else controller.setServoPwmEnable(servoPort);
     }
 
     public void initOptions() {

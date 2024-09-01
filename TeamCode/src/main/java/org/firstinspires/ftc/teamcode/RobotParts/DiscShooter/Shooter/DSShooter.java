@@ -17,7 +17,7 @@ public class DSShooter implements PartsInterface {
    static final double pusherRetracted                 = 0;
    static final double pusherExtended                  = 0.8;
    static final int pusherSweepTime                    = 200;
-   static final int pusherAutoCycles                   = 5;
+   static final int pusherAutoCycles                   = 5;   // 3 rings, but extra pushes in case miss
 
    static final double gateOpen                        = 1;
    static final double gateClosed                      = 0;
@@ -133,6 +133,15 @@ public class DSShooter implements PartsInterface {
       motorSpinner.setPower(0);
    }
 
+   public void eStop() {
+      stopMotors();
+      cancelStateMachines();
+//      retractPusher();
+//      openGate();
+      parts.robot.disableServo(servoPusher);
+      parts.robot.disableServo(servoGate);
+   }
+
    static boolean isSpinnerInTolerance() {
       //!!!!!!
 //      return true;
@@ -166,12 +175,12 @@ public class DSShooter implements PartsInterface {
       motorIngester.setPower(0);
    }
 
-   public void armShooter() {
+   public static void armShooter() {
       retractPusher();
       openGate();
       spinnerOn();
    }
-   public void disarmShooter() {
+   public static void disarmShooter() {
       retractPusher();
       closeGate();
       spinnerOff();

@@ -110,9 +110,9 @@ public class MentorTestBot01 extends LinearOpMode {
 
     private void addTelemetryLoopEnd() {
 //        TelemetryMgr.message(1, "!!", "!!!TEST !!!!!!!!!!!!!!!!!!!!");
-        telemetry.addData("r (magnitude)", parts.controls.driveSpeed);
-        telemetry.addData("robotAngle", parts.controls.driveAngle);
-        telemetry.addData("rotate", parts.controls.rotate);
+        telemetry.addData("r (magnitude)", parts.controls.driveData.driveSpeed);
+        telemetry.addData("robotAngle", parts.controls.driveData.driveAngle);
+        telemetry.addData("rotate", parts.controls.driveData.rotate);
         telemetry.addData("storedHeading", JavaUtil.formatNumber(parts.navigator.storedHeading, 2));
         telemetry.addData("deltaHeading", JavaUtil.formatNumber(parts.navigator.deltaHeading, 2));
 //        telemetry.addData("error", JavaUtil.formatNumber(currentError, 2));

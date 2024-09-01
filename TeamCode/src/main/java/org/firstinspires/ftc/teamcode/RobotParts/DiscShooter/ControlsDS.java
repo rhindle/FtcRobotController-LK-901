@@ -1,13 +1,18 @@
 package org.firstinspires.ftc.teamcode.RobotParts.DiscShooter;
 
 import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr.Buttons;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr.State;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.Controls;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.Parts;
+import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.Shooter.DSShooter;
+import org.firstinspires.ftc.teamcode.Tools.DataTypes.DriveData;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.NavigationTarget;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
-import org.firstinspires.ftc.teamcode.Tools.Functions;
 
 public class ControlsDS extends Controls {
+
+   boolean isStopped = false;
+   boolean guestOK, teamOK;
 
    public ControlsDS(Parts parts) {
       super(parts);
@@ -15,129 +20,137 @@ public class ControlsDS extends Controls {
 
    @Override
    public void runLoop() {
+      driveData = new DriveData();
       userInput();
-      parts.userDrive.setUserDriveSettings(driveSpeed, driveAngle, rotate);
+//      parts.userDrive.setUserDriveSettings(driveSpeed, driveAngle, rotate);
+      parts.userDrive.setUserDriveSettings(driveData);
    }
 
    @Override
    public void userInput() {
 
-      // TeleOp / normal drive
+      //      // Get speed and direction from left stick
+      ////      driveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y)));
+      //      driveSpeed = Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y);
+      //      driveAngle = Math.toDegrees(Math.atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y));  //gamepad.x = left/right = robot.y
+      //      // Get rotation from right stick
+      ////      rotate = Math.pow(gamepad1.right_stick_x, 1);
+      //      rotate = gamepad1.right_stick_x;
+      ////      parts.navigator.handleRotate(rotate);
 
-      // Get speed and direction from left stick
-//      driveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y)));
-      driveSpeed = Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y);
-      driveAngle = Math.toDegrees(Math.atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y));  //gamepad.x = left/right = robot.y
-      // Get rotation from right stick
-//      rotate = Math.pow(gamepad1.right_stick_x, 1);
-      rotate = gamepad1.right_stick_x;
-//      parts.navigator.handleRotate(rotate);
+      DriveData driveDataTeam = new DriveData(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+      DriveData driveDataGuest = new DriveData(gamepad2.left_stick_x, gamepad2.left_stick_y, gamepad2.right_stick_x);
+
+      /* Controls will be in the style of dead man switches */
+      guestOK = buttonMgr.isPressed(1,Buttons.left_trigger);
+      teamOK = buttonMgr.isPressed(1,Buttons.right_trigger);
+
+      /* If neither dead man is pressed, stop everything (if needed) and proceed no further */
+      if (!guestOK && !teamOK) {
+         stopEverything();
+         return;
+      }
+
+      /* If we made it here, things aren't necessarily stopped any more (this affect the e-stop method */
+      isStopped = false;
+
+      /* If guest is allowed, start with their drive input */
+      if (guestOK) {
+         driveData = driveDataGuest.clone();
+      }
+
+      /* If team is allowed, override with their drive input if not 0 */
+      if (teamOK) {
+         if (driveDataTeam.driveSpeed > 0) {
+            driveData.driveSpeed = driveDataTeam.driveSpeed;
+            driveData.driveAngle = driveDataTeam.driveAngle;
+         }
+         if (driveDataTeam.rotate != 0) {
+            driveData.rotate = driveDataTeam.rotate;
+         }
+      }
+
+      /* With the most dangerous things out of the way, we can move on to the other controls */
+
+      if (eitherGuestOrTeam(Buttons.dpad_left, State.wasSingleTapped))
+         DSShooter.disarmShooter();
+
+      if (eitherGuestOrTeam(Buttons.dpad_right, State.wasSingleTapped))
+         DSShooter.armShooter();
+
+      if (eitherGuestOrTeam(Buttons.dpad_left, State.wasDoubleTapped))
+         DSShooter.extendPusher();
+
+      if (eitherGuestOrTeam(Buttons.dpad_right, State.wasDoubleTapped))
+         DSShooter.retractPusher();
+
+      if (eitherGuestOrTeam(Buttons.dpad_up, State.wasSingleTapped))
+         DSShooter.openGate();
+
+      if (eitherGuestOrTeam(Buttons.dpad_down, State.wasSingleTapped))
+         DSShooter.closeGate();
+
+      if (eitherGuestOrTeam(Buttons.left_bumper, State.wasSingleTapped))
+         parts.dsShooter.intakeReverse();
+
+      if (eitherGuestOrTeam(Buttons.right_bumper, State.wasSingleTapped))
+         parts.dsShooter.intakeOn();
+
+      if (eitherGuestOrTeam(Buttons.back, State.isHeld))
+         parts.dsShooter.cancelStateMachines();
+
+      if (eitherGuestOrTeam(Buttons.a, State.wasTapped))
+         parts.dsShooter.startPush();
+
+      if (eitherGuestOrTeam(Buttons.b, State.wasSingleTapped))
+         parts.dsShooter.startShoot1();
+
+      if (eitherGuestOrTeam(Buttons.x, State.wasSingleTapped))
+         parts.dsShooter.startShoot3();
+
+      if (eitherGuestOrTeam(Buttons.y, State.wasSingleTapped))
+         parts.dsShooter.startFullAuto();
+
+      if (eitherGuestOrTeam(Buttons.dpad_up, State.wasHeld))
+         // todo: reference this as a variable from somewhere
+         parts.autoDrive.setNavTarget(new NavigationTarget(new Position(-20,0,0), parts.dsMisc.toleranceHigh));
 
       // Toggle FCD
       //todo: Field centric is broken right now; problem with the angle
-      if (buttonMgr.wasTapped(1, Buttons.start)) {
+      if (eitherGuestOrTeam(Buttons.start, State.wasDoubleTapped)) {
          parts.dsLed.displayMessage('F', parts.userDrive.toggleFieldCentricDrive());
       }
 
       // Toggle HeadingHold
-      if (buttonMgr.wasTapped(1, Buttons.back)) {
+      if (eitherGuestOrTeam(Buttons.back, State.wasDoubleTapped)) {
          parts.dsLed.displayMessage('H', parts.userDrive.toggleHeadingHold());
       }
 
       // Store heading correction
-      if (buttonMgr.wasReleased(1, Buttons.right_stick_button)) {
+      if (eitherGuestOrTeam(Buttons.right_stick_button, State.wasReleased)) {
          parts.userDrive.setDeltaHeading();
          parts.dsLed.displayMessage('D', 1);
       }
 
-      if (buttonMgr.wasReleased(1, Buttons.left_stick_button)) {
+      if (eitherGuestOrTeam(Buttons.left_stick_button, State.wasReleased))  {
          parts.dsLed.displayMessage('P', parts.userDrive.togglePositionHold());
       }
-//         navigator.toggleSnapToAngle();
+   }
 
-      // This blob is for manually entering destinations by adjusting X, Y, Rot
-      if (buttonMgr.wasTapped(1, Buttons.dpad_up))
-           parts.autoDrive.setNavTarget(new NavigationTarget(new Position(-20,0,0), parts.dsMisc.toleranceHigh));
-//         navigator.setTargetByDeltaRelative(2,0,0);
-      if (buttonMgr.wasTapped(1, Buttons.dpad_down));
-//         navigator.setTargetByDeltaRelative(-2,0,0);
-      if (buttonMgr.wasTapped(1, Buttons.dpad_left));
-//         navigator.setTargetByDeltaRelative(0, 2,0);
-      if (buttonMgr.wasTapped(1, Buttons.dpad_right));
-//         navigator.setTargetByDeltaRelative(0, -2,0);
-      if (buttonMgr.wasTapped(1, Buttons.x)) {
-//         navigator.setTargetRotBySnapRelative (45);
-//         navigator.headingDelay = System.currentTimeMillis() + 500;  // workaround
+   public boolean eitherGuestOrTeam(Buttons button, State state) {
+      // if either was enabled and activated the control, return true
+      boolean team = teamOK && buttonMgr.getState(1, button, state);
+      boolean guest = guestOK && buttonMgr.getState(2, button, state);
+      return team || guest;
+   }
+
+   public void stopEverything() {
+      if (!isStopped) {
+         // note: drivedata is already zeroed in the runloop
+         parts.drivetrain.stopDriveMotors(true);
+         parts.dsShooter.eStop();
+         parts.autoDrive.cancelNavigation();
+         isStopped = true;
       }
-      if (buttonMgr.wasTapped(1, Buttons.y)) {
-//         navigator.setTargetRotBySnapRelative (-45);
-//         navigator.headingDelay = System.currentTimeMillis() + 500;  // workaround
-      }
-
-      if (!buttonMgr.isPressed(1, Buttons.right_bumper));
-//         navigator.setMaxSpeed(1);
-      else;
-//         navigator.setMaxSpeed(0.25);
-
-      // AutoDrive Testing
-
-//      liftSpeed = -gamepad2.left_stick_y;
-
-      if (buttonMgr.wasTapped(2, Buttons.dpad_left))
-         parts.dsShooter.extendPusher();
-
-      if (buttonMgr.wasTapped(2, Buttons.dpad_down))
-         parts.dsShooter.closeGate();
-
-      if (buttonMgr.wasTapped(2, Buttons.dpad_right))
-         parts.dsShooter.retractPusher();
-
-      if (buttonMgr.wasTapped(2, Buttons.dpad_up))
-         parts.dsShooter.openGate();
-
-      if (buttonMgr.wasTapped(2, Buttons.back)) {
-         parts.dsShooter.cancelStateMachines();
-      }
-
-      if (buttonMgr.wasPressed(2, Buttons.start))
-         parts.dsShooter.armShooter();
-      if (buttonMgr.wasReleased(2, Buttons.start))
-         parts.dsShooter.disarmShooter();
-
-      if (buttonMgr.wasTapped(2, Buttons.a))
-         parts.dsShooter.startPush();
-
-      if (buttonMgr.wasTapped(2, Buttons.b))
-         parts.dsShooter.startShoot1();
-
-      if (buttonMgr.wasTapped(2, Buttons.x))
-         parts.dsShooter.startShoot3();
-
-      if (buttonMgr.wasTapped(2, Buttons.y))
-         parts.dsShooter.startFullAuto();
-
-      if (buttonMgr.wasTapped(2, Buttons.left_bumper))
-         parts.dsShooter.intakeReverse();
-
-      if (buttonMgr.wasTapped(2, Buttons.right_bumper))
-         parts.dsShooter.intakeOn();
-
-
-//      if (buttonMgr.isHeld(2, Buttons.left_bumper) &&
-//              buttonMgr.wasTapped(2, Buttons.right_bumper));
-////         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_HOME);
-//
-//      if (buttonMgr.wasTapped(2, Buttons.right_bumper)) {
-//         if (buttonMgr.isHeld(2, Buttons.left_bumper)) {
-////            lifter.action(LiftbotLifter.LiftActions.AUTOMATE_HOME);
-//         } else {
-//            // reserved for future use
-//         }
-//      }
-//
-//      if (buttonMgr.wasTapped(2, Buttons.left_bumper));
-////         lifter.action(LiftbotLifter.LiftActions.LIFT_DOWNSTACK);
-
-
    }
 }

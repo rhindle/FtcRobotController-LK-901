@@ -17,17 +17,18 @@ class FullAuto {
         if (state == 1) {
             if (Shoot1.isRunning()) {
                 DSShooter.cancelTimer = System.currentTimeMillis() + 1000;
-                Shoot1.stop();
+                Shoot1.softStop();
             }
             if (Shoot3.isRunning()) {
                 DSShooter.cancelTimer = System.currentTimeMillis() + 1000;
-                Shoot3.stop();
+                Shoot3.softStop();
             }
             if (System.currentTimeMillis() >= DSShooter.cancelTimer) state++;
         }
 
         if (state == 2) {                                    // navigate to launch position
             DSShooter.parts.autoDrive.setNavTarget(new NavigationTarget(DSShooter.autoLaunchPos, DSShooter.parts.dsMisc.toleranceHigh));
+            DSShooter.armShooter();   // todo: this OK?  just added without too much thought
             state++;
         }
         if (state == 3) {                                   // wait until reach position and start blasting
