@@ -66,4 +66,8 @@ class FullAuto {
     public boolean isComplete() {
         return complete;
     }
+
+    public static int getState() {
+        return state;
+    }
 }

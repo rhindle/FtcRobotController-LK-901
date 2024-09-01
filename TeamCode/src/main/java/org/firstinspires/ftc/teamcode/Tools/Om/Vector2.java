@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.RobotParts.Common.Om;
+package org.firstinspires.ftc.teamcode.Tools.Om;
 
+@Deprecated
 public class Vector2 {
     public final double X,Y;
 

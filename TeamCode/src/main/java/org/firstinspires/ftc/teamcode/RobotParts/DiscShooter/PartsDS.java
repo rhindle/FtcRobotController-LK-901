@@ -28,6 +28,7 @@ public class PartsDS extends Parts {
             //throw new RuntimeException("Parts can only be setup once");
             return;
         }
+//        odoRobotOffset = new Position (2.25,0,0);          // map odo to robot (so it holds turn position better)
         isSetup = true;
         robot = new RobotDS(this);
         buttonMgr = new ButtonMgr(opMode);

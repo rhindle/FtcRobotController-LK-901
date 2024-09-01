@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.RobotParts.Common.Om;
+package org.firstinspires.ftc.teamcode.Tools.Om;
 
+@Deprecated
 public class VectorMath {
     public static Vector3 add(Vector3 v1, Vector3 v2){
         return new Vector3(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);

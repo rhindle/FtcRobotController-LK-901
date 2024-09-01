@@ -4,9 +4,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.RobotParts.Common.Om.AngleMath;
-import org.firstinspires.ftc.teamcode.RobotParts.Common.Om.Vector3;
-import org.firstinspires.ftc.teamcode.RobotParts.Common.Om.VectorMath;
+import org.firstinspires.ftc.teamcode.Tools.Om.AngleMath;
+import org.firstinspires.ftc.teamcode.Tools.Om.Vector3;
+import org.firstinspires.ftc.teamcode.Tools.Om.VectorMath;
 
 public class Omdometry {
    int lastLeftYPos, lastRightYPos, lastXPos;

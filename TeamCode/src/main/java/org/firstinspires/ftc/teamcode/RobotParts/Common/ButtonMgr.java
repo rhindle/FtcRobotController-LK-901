@@ -199,8 +199,6 @@ public class ButtonMgr {
                     tapEventCounter = 0;
                 }
                 lastTime = currentTime;          // reset the time
-            } else {
-                //nothing
             }
             if (lastStatus && !currentState) {   // change from pressed to not pressed
                 wasReleased = true;              // this will last for one loop!
@@ -217,8 +215,6 @@ public class ButtonMgr {
                     tapEventCounter = 0;
                 }
                 lastTime = currentTime;          // reset the time
-            } else {
-                //nothing
             }
             if (lastStatus && currentState) {    // still held
                 if (deltaTime >= tapTime) {

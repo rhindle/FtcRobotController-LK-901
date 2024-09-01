@@ -218,9 +218,10 @@ public class DSAprilTag implements PartsInterface {
         }
 
         // Add "key" information to telemetry
-        TelemetryMgr.message(Category.APRILTAG,"\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
-        TelemetryMgr.message(Category.APRILTAG,"PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-        TelemetryMgr.message(Category.APRILTAG,"RBE = Range, Bearing & Elevation");
+//        TelemetryMgr.message(Category.APRILTAG,"\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+        TelemetryMgr.message(Category.APRILTAG_EXT,"XYZ = X (Right), Y (Forward), Z (Up) dist.");
+        TelemetryMgr.message(Category.APRILTAG_EXT,"PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+        TelemetryMgr.message(Category.APRILTAG_EXT,"RBE = Range, Bearing & Elevation");
 
     }   // end method telemetryAprilTag()
 

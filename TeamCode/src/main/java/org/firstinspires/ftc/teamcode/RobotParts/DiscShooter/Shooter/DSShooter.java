@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.Shooter;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -65,12 +67,19 @@ public class DSShooter implements PartsInterface {
    public void preRun() {
    }
 
+   @SuppressLint("DefaultLocale")
    public void runLoop() {
-      TelemetryMgr.message(TelemetryMgr.Category.BASIC, "SpinnerRPM", getSpinnerRPM());
+      TelemetryMgr.message(TelemetryMgr.Category.DISCSHOOTER, "SpinnerRPM", getSpinnerRPM());
       Pusher.stateMachine();
       Shoot1.stateMachine();
       Shoot3.stateMachine();
       FullAuto.stateMachine();
+      TelemetryMgr.message(TelemetryMgr.Category.DISCSHOOTER,
+              "States: " +
+                      "PU: " + String.format("%02d", Pusher.getState()) +
+                      ", S1: " + String.format("%02d", Shoot1.getState()) +
+                      ", S3: " + String.format("%02d", Shoot3.getState()) +
+                      ", FA: " + String.format("%02d", FullAuto.getState()) );
    }
 
    public void stop() {

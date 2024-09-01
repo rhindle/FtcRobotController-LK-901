@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotParts.MentorBot;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr.Buttons;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.Controls;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.Parts;
 import org.firstinspires.ftc.teamcode.Tools.Functions;
@@ -11,8 +11,6 @@ public class ControlsMB extends Controls {
    public ControlsMB(Parts parts) {
       super(parts);
    }
-
-   public int someNewVariable;
 
    @Override
    public void runLoop() {
@@ -33,40 +31,40 @@ public class ControlsMB extends Controls {
       parts.navigator.handleRotate(rotate);
 
       // Toggle FCD
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.start))
+      if (buttonMgr.wasTapped(1, Buttons.start))
          parts.navigator.toggleFieldCentricDrive();
 
       // Toggle HeadingHold
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.back))
+      if (buttonMgr.wasTapped(1, Buttons.back))
          parts.navigator.toggleHeadingHold();
 
       // Store heading correction
-      if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.right_stick_button))
+      if (buttonMgr.wasReleased(1, Buttons.right_stick_button))
          parts.navigator.setDeltaHeading();
 
-      if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.left_stick_button))
+      if (buttonMgr.wasReleased(1, Buttons.left_stick_button))
          parts.navigator.togglePositionHold();
 //         navigator.toggleSnapToAngle();
 
       // This blob is for manually entering destinations by adjusting X, Y, Rot
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_up));
+      if (buttonMgr.wasTapped(1, Buttons.dpad_up));
 //         navigator.setTargetByDeltaRelative(2,0,0);
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_down));
+      if (buttonMgr.wasTapped(1, Buttons.dpad_down));
 //         navigator.setTargetByDeltaRelative(-2,0,0);
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_left));
+      if (buttonMgr.wasTapped(1, Buttons.dpad_left));
 //         navigator.setTargetByDeltaRelative(0, 2,0);
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpad_right));
+      if (buttonMgr.wasTapped(1, Buttons.dpad_right));
 //         navigator.setTargetByDeltaRelative(0, -2,0);
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.x)) {
+      if (buttonMgr.wasTapped(1, Buttons.x)) {
 //         navigator.setTargetRotBySnapRelative (45);
 //         navigator.headingDelay = System.currentTimeMillis() + 500;  // workaround
       }
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.y)) {
+      if (buttonMgr.wasTapped(1, Buttons.y)) {
 //         navigator.setTargetRotBySnapRelative (-45);
 //         navigator.headingDelay = System.currentTimeMillis() + 500;  // workaround
       }
 
-      if (!buttonMgr.isPressed(1, ButtonMgr.Buttons.right_bumper));
+      if (!buttonMgr.isPressed(1, Buttons.right_bumper));
 //         navigator.setMaxSpeed(1);
       else;
 //         navigator.setMaxSpeed(0.25);
@@ -75,46 +73,46 @@ public class ControlsMB extends Controls {
 
       liftSpeed = -gamepad2.left_stick_y;
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_left));
+      if (buttonMgr.wasTapped(2, Buttons.dpad_left));
 //         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_PREP_CAPTURE);
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_down));
+      if (buttonMgr.wasTapped(2, Buttons.dpad_down));
 //         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_PREP_DEPOSIT_LO);
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_right));
+      if (buttonMgr.wasTapped(2, Buttons.dpad_right));
 //         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_PREP_DEPOSIT_MED);
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpad_up));
+      if (buttonMgr.wasTapped(2, Buttons.dpad_up));
 //         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_PREP_DEPOSIT_HI);
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.back));
+      if (buttonMgr.wasTapped(2, Buttons.back));
 //         lifter.action(LiftbotLifter.LiftActions.CANCEL);
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.a));
+      if (buttonMgr.wasTapped(2, Buttons.a));
 //         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_CAPTURE);
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.b));
+      if (buttonMgr.wasTapped(2, Buttons.b));
 //         lifter.action(LiftbotLifter.LiftActions.GRAB_TOGGLE);
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.y));
+      if (buttonMgr.wasTapped(2, Buttons.y));
 //         lifter.action(LiftbotLifter.LiftActions.LIFT_LOWER_TO_DEPOSIT);
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.x));
+      if (buttonMgr.wasTapped(2, Buttons.x));
 //         lifter.action(LiftbotLifter.LiftActions.LIFT_RAISE_AFTER_CAPTURE);
 
-      if (buttonMgr.isHeld(2, ButtonMgr.Buttons.left_bumper) &&
-              buttonMgr.wasTapped(2, ButtonMgr.Buttons.right_bumper));
+      if (buttonMgr.isHeld(2, Buttons.left_bumper) &&
+              buttonMgr.wasTapped(2, Buttons.right_bumper));
 //         lifter.action(LiftbotLifter.LiftActions.AUTOMATE_HOME);
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.right_bumper)) {
-         if (buttonMgr.isHeld(2, ButtonMgr.Buttons.left_bumper)) {
+      if (buttonMgr.wasTapped(2, Buttons.right_bumper)) {
+         if (buttonMgr.isHeld(2, Buttons.left_bumper)) {
 //            lifter.action(LiftbotLifter.LiftActions.AUTOMATE_HOME);
          } else {
             // reserved for future use
          }
       }
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.left_bumper));
+      if (buttonMgr.wasTapped(2, Buttons.left_bumper));
 //         lifter.action(LiftbotLifter.LiftActions.LIFT_DOWNSTACK);
 
 

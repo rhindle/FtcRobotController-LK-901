@@ -7,22 +7,18 @@ import org.firstinspires.ftc.teamcode.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.TelemetryMgr.Category;
 
+import androidx.annotation.NonNull;
+
 public class Odometry implements PartsInterface {
 
    public Parts parts;
 
-   public DcMotorEx odoXL, odoY, odoXR;
-   public byte odoXLdir, odoYdir, odoXRdir;
-   public long encoderY, encoderXL, encoderXR;
-   long encoderY0, encoderXL0, encoderXR0;
-   double odoHeading, odoHeading0;
-   double imuHeading, imuHeading0;
-   public double globalHeading, globalHeading0;
-   public double yPos, xPos;
+   public EncoderSetting odoEncXL, odoEncXR, odoEncY;
+   public OdoData odoData, odoData0;
    public boolean useFusedHeading = true;
+   public boolean use3encoders = true;
 
 //   public Position odoRobotOffset = new Position (2.25,0,0);          // map odo to robot (so it holds turn position better)
-//   public Position odoFieldStart = new Position (-36,63,-90);  // field start position [blue right slot]
    public Position odoRobotOffset = new Position();                     // map odo to robot (so it holds turn position better)
    public Position odoFieldStart = new Position();                      // field start position [blue right slot]
 
@@ -33,10 +29,7 @@ public class Odometry implements PartsInterface {
    public Position odoRobotPosition; // = odoFieldStart.clone();
    final Position zeroPos = new Position (0, 0, 0);
 
-   private static final double eTicksPerInch = 82300 / 48.0;
-   private static final double eTicksPerRotate = 169619;
-   //2022-12-22 Measured 10 rot: 846684,850800; 845875,851775; 845127,845543; 848073,850867
-   //                            169748.4		169765		169067		169894		==>  169618.6
+   public double eTicksPerRotate;                            //169619;  // Both wheels have to be the same size
 
    public Odometry(Parts parts){
       construct(parts);
@@ -48,6 +41,7 @@ public class Odometry implements PartsInterface {
 
    public void initialize() {
 //      odoRobotPosition = odoFieldStart.clone();  //TODO: deal with odoFieldStart set to null
+      if (!use3encoders) useFusedHeading = false;
       if (odoFieldStart!=null) odoRobotPosition = odoFieldStart.clone();
       else odoRobotPosition = new Position ();
       if (!parts.useODO) {
@@ -55,13 +49,17 @@ public class Odometry implements PartsInterface {
          return;
       }
       configureEncoders();
+      if (use3encoders && (odoEncXL.ticksPerInch != odoEncXR.ticksPerInch)) { // this shouldn't have been called
+         throw new RuntimeException("ticksPerInch must be the same for left and right deadwheels");
+      }
 
-      encoderY0 = odoY.getCurrentPosition() * (long)odoYdir;
-      encoderXL0 = odoXL.getCurrentPosition() * (long)odoXLdir;
-      encoderXR0 = odoXR.getCurrentPosition() * (long)odoXRdir;
-      imuHeading0 = parts.imuMgr.returnImuHeadingRaw(true);
-      odoHeading0 = getOdoHeading();
-      globalHeading0 = imuHeading0;
+      odoData.encoderXL = odoEncXL.encoderPort.getCurrentPosition() * (long)odoEncXL.direction;
+      if (use3encoders) odoData.encoderXR = odoEncXR.encoderPort.getCurrentPosition() * (long)odoEncXR.direction;
+      odoData.encoderY = odoEncY.encoderPort.getCurrentPosition() * (long)odoEncY.direction;
+      odoData.imuHeading = parts.imuMgr.returnImuHeadingRaw(true);
+      if (use3encoders) odoData.odoHeading = getOdoHeading();
+      odoData.globalHeading = odoData.imuHeading;
+      odoData0 = odoData.clone();
 
       // odo start position is 0,0,0; imu should also read 0.  odoRawPose is already 0,0,0
       odoRobotPose = getOdoRobotPose();
@@ -80,23 +78,25 @@ public class Odometry implements PartsInterface {
 
    public void runLoop() {
       /* Update encoder readings */
-      encoderY = odoY.getCurrentPosition() * (long)odoYdir;
-      encoderXL = odoXL.getCurrentPosition() * (long)odoXLdir;
-      encoderXR = odoXR.getCurrentPosition() * (long)odoXRdir;
+      odoData.encoderXL = odoEncXL.encoderPort.getCurrentPosition() * (long)odoEncXL.direction;
+      if (use3encoders) odoData.encoderXR = odoEncXR.encoderPort.getCurrentPosition() * (long)odoEncXR.direction;
+      odoData.encoderY = odoEncY.encoderPort.getCurrentPosition() * (long)odoEncY.direction;
 
       /* Update heading */
-      imuHeading = parts.imuMgr.returnImuHeadingRaw();
-      odoHeading = getOdoHeading();
-      globalHeading = fusedHeading();
+      odoData.imuHeading = parts.imuMgr.returnImuHeadingRaw();
+      if (use3encoders) odoData.odoHeading = getOdoHeading();
+      odoData.globalHeading = fusedHeading();
 
       /* Calculate position */
-      updateXY();
-      odoRawPose = new Position(xPos, yPos, globalHeading);
+      odoRawPose = updateOdoRawPose();
       odoRobotPose = getOdoRobotPose();
       odoFinalPose = getOdoFinalPose();
 
       /* Update robot position */
       odoRobotPosition = odoFinalPose.clone();
+
+      /* Store current values for next loop */
+      odoData0 = odoData.clone();
    }
 
    public void stop() {
@@ -104,11 +104,11 @@ public class Odometry implements PartsInterface {
 
    private double fusedHeading() {
       /* Don't fuse if the flag isn't set */
-      if (!useFusedHeading) return imuHeading;
+      if (!useFusedHeading || !use3encoders) return odoData.imuHeading;
       /* Use imuHeading only if it's settled */
-      if (Math.abs(Functions.normalizeAngle(imuHeading - imuHeading0)) < 0.5) return imuHeading;
-      /* Otherwise fuse it with odoHeading data */
-      return Functions.normalizeAngle(globalHeading0 + (odoHeading - odoHeading0));
+      if (Math.abs(Functions.normalizeAngle(odoData.imuHeading - odoData0.imuHeading)) < 0.5) return odoData.imuHeading;
+      /* Otherwise fuse it with odoHeading data (relative change, not absolute) */
+      return Functions.normalizeAngle(odoData0.globalHeading + (odoData.odoHeading - odoData0.odoHeading));
    }
 
    public void toggleUseFusedHeading() {
@@ -117,48 +117,48 @@ public class Odometry implements PartsInterface {
 
    /* Get heading from the odometry ... accuracy varies :-(  */
    private double getOdoHeading() {
+      if (!use3encoders) { // this shouldn't have been called
+         throw new RuntimeException("getOdoHeading cannot be used without 3 deadwheels");
+      }
       double diffX;
-      diffX = encoderXR - encoderXL;
+      diffX = odoData.encoderXR - odoData.encoderXL;
       diffX = diffX % eTicksPerRotate;
       diffX = diffX / eTicksPerRotate * 360;
       return Functions.normalizeAngle(diffX);
    }
 
    public double returnOdoHeading() {
-      return odoHeading;
+      return odoData.odoHeading;
    }
 
    public double returnGlobalHeading() {
-      return globalHeading;
+      return odoData.globalHeading;
    }
 
    /* Get XY position data from odometry wheels */
-   private void updateXY () {
+   private Position updateOdoRawPose() {
       // this function could use some cleanup!
-      double deltaEncX, deltaEncY;
+      double changeX, changeY;
       double myHeading;
+      double xPos = odoRawPose.X;
+      double yPos = odoRawPose.Y;
 
-      //deltaEncX = (encoderXL - encoderXL0) / eTicksPerInch;  //for single encoder; no heading would be possible
-      deltaEncX = (encoderXL + encoderXR - encoderXL0 - encoderXR0) / 2.0 / eTicksPerInch;
-      deltaEncY = (encoderY - encoderY0) / eTicksPerInch;
+      /* Calculate the change in X & Y relative to the robot/encoders */
+      if (use3encoders) changeX = (odoData.encoderXL + odoData.encoderXR - odoData0.encoderXL - odoData0.encoderXR) / 2.0 / odoEncXL.ticksPerInch;
+      else changeX = (odoData.encoderXL - odoData0.encoderXL) / odoEncXL.ticksPerInch;  //for single encoder; no heading would be possible
+      changeY = (odoData.encoderY - odoData0.encoderY) / odoEncY.ticksPerInch;
 
-      myHeading = getAvgHeading(globalHeading0, globalHeading);
-
+      /* Calculate average heading from previous loop to this (movement did not only at the end of the loop!) */
+      myHeading = getAvgHeading(odoData0.globalHeading, odoData.globalHeading);
       TelemetryMgr.message(Category.ODOMETRY,"My Average Heading", myHeading);
 
-      xPos = xPos + deltaEncX * Math.cos(Math.toRadians(myHeading));
-      yPos = yPos + deltaEncX * Math.sin(Math.toRadians(myHeading));
+      xPos = xPos + changeX * Math.cos(Math.toRadians(myHeading));
+      yPos = yPos + changeX * Math.sin(Math.toRadians(myHeading));
 
-      xPos = xPos + deltaEncY * Math.sin(Math.toRadians(myHeading));
-      yPos = yPos - deltaEncY * Math.cos(Math.toRadians(myHeading));
+      xPos = xPos + changeY * Math.sin(Math.toRadians(myHeading));
+      yPos = yPos - changeY * Math.cos(Math.toRadians(myHeading));
 
-      /* Store current values for next loop */
-      encoderXL0 = encoderXL;
-      encoderY0 = encoderY;
-      encoderXR0 = encoderXR;
-      imuHeading0 = imuHeading;
-      odoHeading0 = odoHeading;
-      globalHeading0 = globalHeading;
+      return new Position(xPos, yPos, odoData.globalHeading);
    }
 
    /* Calculate average of two headings */
@@ -184,17 +184,6 @@ public class Odometry implements PartsInterface {
       return odoFinal;
    }
 
-//   void setOdoFieldOffset() {    //TODO: deal with odoFieldStart set to null [also, is this necessary or vestigial?]
-//      Position fS = odoFieldStart;
-//      Position rP = odoRobotPose;
-//      double offsetR = fS.R - rP.R;
-//      odoFieldOffset = new Position (
-//              fS.X - (rP.X*Math.cos(Math.toRadians(offsetR)) - rP.Y*Math.sin(Math.toRadians(offsetR))),
-//              fS.Y - (rP.X*Math.sin(Math.toRadians(offsetR)) + rP.Y*Math.cos(Math.toRadians(offsetR))),
-//              offsetR *1
-//      );
-//   }
-
    public boolean isOdoOffset() {
       return !odoFieldOffset.isEqualTo(zeroPos);
    }
@@ -219,7 +208,7 @@ public class Odometry implements PartsInterface {
       return new Position (
               fieldPose.X - (robotPose.X*Math.cos(Math.toRadians(offsetR)) - robotPose.Y*Math.sin(Math.toRadians(offsetR))),
               fieldPose.Y - (robotPose.X*Math.sin(Math.toRadians(offsetR)) + robotPose.Y*Math.cos(Math.toRadians(offsetR))),
-              offsetR *1
+              offsetR
       );
    }
 
@@ -238,21 +227,52 @@ public class Odometry implements PartsInterface {
       TelemetryMgr.message(Category.ODOMETRY, "odo-final", odoFinalPose.toString(2));
    }
 
+   /* this method is separated with the intent to be overridden */
    public void configureEncoders() {
-//      /* this is separated so it can be overridden */
-//      odoY = parts.robot.motor0B;
-//      odoXR = parts.robot.motor1B;
-//      odoXL = parts.robot.motor2B;
-//      odoY.setDirection(DcMotorEx.Direction.FORWARD);
-//      odoXL.setDirection(DcMotorEx.Direction.REVERSE);
-//      odoXR.setDirection(DcMotorEx.Direction.REVERSE);
-//      odoY.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-//      odoXL.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-//      odoXR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-//      /* dir should be -1 or 1 and is to account for the port being used elsewhere
-//         and needing to be set in direction opposite to what odometry needs */
-//      odoYdir = 1;
-//      odoXRdir = 1;
-//      odoXLdir = 1;
+      double TPI = 82300 / 48.0;
+      double TPR = 169619;
+      //2022-12-22 Measured 10 rot: 846684,850800; 845875,851775; 845127,845543; 848073,850867
+      //                            169748.4		169765		169067		169894		==>  169618.6
+
+      /* direction should be -1 or 1 and is to account for the port being used elsewhere
+         and needing to be set in direction opposite to what odometry needs */
+      odoEncXL = new EncoderSetting(parts.robot.motor2B, 1, TPI);
+      odoEncXR = new EncoderSetting(parts.robot.motor1B, 1, TPI);
+      odoEncY  = new EncoderSetting(parts.robot.motor0B, 1, TPI);
+      odoEncXL.encoderPort.setDirection(DcMotorEx.Direction.REVERSE);
+      odoEncXR.encoderPort.setDirection(DcMotorEx.Direction.REVERSE);
+      odoEncY.encoderPort.setDirection(DcMotorEx.Direction.FORWARD);
+      odoEncXL.encoderPort.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+      odoEncXR.encoderPort.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+      odoEncY.encoderPort.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+      eTicksPerRotate = TPR;
+   }
+
+   public static class OdoData {
+      long encoderXL, encoderXR, encoderY;
+      double odoHeading, imuHeading, globalHeading;
+      public OdoData(long encoderXL, long encoderXR, long encoderY, double odoHeading, double imuHeading, double globalHeading) {
+         this.encoderXL = encoderXL;
+         this.encoderXR = encoderXR;
+         this.encoderY = encoderY;
+         this.odoHeading = odoHeading;
+         this.imuHeading = imuHeading;
+         this.globalHeading = globalHeading;
+      }
+      @NonNull
+      public OdoData clone() {
+         return new OdoData(encoderXL, encoderXR, encoderY, odoHeading, imuHeading, globalHeading);
+      }
+   }
+
+   public static class EncoderSetting {
+      public DcMotorEx encoderPort;
+      byte direction;
+      double ticksPerInch;
+      public EncoderSetting(DcMotorEx encoderPort, int direction, double ticksPerInch) {
+         this.encoderPort = encoderPort;
+         this.direction = (byte)direction;
+         this.ticksPerInch = ticksPerInch;
+      }
    }
 }

@@ -4,8 +4,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Functions {
 
-    private static ElapsedTime timerLoop = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    private static double timeLoop;
+    private static final ElapsedTime timerLoop = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     // Hypotenuse function originally used in Blocky
     public static double mathHypotenuse(float arg0, float arg1) {
@@ -20,7 +19,7 @@ public class Functions {
     }
 
     public static double calculateLoopTime() {
-        timeLoop = timerLoop.milliseconds();
+        double timeLoop = timerLoop.milliseconds();
         timerLoop.reset();
         return timeLoop;
     }

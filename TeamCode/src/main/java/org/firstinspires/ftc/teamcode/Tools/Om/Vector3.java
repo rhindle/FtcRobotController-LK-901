@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.RobotParts.Common.Om;
-
+package org.firstinspires.ftc.teamcode.Tools.Om;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
+@Deprecated
 public class Vector3 {
 	public final double X,Y,Z;
 

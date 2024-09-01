@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr;
-import org.firstinspires.ftc.teamcode.RobotParts.Common.Om.Vector3;
+import org.firstinspires.ftc.teamcode.Tools.Om.Vector3;
 import org.firstinspires.ftc.teamcode.RobotParts.LegacyBots.Omdometry;
 import org.firstinspires.ftc.teamcode.RobotParts.LegacyBots.Robot;
 

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.RobotParts.Common;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.RobotParts.Common.Deprecated.Navigator;
 import org.firstinspires.ftc.teamcode.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.DSAprilTag;
@@ -13,18 +14,6 @@ import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.DSSpeedControl;
 public class Parts implements PartsInterface {
 
    /* Public OpMode members. */
-   public boolean useODO = false;
-   public boolean reverseDrive = false;
-   public boolean useDistanceSensors = true;
-   public boolean useDrivetrainEncoders = true;
-   public boolean useSlamra = false;
-   public boolean useAprilTag = false;
-   public boolean useNeoMatrix = false;
-   public Position robotPosition = new Position();
-   public Position fieldStartPosition;
-   public Position odoRobotOffset;
-   public Position slamraRobotOffset;
-
    public LinearOpMode opMode;
    public Robot robot;
    public ButtonMgr buttonMgr;
@@ -40,6 +29,20 @@ public class Parts implements PartsInterface {
    public TelemetryMgr telemetryHandler;
    public NeoMatrix neo;
 
+   public boolean useODO = false;
+   public boolean reverseDrive = false;
+   public boolean useDistanceSensors = true;
+   public boolean useDrivetrainEncoders = true;
+   public boolean useSlamra = false;
+   public boolean useAprilTag = false;
+   public boolean useNeoMatrix = false;
+   public Position robotPosition = new Position();
+   public Position fieldStartPosition;
+   public Position odoRobotOffset;
+   public Position slamraRobotOffset;
+   public boolean isSetup = false;
+   public double speedMaximum = 1;
+
    //---Legacy need to phase out
    public Navigator navigator;
    //---
@@ -51,8 +54,6 @@ public class Parts implements PartsInterface {
    public DSSpeedControl dsSpeedControl;
    public DSMisc dsMisc;
    //---
-
-   public boolean isSetup = false;
 
    /* Constructor */
    public Parts(LinearOpMode opMode){

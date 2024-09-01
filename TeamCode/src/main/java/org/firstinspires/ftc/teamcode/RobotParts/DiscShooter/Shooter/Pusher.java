@@ -45,4 +45,8 @@ public class Pusher {
     public static boolean isComplete() {
         return complete;
     }
+
+    public static int getState() {
+        return state;
+    }
 }

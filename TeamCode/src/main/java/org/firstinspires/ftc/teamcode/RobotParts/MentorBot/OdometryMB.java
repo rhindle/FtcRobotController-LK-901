@@ -13,21 +13,19 @@ public class OdometryMB extends Odometry {
 
     @Override
     public void configureEncoders() {
-        /* this is separated so it can be overridden */
-        odoY = parts.robot.motor0B;
-        odoXR = parts.robot.motor1B;
-        odoXL = parts.robot.motor2B;
-        odoY.setDirection(DcMotorEx.Direction.FORWARD);
-        odoXL.setDirection(DcMotorEx.Direction.REVERSE);
-        odoXR.setDirection(DcMotorEx.Direction.REVERSE);
-        odoY.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        odoXL.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        odoXR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-      /* dir should be -1 or 1 and is to account for the port being used elsewhere
-         and needing to be set in direction opposite to what odometry needs */
-        odoYdir = 1;
-        odoXRdir = 1;
-        odoXLdir = 1;
+        double TPI = 82300 / 48.0;
+        double TPR = 169619;
+        /* direction should be -1 or 1 and is to account for the port being used elsewhere
+           and needing to be set in direction opposite to what odometry needs */
+        odoEncXL = new EncoderSetting(parts.robot.motor2B, 1, TPI);
+        odoEncXR = new EncoderSetting(parts.robot.motor1B, 1, TPI);
+        odoEncY  = new EncoderSetting(parts.robot.motor0B, 1, TPI);
+        odoEncXL.encoderPort.setDirection(DcMotorEx.Direction.REVERSE);
+        odoEncXR.encoderPort.setDirection(DcMotorEx.Direction.REVERSE);
+        odoEncY.encoderPort.setDirection(DcMotorEx.Direction.FORWARD);
+        odoEncXL.encoderPort.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        odoEncXR.encoderPort.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        odoEncY.encoderPort.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        eTicksPerRotate = TPR;
     }
-
 }

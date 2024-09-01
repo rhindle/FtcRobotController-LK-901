@@ -38,15 +38,6 @@ public class PartsMB extends Parts {
             slamra.slamraRobotOffset = slamraRobotOffset;//.clone();
         }
 
-//        switch (rType) {
-//            case GOCANUM:
-//                break;
-//            case ANDYMARK:
-//                break;
-//            case GENERIC:
-//                break;
-//            default:
-//        }
     }
 
     @Override
