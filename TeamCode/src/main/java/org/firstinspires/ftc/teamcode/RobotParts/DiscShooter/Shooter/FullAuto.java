@@ -4,51 +4,66 @@ import org.firstinspires.ftc.teamcode.Tools.DataTypes.NavigationTarget;
 
 class FullAuto {
 
-    public static int stateFullAuto = 0;
+    private static int state = 0;
+    private static boolean complete = false;
 
-    public static void stateMachineFullAuto() {
+    //----State Machine Start-----
+    public static void stateMachine() {
+        if (complete) state = 0;
+        if (state < 1) return;  // not running
 
-        if (stateFullAuto == -9) {
-            DSShooter.parts.autoDrive.setAutoDrive(false);
-        }
-        if (stateFullAuto < 1 || stateFullAuto > 999) return;  // not running
+        if (!DSShooter.parts.positionMgr.hasPosition()) stop();    // cancel running if no navigation
 
-        if (!DSShooter.parts.positionMgr.hasPosition()) stateFullAuto = -9;    // cancel running if no navigation
-
-        if (stateFullAuto == 1) {
-            if (Shoot1.stateShoot1Step > 0 && Shoot1.stateShoot1Step <999) {
+        if (state == 1) {
+            if (Shoot1.isRunning()) {
                 DSShooter.cancelTimer = System.currentTimeMillis() + 1000;
-                Shoot1.stateShoot1Step = -9;
+                Shoot1.stop();
             }
-            if (Shoot3.stateShoot3Step > 0 && Shoot3.stateShoot3Step <999) {
+            if (Shoot3.isRunning()) {
                 DSShooter.cancelTimer = System.currentTimeMillis() + 1000;
-                Shoot3.stateShoot3Step = -9;
+                Shoot3.stop();
             }
-            if (System.currentTimeMillis() >= DSShooter.cancelTimer) stateFullAuto=2;
+            if (System.currentTimeMillis() >= DSShooter.cancelTimer) state++;
         }
 
-        if (stateFullAuto == 2) {                                    // navigate to launch position
+        if (state == 2) {                                    // navigate to launch position
             DSShooter.parts.autoDrive.setNavTarget(new NavigationTarget(DSShooter.autoLaunchPos, DSShooter.parts.dsMisc.toleranceHigh));
-            stateFullAuto++;
+            state++;
         }
-        if (stateFullAuto == 3) {                                   // wait until reach position then start shooting
+        if (state == 3) {                                   // wait until reach position and start blasting
             if (DSShooter.parts.autoDrive.onTargetByAccuracy) {
-                Shoot3.stateShoot3Step = 1;
-                stateFullAuto++;
+                Shoot3.start();
+                state++;
             }
         }
-        if (stateFullAuto == 4) {                                 // start blasting
-            Shoot3.stateShoot3Step = 1;
-            stateFullAuto++;
-        }
-        if (stateFullAuto == 5) {
-            if (Shoot3.stateShoot3Step == 1000) {
+        if (state == 4) {
+//            if (Shoot3.isComplete() && Push.isComplete()) {
+            if (Shoot3.isComplete()) {
                 DSShooter.parts.autoDrive.setAutoDrive(false);
                 DSShooter.closeGate();
                 DSShooter.spinnerOff();
                 DSShooter.retractPusher();
-                stateFullAuto=1000;
+                complete = true;
             }
         }
+    }
+    //----State Machine End-----
+
+    public static void start() {
+        complete = false;
+        state = 1;
+    }
+
+    public static void stop() {
+        DSShooter.parts.autoDrive.setAutoDrive(false);
+        state = -1;
+    }
+
+    public boolean isRunning() {
+        return (state>0);
+    }
+
+    public boolean isComplete() {
+        return complete;
     }
 }

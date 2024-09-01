@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.RobotParts.Common.Parts;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.TelemetryMgr;
-import org.firstinspires.ftc.teamcode.Tools.DataTypes.NavigationTarget;
 import org.firstinspires.ftc.teamcode.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
 
@@ -24,26 +23,21 @@ public class DSShooter implements PartsInterface {
 
    static final double spinnerRPM                      = 3600;
    static final double spinnerTolerance                = 150;
-   public static PIDFCoefficients spinnerPID    = new PIDFCoefficients(100,0,0,12.4);
+   public static PIDFCoefficients spinnerPID           = new PIDFCoefficients(100,0,0,12.4);
 
-   final double ingesterPower                   = 1;
+   static final double ingesterPower                   = 1;
 
    static Position autoLaunchPos                       = new Position(-24, 0, 0);  // must be updated!!
 
    /* Internal use */
    private static DcMotorEx motorSpinner;
-   private DcMotorEx motorIngester;
+   private static DcMotorEx motorIngester;
    private static Servo servoPusher;
    private static Servo servoGate;
    private static double spinRPMset;
    private static long gateTimer = System.currentTimeMillis();
    private static long pusherTimer = System.currentTimeMillis();
-   static double spinMultiplier;
-//   int stateShoot1Step = 0;
-//   int stateShoot3Step = 0;
-//   int statePushStep = 0;
-//   int stateFullAuto = 0;
-//   int cycleCount = 0;
+   private static double spinMultiplier = 60.0 / 28.0 * 1.0;  // ticksPerRev * gearRatio;;
    public static long cancelTimer = System.currentTimeMillis();
 
    /* Public OpMode members. */
@@ -60,7 +54,6 @@ public class DSShooter implements PartsInterface {
 
    public void initialize(){
       initMotors();
-      spinMultiplier = 60.0 / 28.0 * 1.0;  // ticksPerRev * gearRatio;
    }
 
    public void preInit() {
@@ -74,10 +67,10 @@ public class DSShooter implements PartsInterface {
 
    public void runLoop() {
       TelemetryMgr.message(TelemetryMgr.Category.BASIC, "SpinnerRPM", getSpinnerRPM());
-      Push.stateMachineAutoPush();
-      Shoot1.stateMachineShoot1();
-      Shoot3.stateMachineShoot3();
-      FullAuto.stateMachineFullAuto();
+      Pusher.stateMachine();
+      Shoot1.stateMachine();
+      Shoot3.stateMachine();
+      FullAuto.stateMachine();
    }
 
    public void stop() {
@@ -107,16 +100,23 @@ public class DSShooter implements PartsInterface {
    }
 
    public void startPush () {
-      Push.statePushStep = 1;
+      Pusher.start();
    }
    public void startShoot1 () {
-      Shoot1.stateShoot1Step = 1;
+      Shoot1.start();
    }
    public void startShoot3 () {
-      Shoot3.stateShoot3Step = 1;
+      Shoot3.start();
    }
    public void startFullAuto () {
-      FullAuto.stateFullAuto = 1;
+      FullAuto.start();
+   }
+
+   public void cancelStateMachines() {
+      Shoot1.stop();
+      Shoot3.stop();
+      Pusher.stop();
+      FullAuto.stop();
    }
 
    public void stopMotors() {
@@ -222,158 +222,4 @@ public class DSShooter implements PartsInterface {
    public static boolean isServoAtPosition(double servoPosition, double comparePosition) {
       return(Math.round(servoPosition*100.0) == Math.round(comparePosition*100.0));
    }
-
-//   public void stateMachineAutoPush() {
-//      if (statePushStep == -9) {
-//         retractPusher();
-//         statePushStep = -1;
-//      }
-//      if (statePushStep < 1 || statePushStep > 999) return;  // not running
-//
-//      if (statePushStep == 1) {                 // extend pusher
-//         extendPusher();
-//         statePushStep++;
-//      }
-//      if (statePushStep == 2) {                 // wait for complete, retract
-//         if (isPusherExtended()) {
-//            retractPusher();
-//            statePushStep++;
-//         }
-//      }
-//      if (statePushStep == 3) {                // wait for complete
-//         if (isPusherRetracted()) {
-//            statePushStep=1000;
-//         }
-//      }
-//   }
-
-//   public void stateMachineShoot1() {
-//      if (stateShoot1Step == -9) {
-//         spinnerOff();
-//         retractPusher();
-//         // do we want to close the gate?  Ring might be in there...
-//         stateShoot1Step = -1;
-//      }
-//      if (stateShoot1Step < 1 || stateShoot1Step > 999) return;  // not running
-//
-//      if (stateShoot1Step == 1) {                         // cancel other state machines if needed
-//         if (stateShoot3Step > 0 && stateShoot3Step <999) {
-//            cancelTimer = System.currentTimeMillis() + 1000;
-//            stateShoot3Step = -9;
-//         }
-//         if (System.currentTimeMillis() >= cancelTimer) stateShoot1Step++;
-//      }
-//      if (stateShoot1Step == 2) {                 // open gate, start spinner
-//         statePushStep = -9;   // cancel any ongoing pusher movement
-//         openGate();
-//         spinnerOn();
-//         retractPusher();
-//         stateShoot1Step++;
-//      }
-//      if (stateShoot1Step == 3) {                 // wait for gate up, spinner at rpm
-//         if (isGateOpen() && isPusherRetracted() && isSpinnerInTolerance()) {
-//            stateShoot1Step++;
-//            statePushStep = 1;    // start the pusher state machine
-//         }
-//      }
-//      if (stateShoot1Step == 4) {                 // wait for pusher machine to complete
-//         if (statePushStep <= 0) stateShoot1Step = -9;   //cancel if problem
-//         if (statePushStep == 1000) stateShoot1Step = 1000;
-//      }
-//   }
-
-//   public void stateMachineFullAuto() {
-//
-//      if (stateFullAuto == -9) {
-//         parts.autoDrive.setAutoDrive(false);
-//      }
-//      if (stateFullAuto < 1 || stateFullAuto > 999) return;  // not running
-//
-//      if (!parts.positionMgr.hasPosition()) stateFullAuto = -9;    // cancel running if no navigation
-//
-//      if (stateFullAuto == 1) {
-//         if (Shoot1.stateShoot1Step > 0 && Shoot1.stateShoot1Step <999) {
-//            cancelTimer = System.currentTimeMillis() + 1000;
-//            Shoot1.stateShoot1Step = -9;
-//         }
-//         if (stateShoot3Step > 0 && stateShoot3Step <999) {
-//            cancelTimer = System.currentTimeMillis() + 1000;
-//            stateShoot3Step = -9;
-//         }
-//         if (System.currentTimeMillis() >= cancelTimer) stateFullAuto=2;
-//      }
-//
-//      if (stateFullAuto == 2) {                                    // navigate to launch position
-//         parts.autoDrive.setNavTarget(new NavigationTarget(autoLaunchPos, parts.dsMisc.toleranceHigh));
-//         stateFullAuto++;
-//      }
-//      if (stateFullAuto == 3) {                                   // wait until reach position then start shooting
-//         if (parts.autoDrive.onTargetByAccuracy) {
-//            stateShoot3Step = 1;
-//            stateFullAuto++;
-//         }
-//      }
-//      if (stateFullAuto == 4) {                                 // start blasting
-//         stateShoot3Step = 1;
-//         stateFullAuto++;
-//      }
-//      if (stateFullAuto == 5) {
-//         if (stateShoot3Step == 1000) {
-//            parts.autoDrive.setAutoDrive(false);
-//            closeGate();
-//            spinnerOff();
-//            retractPusher();
-//            stateFullAuto=1000;
-//         }
-//      }
-//
-//   }
-
-   public void cancelStateMachines() {
-      Shoot1.stateShoot1Step = -9;
-      Shoot3.stateShoot3Step = -9;
-      Push.statePushStep = -9;
-      FullAuto.stateFullAuto = -9;
-   }
-
-//   public void stateMachineShoot3() {
-//      if (stateShoot3Step == -9) {
-//         spinnerOff();
-//         retractPusher();
-//         // do we want to close the gate?  Ring might be in there...
-//         stateShoot3Step = -1;
-//      }
-//      if (stateShoot3Step < 1 || stateShoot3Step > 999) return;  // not running
-//
-//      if (stateShoot3Step == 1) {                                       // cancel other state machines if needed
-//         if (Shoot1.stateShoot1Step > 0 && Shoot1.stateShoot1Step <999) {
-//            cancelTimer = System.currentTimeMillis() + 1000;
-//            Shoot1.stateShoot1Step = -9;
-//         }
-//         if (System.currentTimeMillis() >= cancelTimer) stateShoot3Step++;
-//      }
-//      if (stateShoot3Step == 2) {                 // open gate, start spinner
-//         Push.statePushStep = -9;   // cancel any ongoing pusher movement
-//         cycleCount = 0;
-//         openGate();
-//         spinnerOn();
-//         retractPusher();
-//         stateShoot3Step++;
-//      }
-//      if (stateShoot3Step == 3) {                 // wait for gate up, spinner at rpm
-//         if (isGateOpen() && isPusherRetracted() && isSpinnerInTolerance()) {
-//            stateShoot3Step++;
-//            Push.statePushStep = 1;    // start the pusher state machine
-//         }
-//      }
-//      if (stateShoot3Step == 4) {                 // wait for pusher machine to complete
-//         if (Push.statePushStep <= 0) stateShoot3Step = -9;   //cancel if problem
-//         if (Push.statePushStep == 1000) {
-//            cycleCount++;
-//            Push.statePushStep = 1;      //restart pusher
-//         }
-//         if (cycleCount == pusherAutoCycles) stateShoot3Step = 1000;
-//      }
-//   }
-
 }

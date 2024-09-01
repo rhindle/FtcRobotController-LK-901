@@ -2,46 +2,68 @@ package org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.Shooter;
 
 class Shoot3 {
 
-    public static int stateShoot3Step = 0;
-    static int cycleCount = 0;
+    private static int state = 0;
+    private static int cycleCount = 0;
+    private static boolean complete = false;
 
-    public static void stateMachineShoot3() {
-        if (stateShoot3Step == -9) {
-            DSShooter.spinnerOff();
-            DSShooter.retractPusher();
-            // do we want to close the gate?  Ring might be in there...
-            stateShoot3Step = -1;
-        }
-        if (stateShoot3Step < 1 || stateShoot3Step > 999) return;  // not running
+    //----State Machine Start-----
+    public static void stateMachine() {
+        if (complete) state = 0;
+        if (state < 1) return;  // not running
 
-        if (stateShoot3Step == 1) {                                       // cancel other state machines if needed
-            if (Shoot1.stateShoot1Step > 0 && Shoot1.stateShoot1Step <999) {
+        if (state == 1) {                                       // cancel other state machines if needed
+            if (Shoot1.isRunning()) {
                 DSShooter.cancelTimer = System.currentTimeMillis() + 1000;
-                Shoot1.stateShoot1Step = -9;
+                Shoot1.stop();
             }
-            if (System.currentTimeMillis() >= DSShooter.cancelTimer) stateShoot3Step++;
+            if (System.currentTimeMillis() >= DSShooter.cancelTimer) state++;
         }
-        if (stateShoot3Step == 2) {                 // open gate, start spinner
-            Push.statePushStep = -9;   // cancel any ongoing pusher movement
+        if (state == 2) {                 // open gate, start spinner
+            Pusher.stop();   // cancel any ongoing pusher movement
             cycleCount = 0;
             DSShooter.openGate();
             DSShooter.spinnerOn();
             DSShooter.retractPusher();
-            stateShoot3Step++;
+            state++;
         }
-        if (stateShoot3Step == 3) {                 // wait for gate up, spinner at rpm
+        if (state == 3) {                 // wait for gate up, spinner at rpm
             if (DSShooter.isGateOpen() && DSShooter.isPusherRetracted() && DSShooter.isSpinnerInTolerance()) {
-                stateShoot3Step++;
-                Push.statePushStep = 1;    // start the pusher state machine
-            }
-        }
-        if (stateShoot3Step == 4) {                 // wait for pusher machine to complete
-            if (Push.statePushStep <= 0) stateShoot3Step = -9;   //cancel if problem
-            if (Push.statePushStep == 1000) {
                 cycleCount++;
-                Push.statePushStep = 1;      //restart pusher
+                Pusher.start();    // start the pusher state machine
+                state++;
             }
-            if (cycleCount == DSShooter.pusherAutoCycles) stateShoot3Step = 1000;
         }
+        if (state == 4) {                 // wait for pusher machine to complete
+            if (Pusher.isComplete()) {
+                if (cycleCount == DSShooter.pusherAutoCycles) complete = true;
+                else if (DSShooter.isSpinnerInTolerance()) {
+                    cycleCount++;
+                    Pusher.start();      //restart pusher
+                }
+            }
+            else if (!Pusher.isRunning()) stop();   //cancel if problem
+//            if (cycleCount == DSShooter.pusherAutoCycles) complete = true;  //note:push is still running at this moment
+        }
+    }
+    //----State Machine End-----
+
+    public static void start() {
+        complete = false;
+        state = 1;
+    }
+
+    public static void stop() {
+        DSShooter.spinnerOff();
+        DSShooter.retractPusher();
+        // do we want to close the gate?  Ring might be in there...
+        state = -1;
+    }
+
+    public static boolean isRunning() {
+        return (state>0);
+    }
+
+    public static boolean isComplete() {
+        return complete;
     }
 }
