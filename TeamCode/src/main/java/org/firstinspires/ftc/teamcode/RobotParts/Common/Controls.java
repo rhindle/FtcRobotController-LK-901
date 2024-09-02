@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.RobotParts.Common;
 
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.DriveData;
@@ -13,7 +12,6 @@ public class Controls implements PartsInterface {
    public Gamepad gamepad2;
    public ButtonMgr buttonMgr;
    public DriveData driveData;
-   //public double driveSpeed, driveAngle, rotate;  // this left in place for old controls (e.g., ControlsMB) and shall be deleted in the future
    public double liftSpeed;
 
    /* Constructor */

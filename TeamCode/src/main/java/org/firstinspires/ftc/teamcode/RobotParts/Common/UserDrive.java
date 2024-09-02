@@ -133,9 +133,9 @@ public class UserDrive implements PartsInterface {
          idleDelay = System.currentTimeMillis() + 500;  //was 250 to match rotate?
          useHoldOK = true;
       }
-      if (parts.positionMgr.noPosition()) return;
-//      if (idleDelay < System.currentTimeMillis() && useHoldPosition) {
-//      }
+      //      if (parts.positionMgr.noPosition()) return;
+      //      if (idleDelay < System.currentTimeMillis() && useHoldPosition) {
+      //      }
    }
 
    public void handleRotateIdle() { //(double rotate) {

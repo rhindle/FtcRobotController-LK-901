@@ -22,7 +22,6 @@ import java.util.List;
 
 public class Robot implements PartsInterface {
     /* Public OpMode members. */
-//    public boolean disableIMUupdate = false;
 
     public DcMotorEx    motor0   = null;
     public DcMotorEx    motor1   = null;
@@ -62,12 +61,24 @@ public class Robot implements PartsInterface {
     public DigitalChannel   digital5 = null;
     public DigitalChannel   digital6 = null;
     public DigitalChannel   digital7 = null;
+    public DigitalChannel   digital0B = null;
+    public DigitalChannel   digital1B = null;
+    public DigitalChannel   digital2B = null;
+    public DigitalChannel   digital3B = null;
+    public DigitalChannel   digital4B = null;
+    public DigitalChannel   digital5B = null;
+    public DigitalChannel   digital6B = null;
+    public DigitalChannel   digital7B = null;
     // Add B here as needed
 
     public AnalogInput  analog0 = null;
     public AnalogInput  analog1 = null;
     public AnalogInput  analog2 = null;
     public AnalogInput  analog3 = null;
+    public AnalogInput  analog0B = null;
+    public AnalogInput  analog1B = null;
+    public AnalogInput  analog2B = null;
+    public AnalogInput  analog3B = null;
     // Add B here as needed
 
 //    public BNO055IMU sensorIMU      = null;
@@ -85,9 +96,6 @@ public class Robot implements PartsInterface {
 
     LinearOpMode opMode;
     HardwareMap hardwareMap;
-
-//    Orientation angles;
-//    double imuHeading;
 
     /* Constructor */
     public Robot(Parts parts){
@@ -120,32 +128,10 @@ public class Robot implements PartsInterface {
         for (LynxModule module : allHubs) {
             module.clearBulkCache();
         }
-//        // Read IMU - once per cycle!
-//        if (!disableIMUupdate) updateImuHeading();
     }
 
     public void stop() {
     }
-
-//    private void updateImuHeading() {
-//        imuHeading =  imuHeading(true);
-//    }
-//
-//    private double imuHeading() {
-//        return imuHeading(false);
-//    }
-//    private double imuHeading(boolean readme) {
-//        if (readme) angles = sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-//        return angles.firstAngle;
-//    }
-//
-//    public double returnImuHeading() {
-//        return imuHeading;
-//    }
-//    public double returnImuHeading(boolean forceRead) {
-//        if (forceRead) updateImuHeading();
-//        return imuHeading;
-//    }
 
     /* Initialize standard Hardware interfaces */
     public void init() {
@@ -175,10 +161,10 @@ public class Robot implements PartsInterface {
             )
         );
 
-//        sensorIMU = hardwareMap.get(BNO055IMU.class, "imu");
-//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
-//        sensorIMU.initialize(parameters);
+        //        sensorIMU = hardwareMap.get(BNO055IMU.class, "imu");
+        //        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        //        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
+        //        sensorIMU.initialize(parameters);
 
         initOptions();
     }
@@ -193,14 +179,14 @@ public class Robot implements PartsInterface {
         motor2B = hardwareMap.get(DcMotorEx.class, "motor2B");
         motor3B = hardwareMap.get(DcMotorEx.class, "motor3B");
 
-        motor0.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor1.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor2.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor3.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor0B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor1B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor2B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motor3B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        motor0.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using spur gear motors
+        motor1.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using spur gear motors
+        motor2.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using spur gear motors
+        motor3.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using spur gear motors
+        motor0B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using spur gear motors
+        motor1B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using spur gear motors
+        motor2B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using spur gear motors
+        motor3B.setDirection(DcMotorEx.Direction.FORWARD); // Set to REVERSE if using spur gear motors
 
         motor0.setPower(0);
         motor1.setPower(0);
@@ -249,6 +235,14 @@ public class Robot implements PartsInterface {
         digital5 = hardwareMap.get(DigitalChannel.class, "digital5");
         digital6 = hardwareMap.get(DigitalChannel.class, "digital6");
         digital7 = hardwareMap.get(DigitalChannel.class, "digital7");
+        digital0B = hardwareMap.get(DigitalChannel.class, "digital0B");
+        digital1B = hardwareMap.get(DigitalChannel.class, "digital1B");
+        digital2B = hardwareMap.get(DigitalChannel.class, "digital2B");
+        digital3B = hardwareMap.get(DigitalChannel.class, "digital3B");
+        digital4B = hardwareMap.get(DigitalChannel.class, "digital4B");
+        digital5B = hardwareMap.get(DigitalChannel.class, "digital5B");
+        digital6B = hardwareMap.get(DigitalChannel.class, "digital6B");
+        digital7B = hardwareMap.get(DigitalChannel.class, "digital7B");
 
         digital0.setMode(DigitalChannel.Mode.INPUT);
         digital1.setMode(DigitalChannel.Mode.INPUT);
@@ -258,6 +252,14 @@ public class Robot implements PartsInterface {
         digital5.setMode(DigitalChannel.Mode.INPUT);
         digital6.setMode(DigitalChannel.Mode.INPUT);
         digital7.setMode(DigitalChannel.Mode.INPUT);
+        digital0B.setMode(DigitalChannel.Mode.INPUT);
+        digital1B.setMode(DigitalChannel.Mode.INPUT);
+        digital2B.setMode(DigitalChannel.Mode.INPUT);
+        digital3B.setMode(DigitalChannel.Mode.INPUT);
+        digital4B.setMode(DigitalChannel.Mode.INPUT);
+        digital5B.setMode(DigitalChannel.Mode.INPUT);
+        digital6B.setMode(DigitalChannel.Mode.INPUT);
+        digital7B.setMode(DigitalChannel.Mode.INPUT);
     }
 
     public void initAnalog() {
@@ -265,6 +267,10 @@ public class Robot implements PartsInterface {
         analog1 = hardwareMap.get(AnalogInput.class, "analog1");
         analog2 = hardwareMap.get(AnalogInput.class, "analog2");
         analog3 = hardwareMap.get(AnalogInput.class, "analog3");
+        analog0B = hardwareMap.get(AnalogInput.class, "analog0B");
+        analog1B = hardwareMap.get(AnalogInput.class, "analog1B");
+        analog2B = hardwareMap.get(AnalogInput.class, "analog2B");
+        analog3B = hardwareMap.get(AnalogInput.class, "analog3B");
     }
 
     public void settingOptions() {
@@ -278,7 +284,7 @@ public class Robot implements PartsInterface {
         ServoControllerEx controller = (ServoControllerEx) servo.getController();
         int servoPort = servo.getPortNumber();
         controller.setServoPwmDisable(servoPort);
-//        if (controller.isServoPwmEnabled(servoPort)) controller.setServoPwmDisable(servoPort);
+//        if (controller.isServoPwmEnabled(servoPort)) controller.setServoPwmDisable(servoPort);  //todo:check this
 //        else controller.setServoPwmEnable(servoPort);
     }
 

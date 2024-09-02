@@ -111,6 +111,11 @@ public class ImuMgr implements PartsInterface {
       return imuHeadingRaw;
    }
 
+   public Position returnImuRobotHeadingAsPosition() {
+      // potentially useful because of it's ability to return null
+      if (disableIMUupdate) return null;
+      return new Position(0,0, imuRobotHeading);
+   }
    public double returnImuRobotHeading() {
       return imuRobotHeading;
    }

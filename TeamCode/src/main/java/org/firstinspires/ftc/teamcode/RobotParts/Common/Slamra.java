@@ -72,7 +72,7 @@ public class Slamra implements PartsInterface {
 	public boolean isSlamraChanging() {
 		if(!slamraRawPose.isEqualTo(lastPos)) {
 			timesStuck = 0;
-			lastPos = slamraRawPose.clone();  // add .clone?????
+			lastPos = slamraRawPose.clone();
 			return true;
 		} else {
 			timesStuck ++;
@@ -141,10 +141,10 @@ public class Slamra implements PartsInterface {
 	}
 
 	public void addTeleOpTelemetry() {
-		TelemetryMgr.message(Category.SLAMRA, "slm-fldof", slamraFieldOffset.toString(2));
-		TelemetryMgr.message(Category.SLAMRA, "slm-raw__", slamraRawPose.toString(2));
-		TelemetryMgr.message(Category.SLAMRA, "slm-robot", slamraRobotPose.toString(2));
-		TelemetryMgr.message(Category.SLAMRA, "slm-final", slamraFinalPose.toString(2));
-		TelemetryMgr.message(Category.SLAMRA, "slamra stuck", timesStuck);
+		TelemetryMgr.message(Category.SLAMRA_EXT, "fldof", slamraFieldOffset.toString(2));
+		TelemetryMgr.message(Category.SLAMRA_EXT, "raw__", slamraRawPose.toString(2));
+		TelemetryMgr.message(Category.SLAMRA_EXT, "robot", slamraRobotPose.toString(2));
+		TelemetryMgr.message(Category.SLAMRA, "final", slamraFinalPose.toString(2));
+		TelemetryMgr.message(Category.SLAMRA, "stuck", timesStuck);
 	}
 }

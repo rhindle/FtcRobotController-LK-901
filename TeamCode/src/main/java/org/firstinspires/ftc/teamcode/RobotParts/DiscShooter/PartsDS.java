@@ -115,7 +115,7 @@ public class PartsDS extends Parts {
         dsShooter.runLoop();
         if (useNeoMatrix) dsLed.runLoop();
 
-        //experiment follows, to be moved elsewhere eventually  //todo:move this (including firstlock variable)
+        /* AprilTag experiment follows, to be moved elsewhere eventually */   //todo:move this (including firstlock variable)
         if (useAprilTag) {
             Position roboTagPosition = dsApriltag.getTagRobotPosition();
             if (roboTagPosition != null) {
@@ -126,31 +126,25 @@ public class PartsDS extends Parts {
             }
             if (dsApriltag.tagRobotPosition!=null){
                 dsLed.updateGraphic('1', Color.rgb(0,4,1));
-//                neo.drawRectangle(3,4,3,4, Color.rgb(0,4,1));
                 if (firstLock && !userDrive.isDriving) {   //todo:make this better
                     firstLock = false;
                     autoDrive.setNavTarget(new NavigationTarget(new Position(-20,0,0), dsMisc.toleranceHigh));
                 }
             } else if (dsApriltag.instantTagRobotPosition!=null) {
                 dsLed.updateGraphic('1', Color.rgb(2,1,0));
-//                neo.drawRectangle(3,4,3,4, Color.rgb(2,1,0));
             } else {
                 dsLed.updateGraphic('1', Color.rgb(2,0,0));
-//                neo.drawRectangle(3,4,3,4, Color.rgb(2,0,0));
             }
         }
 
         if (positionMgr.robotPosition!=null) {
             if (dsApriltag.strongLocked) {
                 dsLed.updateGraphic('2', Color.rgb(0,2,0));
-//                neo.drawRectangle(2, 5, 2, 5, Color.rgb(0, 2, 0));
             } else {
                 dsLed.updateGraphic('2', Color.rgb(2,1,0));
-//                neo.drawRectangle(2, 5, 2, 5, Color.rgb(2, 1, 0));
             }
         } else {
             dsLed.updateGraphic('2', Color.rgb(2,0,0));
-//            neo.drawRectangle(2,5,2,5, Color.rgb(2,0,0));
             dsApriltag.strongLocked=false;  // if all is lost, allow a weak lock again
         }
     }
@@ -162,5 +156,4 @@ public class PartsDS extends Parts {
         dsShooter.stop();
         drivetrain.stop();
     }
-
 }

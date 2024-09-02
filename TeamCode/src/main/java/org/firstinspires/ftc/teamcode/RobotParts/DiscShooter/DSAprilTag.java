@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotParts.DiscShooter;
 
+import android.annotation.SuppressLint;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -51,21 +53,21 @@ public class DSAprilTag implements PartsInterface {
         }
     }
 
-    public void preInit() {};
+    public void preInit() {}
 
     public void initLoop() {
         updateAprilTag();
-    };
+    }
 
-    public void preRun() {};
+    public void preRun() {}
 
     public void runLoop() {
         updateAprilTag();
-    };
+    }
 
     public void stop() {
         visionPortal.close();
-    };
+    }
 
     public void enableStreaming (boolean streamBoo) {
         if (streamBoo) {
@@ -149,6 +151,7 @@ public class DSAprilTag implements PartsInterface {
         //visionPortal.setProcessorEnabled(aprilTag, true);
     }
 
+    @SuppressLint("DefaultLocale")
     private void updateAprilTag() {
 
         instantTagRobotPosition = null;
@@ -157,10 +160,15 @@ public class DSAprilTag implements PartsInterface {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         TelemetryMgr.message(Category.APRILTAG,"# AprilTags Detected", currentDetections.size());
 
+        // Add "key" information to telemetry
+        TelemetryMgr.message(Category.APRILTAG_EXT,"XYZ = X (Right), Y (Forward), Z (Up) dist.");
+        TelemetryMgr.message(Category.APRILTAG_EXT,"PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+        TelemetryMgr.message(Category.APRILTAG_EXT,"RBE = Range, Bearing & Elevation");
+
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
-                TelemetryMgr.message(Category.APRILTAG,String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                TelemetryMgr.message(Category.APRILTAG,String.format("=== (ID %d) %s", detection.id, detection.metadata.name));
                 TelemetryMgr.message(Category.APRILTAG,String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                 TelemetryMgr.message(Category.APRILTAG,String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 TelemetryMgr.message(Category.APRILTAG_EXT,String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
@@ -209,7 +217,7 @@ public class DSAprilTag implements PartsInterface {
         }   // end for() loop
 
         if (currentDetections.size() == 0) {
-            for (int j=0; j<9; j++) {
+            for (int j=0; j<8; j++) {
                 TelemetryMgr.message(Category.APRILTAG,"X");
             }
             for (int j=0; j<6; j++) {
@@ -217,14 +225,9 @@ public class DSAprilTag implements PartsInterface {
             }
         }
 
-        // Add "key" information to telemetry
-//        TelemetryMgr.message(Category.APRILTAG,"\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
-        TelemetryMgr.message(Category.APRILTAG_EXT,"XYZ = X (Right), Y (Forward), Z (Up) dist.");
-        TelemetryMgr.message(Category.APRILTAG_EXT,"PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-        TelemetryMgr.message(Category.APRILTAG_EXT,"RBE = Range, Bearing & Elevation");
-
     }   // end method telemetryAprilTag()
 
+    @SuppressLint("DefaultLocale")
     void processTagPosition() {
         int length=lastPositions.length;
 
@@ -240,7 +243,7 @@ public class DSAprilTag implements PartsInterface {
             meanPosition.Y += i.Y / length;
             meanPosition.R += i.R / length;
         }
-        TelemetryMgr.message(Category.APRILTAG,String.format("meanPos_ XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", meanPosition.X, meanPosition.Y, meanPosition.R));
+        TelemetryMgr.message(Category.APRILTAG,String.format("meanPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", meanPosition.X, meanPosition.Y, meanPosition.R));
 
         // calculate the standard deviation
         Position stdevPosition = new Position();
@@ -253,7 +256,7 @@ public class DSAprilTag implements PartsInterface {
         stdevPosition.X = Math.sqrt(stdevPosition.X / length);
         stdevPosition.Y = Math.sqrt(stdevPosition.Y / length);
         stdevPosition.R = Math.sqrt(stdevPosition.R / length);
-        TelemetryMgr.message(Category.APRILTAG,String.format("stdvPos_ XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", stdevPosition.X, stdevPosition.Y, stdevPosition.R));
+        TelemetryMgr.message(Category.APRILTAG,String.format("stdvPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", stdevPosition.X, stdevPosition.Y, stdevPosition.R));
 
         if (stdevPosition.X <= acceptableStDev.X && stdevPosition.Y <= acceptableStDev.Y && stdevPosition.R <= acceptableStDev.R) {
             if (Math.abs(meanPosition.R) <= strongLockMaxAngle) {

@@ -152,9 +152,9 @@ public class Odometry implements PartsInterface {
       myHeading = getAvgHeading(odoData0.globalHeading, odoData.globalHeading);
       TelemetryMgr.message(Category.ODOMETRY,"My Average Heading", myHeading);
 
+      /* Calculate the new x and y positions */
       xPos = xPos + changeX * Math.cos(Math.toRadians(myHeading));
       yPos = yPos + changeX * Math.sin(Math.toRadians(myHeading));
-
       xPos = xPos + changeY * Math.sin(Math.toRadians(myHeading));
       yPos = yPos - changeY * Math.cos(Math.toRadians(myHeading));
 

@@ -288,7 +288,7 @@ public class AutoDrive implements PartsInterface {
       LOST
    }
 
-   public class Error {
+   public static class Error {
 
       public double x, y, rot, dist;
 

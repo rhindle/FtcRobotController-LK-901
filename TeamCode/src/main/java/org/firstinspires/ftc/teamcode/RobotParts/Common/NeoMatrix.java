@@ -203,7 +203,6 @@ public class NeoMatrix {
       for (int c = startC; c <= endC; c++) {
          for (int r = 0; r < ledRows; r++) {
             matrixBuffer[c][r]=0;
-
          }
       }
    }

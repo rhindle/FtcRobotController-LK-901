@@ -10,6 +10,12 @@ public class DSLed implements PartsInterface {
    /* Public OpMode members. */
    public Parts parts;
 
+   public int cols = 16;
+   public int rows = 8;
+
+   int[][] messageMatrix = new int[cols][rows];
+   int[][] normalMatrix = new int[cols][rows];
+   int[][] finalMatrix = new int[cols][rows];
 
    /* Constructor */
    public DSLed(Parts parts){
@@ -42,11 +48,11 @@ public class DSLed implements PartsInterface {
 
    public void preRun() {
       parts.neo.clearMatrix();
-      normalMatrix = parts.neo.newPixelMapSameSize(normalMatrix);
+//      normalMatrix = parts.neo.newPixelMapSameSize(normalMatrix);
+      normalMatrix = new int[cols][rows];
       updateGraphic('4', Color.rgb(1,1,1));
       parts.neo.applyPixelMapToBuffer(finalMatrix,0,15,0, true);
       parts.neo.forceUpdateMatrix();
-//      parts.neo.drawRectangle(0,7,0,7, Color.rgb(1,1,1));
       parts.neo.setUpdateLimit(1);
    }
 
@@ -69,7 +75,6 @@ public class DSLed implements PartsInterface {
    public void displayMessage (char msgChar, int color) {
       if (!parts.useNeoMatrix) return;
       clearMessageTimer = System.currentTimeMillis() + messageDisplayTime;
-//      parts.neo.clearCols(8,15);
       int msgColor;
       int[][] textMatrix;
       switch (color) {
@@ -84,12 +89,11 @@ public class DSLed implements PartsInterface {
             msgColor = Color.rgb(2,2,2);
       }
       textMatrix = parts.neo.buildPixelMapFromString(String.valueOf(msgChar), parts.neo.bigLetters, msgColor);
-      messageMatrix = parts.neo.newPixelMapSameSize(messageMatrix);
+//      messageMatrix = parts.neo.newPixelMapSameSize(messageMatrix);
+      messageMatrix = new int[cols][rows];
       messageMatrix = parts.neo.overlayPixelMap(textMatrix, messageMatrix, 2);
       messageMatrix = parts.neo.overlayPixelMap(textMatrix, messageMatrix, 10);
       finalMatrix = parts.neo.cloneArray(messageMatrix);
-//      parts.neo.applyPixelMapToBuffer(messageMatrix,10,15,0, true);
-//      parts.neo.applyPixelMapToBuffer(messageMatrix,2,7,0, true);
    }
 
    public void updateGraphic (char msgChar, int color) {
@@ -106,14 +110,8 @@ public class DSLed implements PartsInterface {
       }
       if (System.currentTimeMillis() >= clearMessageTimer) {
          clearMessageTimer = 0;
-//         parts.neo.clearCols(8,15);
       }
    }
-
-//   int[][] textMatrix;
-   int[][] messageMatrix = new int[16][8];
-   int[][] normalMatrix = new int[16][8];
-   int[][] finalMatrix = new int[16][8];
 
    public final char[][] marquis = {
            {'a', 17, 128, 0, 0, 1, 128, 0, 34},

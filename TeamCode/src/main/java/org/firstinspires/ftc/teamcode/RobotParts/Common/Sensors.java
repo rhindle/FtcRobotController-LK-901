@@ -9,6 +9,8 @@ import org.firstinspires.ftc.teamcode.Tools.PartsInterface;
 
 public class Sensors implements PartsInterface {
 
+   //todo: This is not a very good "Common" part. Consider making sweeping changes!
+
    Parts parts;
    HardwareMap hardwareMap;
 

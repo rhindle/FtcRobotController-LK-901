@@ -24,26 +24,16 @@ public class ControlsDS extends Controls {
    public void runLoop() {
       driveData = new DriveData();
       userInput();
-//      parts.userDrive.setUserDriveSettings(driveSpeed, driveAngle, rotate);
       parts.userDrive.setUserDriveSettings(driveData);
    }
 
    @Override
    public void userInput() {
 
-      //      // Get speed and direction from left stick
-      ////      driveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y)));
-      //      driveSpeed = Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y);
-      //      driveAngle = Math.toDegrees(Math.atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y));  //gamepad.x = left/right = robot.y
-      //      // Get rotation from right stick
-      ////      rotate = Math.pow(gamepad1.right_stick_x, 1);
-      //      rotate = gamepad1.right_stick_x;
-      ////      parts.navigator.handleRotate(rotate);
-
-      //forza - can't work with dead man switch, so simulate
-      //DriveData driveDataTeam = new DriveData(gamepad1.left_stick_y, 0, gamepad1.left_stick_x, gamepad1.right_stick_x);
       DriveData driveDataTeam = new DriveData(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
       DriveData driveDataGuest = new DriveData(gamepad2.left_stick_x, gamepad2.left_stick_y, gamepad2.right_stick_x);
+      //forza - can't work with dead man switch, so simulate
+      //DriveData driveDataTeam = new DriveData(gamepad1.left_stick_y, 0, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
       /* Controls will be in the style of dead man switches */
       guestOK = buttonMgr.isPressed(1,Buttons.left_trigger);
@@ -84,7 +74,7 @@ public class ControlsDS extends Controls {
          }
       }
 
-      /* With the most dangerous things out of the way, we can move on to the other controls */
+      /* With the most dangerous things out of the way (i.e., drivertrain motion), we can move on to the other controls */
 
       if (eitherGuestOrTeam(Buttons.dpad_left, State.wasSingleTapped))
          DSShooter.disarmShooter();

@@ -49,9 +49,9 @@ public class Drivetrain {
     }
 
     public void applyDrivePowers() {
-        TelemetryMgr.message(Category.DRIVETRAIN, "dt-raw", drivePowers.toString(2));
+        TelemetryMgr.message(Category.DRIVETRAIN, "raw", drivePowers.toString(2));
         if (minimizeCycleTime) drivePowers = adjustPowers(drivePowers, drivePowersLast);
-        TelemetryMgr.message(Category.DRIVETRAIN, "dt-adj", drivePowers.toString(2));
+        TelemetryMgr.message(Category.DRIVETRAIN, "adj", drivePowers.toString(2));
         motorLF.setPower(drivePowers.v0);
         motorRF.setPower(drivePowers.v1);
         motorLR.setPower(drivePowers.v2);

@@ -22,8 +22,8 @@ public class DSSpeedControl implements PartsInterface {
    public DrivePowers drivePowers;
    public double speedMaximum;
    public double speedMaximumNoPosition = 0.33;
-   public Fence fenceInner = new Fence(0.5, new Position(-30,17), new Position(-64,-17));
-   public Fence fenceOuter = new Fence(0.25, new Position(-18,29), new Position(-76,-29));
+   public Fence fenceInner = new Fence(0.5, new Position(-30, 17), new Position(-64, -17));
+   public Fence fenceOuter = new Fence(0.25, new Position(-18, 29), new Position(-76, -29));
 
    /* Constructor */
    public DSSpeedControl(Parts parts){
@@ -49,12 +49,17 @@ public class DSSpeedControl implements PartsInterface {
    public void runLoop() {
       if (!parts.userDrive.isDriving) {
          // insert dummy telemetry so it doesn't bounce around
-         TelemetryMgr.message(Category.SPEED,"SpdCtrl - Not Driving", JavaUtil.formatNumber(0,2));
-         TelemetryMgr.message(Category.DRIVETRAIN,"dt-fnc : Not applicable");
+         TelemetryMgr.message(Category.SPEED,"SpdCtrl - Not Driving");
+         TelemetryMgr.message(Category.SPEED,"Fence : Not applicable");
          return;
       }
       // if rotating only, don't use the fences  //todo:consider this
-      if (parts.userDrive.driveSpeed==0) return;
+      if (parts.userDrive.driveSpeed==0) {
+         // insert dummy telemetry so it doesn't bounce around
+         TelemetryMgr.message(Category.SPEED,"SpdCtrl - Rotating only");
+         TelemetryMgr.message(Category.SPEED,"Fence : Not applicable");
+         return;
+      }
       // if UserDrive is driving robot, adjust the powers as necessary and send them to drivetrain again
       drivePowers=parts.userDrive.drivePowers.clone();
       //speedMaximum=parts.userDrive.speedMaximum;
@@ -64,7 +69,7 @@ public class DSSpeedControl implements PartsInterface {
          drivePowers.scaleAverage(speedMaximum);
       }
       parts.drivetrain.setDrivePowers(drivePowers);
-      TelemetryMgr.message(Category.DRIVETRAIN,"dt-fnc", drivePowers.toString(2));
+      TelemetryMgr.message(Category.SPEED,"Fence", drivePowers.toString(2));
    }
 
    public void stop() {
@@ -131,7 +136,7 @@ public class DSSpeedControl implements PartsInterface {
       return outside ? fence.outsideSpeed : fence.insideSpeed;
    }
 
-   public class Fence {
+   public static class Fence {
 
       public double insideSpeed, outsideSpeed;
       public double xMax, xMin, yMax, yMin;
@@ -163,6 +168,5 @@ public class DSSpeedControl implements PartsInterface {
          this.yMax = topLeft.Y;
          this.yMin = bottomRight.Y;
       }
-
    }
 }

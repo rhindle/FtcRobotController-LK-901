@@ -12,6 +12,7 @@ public class PositionMgr implements PartsInterface {
    public Position odoPosition;
    public Position slamraPosition;
    public Position tagPosition;
+   public Position imuHeading;
 
    public PosSource[] priorityList = {PosSource.ODO, PosSource.SLAMRA, PosSource.TAG};
    public Boolean prioritizeSlamraRforODO = false;      // use Slamra R instead of IMU for ODO
@@ -51,12 +52,16 @@ public class PositionMgr implements PartsInterface {
       if (parts.useSlamra) {
          slamraPosition = parts.slamra.isSlamraPositionGood() ? parts.slamra.slamraRobotPosition : null;
       }
-      if (parts.useAprilTag) tagPosition=parts.dsApriltag.tagRobotPosition;
-      TelemetryMgr.message(Category.POSITION, "pmgr:odo", (odoPosition==null) ? "(null)" : odoPosition.toString(2));
-      TelemetryMgr.message(Category.POSITION, "pmgr:slm", (slamraPosition==null) ? "(null)" : slamraPosition.toString(2));
-      TelemetryMgr.message(Category.POSITION, "pmgr:tag", (tagPosition==null) ? "(null)" : tagPosition.toString(2));
+      if (parts.useAprilTag) {
+         tagPosition = parts.dsApriltag.tagRobotPosition;
+      }
+      imuHeading = parts.imuMgr.returnImuRobotHeadingAsPosition();
+      TelemetryMgr.message(Category.POSITION, "odo", (odoPosition==null) ? "(null)" : odoPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "slm", (slamraPosition==null) ? "(null)" : slamraPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "tag", (tagPosition==null) ? "(null)" : tagPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "imu", (tagPosition==null) ? "(null)" : imuHeading.toString(2));
       robotPosition = normalUpdate();
-      TelemetryMgr.message(Category.POSITION, "pmgr:fnl", (robotPosition==null) ? "(null)" : robotPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "fnl", (robotPosition==null) ? "(null)" : robotPosition.toString(2));
    }
 
    public void stop() {
@@ -72,18 +77,20 @@ public class PositionMgr implements PartsInterface {
    Position normalUpdate() {
       posSource = returnPrioritySource();
       switch (posSource) {
-         case NONE:
-            return null;
          case ODO:
             if (prioritizeSlamraRforODO && slamraPosition!=null) {
                return odoPosition.withR(slamraPosition.R);
             }
             return odoPosition;
          case SLAMRA:
-            //if (prioritizeIMUforSLAMRA) return slamraPosition.withR() //todo: finish this
+            //todo: finish/check this
+            if (prioritizeIMUforSLAMRA && imuHeading!=null) {
+               return slamraPosition.withR(imuHeading.R);
+            }
             return slamraPosition;
          case TAG:
             return tagPosition;
+         case NONE:
          default:
             return null;
       }

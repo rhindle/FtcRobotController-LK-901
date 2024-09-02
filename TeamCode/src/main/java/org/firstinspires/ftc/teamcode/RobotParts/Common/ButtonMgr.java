@@ -278,7 +278,7 @@ public class ButtonMgr {
         left_stick_button,
         right_stick_button,
         left_trigger,
-        right_trigger;
+        right_trigger
     }
 
     public enum State {
@@ -290,6 +290,6 @@ public class ButtonMgr {
         wasHeld,
         wasSingleTapped,
         wasDoubleTapped,
-        isSingleTapHeld;
+        isSingleTapHeld
     }
 }

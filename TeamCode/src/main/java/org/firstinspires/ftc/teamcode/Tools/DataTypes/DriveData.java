@@ -27,12 +27,9 @@ public class DriveData {
         this.driveSpeed = Functions.mathHypotenuse(X, Y);
         this.driveAngle = Math.toDegrees(Math.atan2(Y, X));
         this.rotate = rightStickX;
-//        this.driveSpeed = Functions.mathHypotenuse(leftStickX, leftStickY);
-//        this.driveAngle = Math.toDegrees(Math.atan2(-leftStickX, -leftStickY));
-//        this.rotate = rightStickX;
     }
 
-    // forza drive?
+    // forza drive
     // robot x direction is triggers, robot y direction is right stick x, rotate is left stick x
     public DriveData (float leftTrigger, float rightTrigger, float leftStickX, float rightStickX ) {
         float X = rightTrigger - leftTrigger;
