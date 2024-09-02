@@ -42,20 +42,20 @@ public class ControlsDS extends Controls {
       /* If neither dead man is pressed, stop everything (if needed) and proceed no further */
       if (!guestOK && !teamOK) {
          stopEverything();
-         parts.dsLed.updateGraphic('3', Color.rgb(1,0,0));
+         parts.dsLed.updateGraphic('3', Color.rgb(20,0,0));
          return;
       }
 
       /* If we made it here, things aren't necessarily stopped any more (this affect the e-stop method */
       isStopped = false;
       if (guestOK && teamOK) {
-         parts.dsLed.updateGraphic('3', Color.rgb(0,0,2));
+         parts.dsLed.updateGraphic('3', Color.rgb(0,0,20));
       }
       else if (guestOK) {
-         parts.dsLed.updateGraphic('3', Color.rgb(0,2,0));
+         parts.dsLed.updateGraphic('3', Color.rgb(0,20,0));
       }
       else {
-         parts.dsLed.updateGraphic('3', Color.rgb(1,0,1));
+         parts.dsLed.updateGraphic('3', Color.rgb(5,0,15));
       }
 
       /* If guest is allowed, start with their drive input */

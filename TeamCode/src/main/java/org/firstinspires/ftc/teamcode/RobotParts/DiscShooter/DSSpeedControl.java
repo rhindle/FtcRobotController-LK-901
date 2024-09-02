@@ -21,7 +21,7 @@ public class DSSpeedControl implements PartsInterface {
 
    public DrivePowers drivePowers;
    public double speedMaximum;
-   public double speedMaximumNoPosition = 0.33;
+   public double speedMaximumNoPosition = 0.5;
    public Fence fenceInner = new Fence(0.5, new Position(-30, 17), new Position(-64, -17));
    public Fence fenceOuter = new Fence(0.25, new Position(-18, 29), new Position(-76, -29));
 

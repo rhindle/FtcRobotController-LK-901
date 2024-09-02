@@ -30,9 +30,9 @@ public class DSLed implements PartsInterface {
       parts.neo.initialize();
       parts.neo.setUpdateLimit(0);
       parts.neo.setPreventTearing(true);
-      parts.neo.setDimmingValue(192);
-      parts.neo.drawRectangle(0, 7, 0, 7, Color.rgb(1, 1, 0));
-      normalMatrix = parts.neo.buildPixelMapFromString("abcd", marquis, Color.rgb(1,1,0), Color.rgb(0,0,0));
+      parts.neo.setDimmingValue(64);
+      parts.neo.drawRectangle(0, 7, 0, 7, Color.rgb(10, 10, 0));
+      normalMatrix = parts.neo.buildPixelMapFromString("abcd", marquis, Color.rgb(10,10,0), Color.rgb(0,0,0));
    }
 
    public void preInit() {
@@ -50,7 +50,7 @@ public class DSLed implements PartsInterface {
       parts.neo.clearMatrix();
 //      normalMatrix = parts.neo.newPixelMapSameSize(normalMatrix);
       normalMatrix = new int[cols][rows];
-      updateGraphic('4', Color.rgb(1,1,1));
+      updateGraphic('4', Color.rgb(2,2,2));
       parts.neo.applyPixelMapToBuffer(finalMatrix,0,15,0, true);
       parts.neo.forceUpdateMatrix();
       parts.neo.setUpdateLimit(1);
@@ -79,14 +79,14 @@ public class DSLed implements PartsInterface {
       int[][] textMatrix;
       switch (color) {
          case 2:
-            msgColor = Color.rgb(0,4,0);
+            msgColor = Color.rgb(0,40,0);
             break;
          case 3:
-            msgColor = Color.rgb(4,0,0);
+            msgColor = Color.rgb(40,0,0);
             break;
          case 1:
          default:
-            msgColor = Color.rgb(2,2,2);
+            msgColor = Color.rgb(20,20,20);
       }
       textMatrix = parts.neo.buildPixelMapFromString(String.valueOf(msgChar), parts.neo.bigLetters, msgColor);
 //      messageMatrix = parts.neo.newPixelMapSameSize(messageMatrix);

@@ -56,7 +56,7 @@ public class UserDrive implements PartsInterface {
    public void userDrivePower () {
 
       if (parts.autoDrive.isNavigating) {
-         TelemetryMgr.message(Category.DRIVETRAIN, "dt-usr : autoDrive is Navigating");
+         TelemetryMgr.message(Category.USERDRIVE, "pow : autoDrive is Navigating");
          if (parts.positionMgr.hasPosition()) storedHeading = parts.positionMgr.robotPosition.R;
          return;
       }
@@ -71,7 +71,7 @@ public class UserDrive implements PartsInterface {
                parts.autoDrive.setTargetToCurrentPosition();
                useHoldOK = false;
             }
-            TelemetryMgr.message(Category.DRIVETRAIN, "dt-usr : Not Driving");
+            TelemetryMgr.message(Category.USERDRIVE, "pow: Not Driving");
             return;
          }
       }
@@ -98,7 +98,7 @@ public class UserDrive implements PartsInterface {
       // scale to no higher than 1
       drivePowers.scaleMax(1);
       parts.drivetrain.setDrivePowers(drivePowers);
-      TelemetryMgr.message(Category.DRIVETRAIN, "dt-usr", drivePowers.toString(2));
+      TelemetryMgr.message(Category.USERDRIVE, "pow", drivePowers.toString(2));
    }
 
    public void setUserDriveSettings(DriveData driveData) {

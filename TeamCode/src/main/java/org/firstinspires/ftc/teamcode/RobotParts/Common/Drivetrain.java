@@ -48,10 +48,15 @@ public class Drivetrain {
         stopDriveMotors(true);
     }
 
+
     public void applyDrivePowers() {
-        TelemetryMgr.message(Category.DRIVETRAIN, "raw", drivePowers.toString(2));
+        applyDrivePowers(true);
+    }
+
+    public void applyDrivePowers(boolean addTelemetry) {
+        if (addTelemetry) TelemetryMgr.message(Category.DRIVETRAIN, "raw", drivePowers.toString(2));
         if (minimizeCycleTime) drivePowers = adjustPowers(drivePowers, drivePowersLast);
-        TelemetryMgr.message(Category.DRIVETRAIN, "adj", drivePowers.toString(2));
+        if (addTelemetry) TelemetryMgr.message(Category.DRIVETRAIN, "adj", drivePowers.toString(2));
         motorLF.setPower(drivePowers.v0);
         motorRF.setPower(drivePowers.v1);
         motorLR.setPower(drivePowers.v2);
@@ -83,7 +88,7 @@ public class Drivetrain {
 
     public void stopDriveMotors(boolean immediate) {
         setDrivePowers(0, 0, 0, 0);
-        if (immediate) applyDrivePowers();
+        if (immediate) applyDrivePowers(false);
     }
 
     private DrivePowers adjustPowers(DrivePowers powerRequested, DrivePowers powerLast) {
