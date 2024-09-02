@@ -428,6 +428,10 @@ public class NeoMatrix {
       return newMap;
    }
 
+   public int[][] newPixelMapSameSize(int[][] pMap) {
+      return new int[pMap.length][pMap[0].length];
+   }
+
    public int[][] getPixelMapFromBuffer (int startCol, int endCol) {
       if (startCol < 0 || startCol >= ledCols) startCol = 0;
       if (endCol < 0 || endCol >= ledCols || endCol < startCol) endCol = ledCols - 1;

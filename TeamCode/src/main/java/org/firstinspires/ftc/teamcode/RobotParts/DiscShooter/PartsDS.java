@@ -125,26 +125,32 @@ public class PartsDS extends Parts {
                 //  autoDrive.modifyHeading = robot.returnImuHeading() - roboTagPosition.R; // saving for reference
             }
             if (dsApriltag.tagRobotPosition!=null){
-                neo.drawRectangle(3,4,3,4, Color.rgb(0,4,1));
+                dsLed.updateGraphic('1', Color.rgb(0,4,1));
+//                neo.drawRectangle(3,4,3,4, Color.rgb(0,4,1));
                 if (firstLock && !userDrive.isDriving) {   //todo:make this better
                     firstLock = false;
                     autoDrive.setNavTarget(new NavigationTarget(new Position(-20,0,0), dsMisc.toleranceHigh));
                 }
             } else if (dsApriltag.instantTagRobotPosition!=null) {
-                neo.drawRectangle(3,4,3,4, Color.rgb(2,1,0));
+                dsLed.updateGraphic('1', Color.rgb(2,1,0));
+//                neo.drawRectangle(3,4,3,4, Color.rgb(2,1,0));
             } else {
-                neo.drawRectangle(3,4,3,4, Color.rgb(2,0,0));
+                dsLed.updateGraphic('1', Color.rgb(2,0,0));
+//                neo.drawRectangle(3,4,3,4, Color.rgb(2,0,0));
             }
         }
 
         if (positionMgr.robotPosition!=null) {
             if (dsApriltag.strongLocked) {
-                neo.drawRectangle(2, 5, 2, 5, Color.rgb(0, 2, 0));
+                dsLed.updateGraphic('2', Color.rgb(0,2,0));
+//                neo.drawRectangle(2, 5, 2, 5, Color.rgb(0, 2, 0));
             } else {
-                neo.drawRectangle(2, 5, 2, 5, Color.rgb(2, 1, 0));
+                dsLed.updateGraphic('2', Color.rgb(2,1,0));
+//                neo.drawRectangle(2, 5, 2, 5, Color.rgb(2, 1, 0));
             }
         } else {
-            neo.drawRectangle(2,5,2,5, Color.rgb(2,0,0));
+            dsLed.updateGraphic('2', Color.rgb(2,0,0));
+//            neo.drawRectangle(2,5,2,5, Color.rgb(2,0,0));
             dsApriltag.strongLocked=false;  // if all is lost, allow a weak lock again
         }
     }

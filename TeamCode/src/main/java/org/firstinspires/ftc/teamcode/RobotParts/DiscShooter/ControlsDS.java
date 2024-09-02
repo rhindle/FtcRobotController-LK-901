@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotParts.DiscShooter;
 
+import android.graphics.Color;
+
 import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr.Buttons;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr.State;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.Controls;
@@ -38,6 +40,8 @@ public class ControlsDS extends Controls {
       //      rotate = gamepad1.right_stick_x;
       ////      parts.navigator.handleRotate(rotate);
 
+      //forza - can't work with dead man switch, so simulate
+      //DriveData driveDataTeam = new DriveData(gamepad1.left_stick_y, 0, gamepad1.left_stick_x, gamepad1.right_stick_x);
       DriveData driveDataTeam = new DriveData(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
       DriveData driveDataGuest = new DriveData(gamepad2.left_stick_x, gamepad2.left_stick_y, gamepad2.right_stick_x);
 
@@ -48,11 +52,21 @@ public class ControlsDS extends Controls {
       /* If neither dead man is pressed, stop everything (if needed) and proceed no further */
       if (!guestOK && !teamOK) {
          stopEverything();
+         parts.dsLed.updateGraphic('3', Color.rgb(1,0,0));
          return;
       }
 
       /* If we made it here, things aren't necessarily stopped any more (this affect the e-stop method */
       isStopped = false;
+      if (guestOK && teamOK) {
+         parts.dsLed.updateGraphic('3', Color.rgb(0,0,2));
+      }
+      else if (guestOK) {
+         parts.dsLed.updateGraphic('3', Color.rgb(0,2,0));
+      }
+      else {
+         parts.dsLed.updateGraphic('3', Color.rgb(1,0,1));
+      }
 
       /* If guest is allowed, start with their drive input */
       if (guestOK) {

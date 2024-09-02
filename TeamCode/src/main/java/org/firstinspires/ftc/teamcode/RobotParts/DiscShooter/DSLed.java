@@ -26,28 +26,33 @@ public class DSLed implements PartsInterface {
       parts.neo.setPreventTearing(true);
       parts.neo.setDimmingValue(192);
       parts.neo.drawRectangle(0, 7, 0, 7, Color.rgb(1, 1, 0));
-      textMatrix = parts.neo.buildPixelMapFromString("abcd", marquis, Color.rgb(1,1,0), Color.rgb(0,0,0));
+      normalMatrix = parts.neo.buildPixelMapFromString("abcd", marquis, Color.rgb(1,1,0), Color.rgb(0,0,0));
    }
 
    public void preInit() {
    }
 
    public void initLoop() {
-      parts.neo.applyPixelMapToBuffer(textMatrix,0,7, 0, true);
-      parts.neo.applyPixelMapToBuffer(parts.neo.reversePixelMap(textMatrix),8,15, 0, true);
-      textMatrix = parts.neo.shiftPixelMap(textMatrix,-8,0,true);
+      parts.neo.applyPixelMapToBuffer(normalMatrix,0,7, 0, true);
+      parts.neo.applyPixelMapToBuffer(parts.neo.reversePixelMap(normalMatrix),8,15, 0, true);
+      normalMatrix = parts.neo.shiftPixelMap(normalMatrix,-8,0,true);
       clearMessage();
       parts.neo.runLoop();
    }
 
    public void preRun() {
       parts.neo.clearMatrix();
-      parts.neo.drawRectangle(0,7,0,7, Color.rgb(1,1,1));
+      normalMatrix = parts.neo.newPixelMapSameSize(normalMatrix);
+      updateGraphic('4', Color.rgb(1,1,1));
+      parts.neo.applyPixelMapToBuffer(finalMatrix,0,15,0, true);
+      parts.neo.forceUpdateMatrix();
+//      parts.neo.drawRectangle(0,7,0,7, Color.rgb(1,1,1));
       parts.neo.setUpdateLimit(1);
    }
 
    public void runLoop() {
       clearMessage();
+      parts.neo.applyPixelMapToBuffer(finalMatrix,0,15,0, true);
       parts.neo.runLoop();
    }
 
@@ -64,7 +69,7 @@ public class DSLed implements PartsInterface {
    public void displayMessage (char msgChar, int color) {
       if (!parts.useNeoMatrix) return;
       clearMessageTimer = System.currentTimeMillis() + messageDisplayTime;
-      parts.neo.clearCols(8,15);
+//      parts.neo.clearCols(8,15);
       int msgColor;
       int[][] textMatrix;
       switch (color) {
@@ -79,18 +84,36 @@ public class DSLed implements PartsInterface {
             msgColor = Color.rgb(2,2,2);
       }
       textMatrix = parts.neo.buildPixelMapFromString(String.valueOf(msgChar), parts.neo.bigLetters, msgColor);
-      parts.neo.applyPixelMapToBuffer(textMatrix,10,15,0, true);
+      messageMatrix = parts.neo.newPixelMapSameSize(messageMatrix);
+      messageMatrix = parts.neo.overlayPixelMap(textMatrix, messageMatrix, 2);
+      messageMatrix = parts.neo.overlayPixelMap(textMatrix, messageMatrix, 10);
+      finalMatrix = parts.neo.cloneArray(messageMatrix);
+//      parts.neo.applyPixelMapToBuffer(messageMatrix,10,15,0, true);
+//      parts.neo.applyPixelMapToBuffer(messageMatrix,2,7,0, true);
+   }
+
+   public void updateGraphic (char msgChar, int color) {
+      int[][] textMatrix;
+      textMatrix = parts.neo.buildPixelMapFromString(String.valueOf(msgChar), circles, color);
+      normalMatrix = parts.neo.overlayPixelMap(textMatrix, normalMatrix,0);
+      normalMatrix = parts.neo.overlayPixelMap(textMatrix, normalMatrix,8);
    }
 
    public void clearMessage () {
-      if (clearMessageTimer == 0) return;
+      if (clearMessageTimer == 0) {
+         finalMatrix = parts.neo.cloneArray(normalMatrix);
+         return;
+      }
       if (System.currentTimeMillis() >= clearMessageTimer) {
          clearMessageTimer = 0;
-         parts.neo.clearCols(8,15);
+//         parts.neo.clearCols(8,15);
       }
    }
 
-   int[][] textMatrix;
+//   int[][] textMatrix;
+   int[][] messageMatrix = new int[16][8];
+   int[][] normalMatrix = new int[16][8];
+   int[][] finalMatrix = new int[16][8];
 
    public final char[][] marquis = {
            {'a', 17, 128, 0, 0, 1, 128, 0, 34},
@@ -102,4 +125,9 @@ public class DSLed implements PartsInterface {
            {'g', 187, 129, 128, 1, 129, 129, 128, 119},
            {'h', 119, 128, 129, 129, 1, 128, 129, 187} };
 
+   public final char[][] circles = {
+           {'1', 0, 0, 0, 24, 24, 0, 0, 0},
+           {'2', 0, 0, 60, 36, 36, 60, 0, 0},
+           {'3', 0, 60, 66, 66, 66, 66, 60, 0},
+           {'4', 60, 66, 129, 129, 129, 129, 66, 60} };
 }

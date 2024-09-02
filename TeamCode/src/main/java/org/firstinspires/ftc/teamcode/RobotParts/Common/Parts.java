@@ -36,6 +36,7 @@ public class Parts implements PartsInterface {
    public boolean useSlamra = false;
    public boolean useAprilTag = false;
    public boolean useNeoMatrix = false;
+   public boolean useForzaControls = false;
    public Position robotPosition = new Position();
    public Position fieldStartPosition;
    public Position odoRobotOffset;
