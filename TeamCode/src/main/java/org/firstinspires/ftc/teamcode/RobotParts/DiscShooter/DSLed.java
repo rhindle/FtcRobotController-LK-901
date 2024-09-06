@@ -10,8 +10,12 @@ public class DSLed implements PartsInterface {
    /* Public OpMode members. */
    public Parts parts;
 
-   public int cols = 16;
+   public int cols = 18;
    public int rows = 8;
+
+   public int attractDelay = 250;
+   public long attractTime = 0;
+   int[][] attractMatrix = new int[1][8];
 
    int[][] messageMatrix = new int[cols][rows];
    int[][] normalMatrix = new int[cols][rows];
@@ -53,12 +57,14 @@ public class DSLed implements PartsInterface {
       updateGraphic('4', Color.rgb(2,2,2));
       parts.neo.applyPixelMapToBuffer(finalMatrix,0,15,0, true);
       parts.neo.forceUpdateMatrix();
-      parts.neo.setUpdateLimit(1);
+      parts.neo.setUpdateLimit(2);
+      attractMatrix[0] = chase;
    }
 
    public void runLoop() {
       clearMessage();
       parts.neo.applyPixelMapToBuffer(finalMatrix,0,15,0, true);
+      attract();
       parts.neo.runLoop();
    }
 
@@ -116,6 +122,14 @@ public class DSLed implements PartsInterface {
       }
    }
 
+   public void attract () {
+      if (System.currentTimeMillis() > attractTime) {
+         attractTime = System.currentTimeMillis() + attractDelay;
+         attractMatrix = parts.neo.shiftPixelMap(attractMatrix,0,1,true);
+      }
+      parts.neo.applyPixelMapToBuffer(attractMatrix, 16, 16,0,true);
+   }
+
    public final char[][] marquis = {
            {'a', 17, 128, 0, 0, 1, 128, 0, 34},
            {'b', 34, 0, 128, 1, 0, 0, 128, 17},
@@ -131,4 +145,6 @@ public class DSLed implements PartsInterface {
            {'2', 0, 0, 60, 36, 36, 60, 0, 0},
            {'3', 0, 60, 66, 66, 66, 66, 60, 0},
            {'4', 60, 66, 129, 129, 129, 129, 66, 60} };
+
+   public final int[] chase = { 10, 20, 40, 60, 20, 0, 0, 0};
 }

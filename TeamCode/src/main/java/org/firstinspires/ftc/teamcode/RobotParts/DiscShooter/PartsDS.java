@@ -61,7 +61,7 @@ public class PartsDS extends Parts {
             slamra.slamraRobotOffset = slamraRobotOffset;
         }
 
-        if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 16, AdafruitNeoDriver.ColorOrder.GRB);  //RGB for fairy string
+        if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 18, AdafruitNeoDriver.ColorOrder.GRB);  //RGB for fairy string
     }
 
     @Override
