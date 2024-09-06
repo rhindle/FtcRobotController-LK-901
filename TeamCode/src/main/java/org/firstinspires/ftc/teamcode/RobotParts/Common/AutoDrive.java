@@ -211,11 +211,12 @@ public class AutoDrive implements PartsInterface {
    public double getHeadingError(double targetAngle) {
 //      if (parts.positionMgr.noPosition()) return 0;
       double robotError;
-      robotError = targetAngle - (parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading);
+//      robotError = targetAngle - (parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading);
+      robotError = targetAngle - (parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.positionMgr.headingOnly.R);
       return Functions.normalizeAngle(robotError);
    }
 
-   public void setTargetToCurrentPosition() {
+   public void setTargetToCurrentPosition(double withR) {
       if (parts.positionMgr.noPosition()) {
          cancelNavigation();
          status = Status.LOST;
@@ -224,11 +225,32 @@ public class AutoDrive implements PartsInterface {
       navTarget = new NavigationTarget(new Position (
               Math.round(parts.positionMgr.robotPosition.X),
               Math.round(parts.positionMgr.robotPosition.Y),
-              Math.round(parts.positionMgr.robotPosition.R)
-            ));
+              Math.round(withR)
+      ));
       isNavigating = false;
       isHolding = true;
       resetPID();
+   }
+   public void setTargetToCurrentPosition() {
+      if (parts.positionMgr.noPosition()) {
+         cancelNavigation();
+         status = Status.LOST;
+         return;
+      }
+      setTargetToCurrentPosition(parts.positionMgr.robotPosition.R);
+//      if (parts.positionMgr.noPosition()) {
+//         cancelNavigation();
+//         status = Status.LOST;
+//         return;
+//      }
+//      navTarget = new NavigationTarget(new Position (
+//              Math.round(parts.positionMgr.robotPosition.X),
+//              Math.round(parts.positionMgr.robotPosition.Y),
+//              Math.round(parts.positionMgr.robotPosition.R)
+//            ));
+//      isNavigating = false;
+//      isHolding = true;
+//      resetPID();
    }
 
    public void setNavTarget(NavigationTarget navTarget) {
@@ -242,6 +264,8 @@ public class AutoDrive implements PartsInterface {
       isNavigating = true;
       isHolding = hold;
       resetPID();
+      onTargetByAccuracy = false;  //todo: does setting this to false cause any problems?  Needed for shooter state machines.
+      //onTargetByAccuracy = navTarget.inToleranceByTime(parts.positionMgr.robotPosition);
    }
 
    // included for legacy reasons, but should be phased out

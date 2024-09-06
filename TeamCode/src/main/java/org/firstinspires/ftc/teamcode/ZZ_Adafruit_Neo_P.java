@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.NeoMatrix;
 import org.firstinspires.ftc.teamcode.RobotParts.LegacyBots.Robot;
+import org.firstinspires.ftc.teamcode.Tools.i2c.AdafruitNeoDriver;
 
 @TeleOp (name="AA_Adafruit_Neo_P", group="Test")
 //@Disabled

@@ -15,6 +15,10 @@ public class ControlsDS extends Controls {
 
    boolean isStopped = false;
    boolean guestOK, teamOK;
+   boolean toggleIntake = false;
+
+   Position shootPosition = new Position (-20, 0, 0);
+   Position aimPosition = new Position (0, 0, 0);
 
    public ControlsDS(Parts parts) {
       super(parts);
@@ -76,51 +80,95 @@ public class ControlsDS extends Controls {
 
       /* With the most dangerous things out of the way (i.e., drivertrain motion), we can move on to the other controls */
 
-      if (eitherGuestOrTeam(Buttons.dpad_left, State.wasSingleTapped))
+      if (eitherGuestOrTeam(Buttons.dpad_left, State.wasSingleTapped)) {
          DSShooter.disarmShooter();
+         parts.dsLed.displayMessage('S', 3);
+      }
 
-      if (eitherGuestOrTeam(Buttons.dpad_right, State.wasSingleTapped))
+      if (eitherGuestOrTeam(Buttons.dpad_right, State.wasSingleTapped)) {
          DSShooter.armShooter();
+         parts.dsLed.displayMessage('S', 2);
+      }
 
-      if (eitherGuestOrTeam(Buttons.dpad_left, State.wasDoubleTapped))
+      if (eitherGuestOrTeam(Buttons.dpad_left, State.wasDoubleTapped)) {
          DSShooter.extendPusher();
+      }
 
-      if (eitherGuestOrTeam(Buttons.dpad_right, State.wasDoubleTapped))
+      if (eitherGuestOrTeam(Buttons.dpad_right, State.wasDoubleTapped)) {
          DSShooter.retractPusher();
+      }
 
-      if (eitherGuestOrTeam(Buttons.dpad_up, State.wasSingleTapped))
+      if (eitherGuestOrTeam(Buttons.dpad_up, State.wasSingleTapped)) {
          DSShooter.openGate();
+         parts.dsLed.displayMessage('G', 2);
+      }
 
-      if (eitherGuestOrTeam(Buttons.dpad_down, State.wasSingleTapped))
+      if (eitherGuestOrTeam(Buttons.dpad_down, State.wasSingleTapped)) {
          DSShooter.closeGate();
+         parts.dsLed.displayMessage('G', 3);
+      }
 
-      if (eitherGuestOrTeam(Buttons.left_bumper, State.wasSingleTapped))
-         parts.dsShooter.intakeReverse();
+      if (eitherGuestOrTeam(Buttons.left_bumper, State.wasSingleTapped)) {
+         toggleIntake = !toggleIntake;
+         if (toggleIntake) {
+            parts.dsShooter.intakeReverse();
+            parts.dsLed.displayMessage('I', 4);
+         }
+         else {
+            parts.dsShooter.intakeOff();
+            parts.dsLed.displayMessage('I', 3);
+         }
+      }
 
-      if (eitherGuestOrTeam(Buttons.right_bumper, State.wasSingleTapped))
-         parts.dsShooter.intakeOn();
+      if (eitherGuestOrTeam(Buttons.right_bumper, State.wasSingleTapped)) {
+         toggleIntake = !toggleIntake;
+         if (toggleIntake) {
+            parts.dsShooter.intakeOn();
+            parts.dsLed.displayMessage('I', 2);
+         }
+         else {
+            parts.dsShooter.intakeOff();
+            parts.dsLed.displayMessage('I', 3);
+         }
+      }
 
-      if (eitherGuestOrTeam(Buttons.back, State.isHeld))
+      if (eitherGuestOrTeam(Buttons.back, State.isHeld)) {
          parts.dsShooter.cancelStateMachines();
+         parts.dsLed.displayMessage('X', 3);
+      }
 
-      if (eitherGuestOrTeam(Buttons.a, State.wasTapped))
-         parts.dsShooter.startPush();
+      if (eitherGuestOrTeam(Buttons.a, State.wasTapped)) {  // todo: Do we want team to be able to push without being armed?
+         parts.dsShooter.startPushIfArmed();
+      }
 
-      if (eitherGuestOrTeam(Buttons.b, State.wasSingleTapped))
+      if (eitherGuestOrTeam(Buttons.b, State.wasSingleTapped)) {
          parts.dsShooter.startShoot1();
+         parts.dsLed.displayMessage('1', 4);
+      }
 
-      if (eitherGuestOrTeam(Buttons.x, State.wasSingleTapped))
+      if (eitherGuestOrTeam(Buttons.x, State.wasSingleTapped)) {
          parts.dsShooter.startShoot3();
+         parts.dsLed.displayMessage('3', 4);
+      }
 
-      if (eitherGuestOrTeam(Buttons.y, State.wasSingleTapped))
+      if (eitherGuestOrTeam(Buttons.y, State.wasSingleTapped)) {
          parts.dsShooter.startFullAuto();
+         parts.dsLed.displayMessage('A', 4);
+      }
 
-      if (eitherGuestOrTeam(Buttons.dpad_up, State.wasHeld))
-         // todo: reference this as a variable from somewhere
-         parts.autoDrive.setNavTarget(new NavigationTarget(new Position(-20,0,0), parts.dsMisc.toleranceHigh));
+      if (eitherGuestOrTeam(Buttons.dpad_up, State.wasHeld)) {
+         parts.autoDrive.setNavTarget(new NavigationTarget(shootPosition, parts.dsMisc.toleranceHigh));
+         parts.userDrive.directionTarget = aimPosition;
+         parts.userDrive.useTargetDirection = true;
+         parts.dsLed.displayMessage('A', 2);
+      }
+
+      if (eitherGuestOrTeam(Buttons.dpad_down, State.wasHeld)) {
+         parts.userDrive.directionTarget = aimPosition;
+         parts.dsLed.displayMessage('T', parts.userDrive.toggleUseTargetDirection());
+      }
 
       // Toggle FCD
-      //todo: Field centric is broken right now; problem with the angle
       if (eitherGuestOrTeam(Buttons.start, State.wasDoubleTapped)) {
          parts.dsLed.displayMessage('F', parts.userDrive.toggleFieldCentricDrive());
       }
@@ -154,6 +202,8 @@ public class ControlsDS extends Controls {
          parts.drivetrain.stopDriveMotors(true);
          parts.dsShooter.eStop();
          parts.autoDrive.cancelNavigation();
+         parts.userDrive.useHoldOK = false;
+         toggleIntake = false;
          isStopped = true;
       }
    }

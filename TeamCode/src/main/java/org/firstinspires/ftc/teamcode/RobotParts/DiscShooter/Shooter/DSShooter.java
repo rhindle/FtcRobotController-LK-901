@@ -39,8 +39,9 @@ public class DSShooter implements PartsInterface {
    private static double spinRPMset;
    private static long gateTimer = System.currentTimeMillis();
    private static long pusherTimer = System.currentTimeMillis();
-   private static double spinMultiplier = 60.0 / 28.0 * 1.0;  // ticksPerRev * gearRatio;;
+   private static final double spinMultiplier = 60.0 / 28.0 * 1.0;  // ticksPerRev * gearRatio;;
    public static long cancelTimer = System.currentTimeMillis();
+   public static boolean isArmed = false;
 
    /* Public OpMode members. */
    public static Parts parts;
@@ -70,6 +71,7 @@ public class DSShooter implements PartsInterface {
    @SuppressLint("DefaultLocale")
    public void runLoop() {
       TelemetryMgr.message(TelemetryMgr.Category.DISCSHOOTER, "SpinnerRPM", getSpinnerRPM());
+      TelemetryMgr.message(TelemetryMgr.Category.DISCSHOOTER, "Ingester", motorIngester.getPower());
       Pusher.stateMachine();
       Shoot1.stateMachine();
       Shoot3.stateMachine();
@@ -120,17 +122,22 @@ public class DSShooter implements PartsInterface {
    public void startFullAuto () {
       FullAuto.start();
    }
+   public void startPushIfArmed () {
+      if (isArmed) Pusher.start();
+   }
 
    public void cancelStateMachines() {
       Shoot1.stop();
       Shoot3.stop();
       Pusher.stop();
       FullAuto.stop();
+      isArmed = false;
    }
 
    public void stopMotors() {
       motorIngester.setPower(0);
       motorSpinner.setPower(0);
+      isArmed = false;
    }
 
    public void eStop() {
@@ -140,6 +147,7 @@ public class DSShooter implements PartsInterface {
 //      openGate();
       parts.robot.disableServo(servoPusher);
       parts.robot.disableServo(servoGate);
+      isArmed = false;
    }
 
    static boolean isSpinnerInTolerance() {
@@ -164,6 +172,7 @@ public class DSShooter implements PartsInterface {
    }
    public static void spinnerOff() {
       motorSpinner.setPower(0);
+      isArmed = false;
    }
    public void intakeOn() {
       motorIngester.setPower(ingesterPower);
@@ -179,11 +188,13 @@ public class DSShooter implements PartsInterface {
       retractPusher();
       openGate();
       spinnerOn();
+      isArmed = true;
    }
    public static void disarmShooter() {
       retractPusher();
       closeGate();
       spinnerOff();
+      isArmed = false;
    }
 
    public static void openGate() {
@@ -191,6 +202,7 @@ public class DSShooter implements PartsInterface {
    }
    public static void closeGate() {
       setGateServo(gateClosed);
+      isArmed = false;
    }
    public static void extendPusher() {
       setPusherServo(pusherExtended);

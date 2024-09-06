@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.RobotParts.Common;
 
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.DriveData;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.DrivePowers;
+import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
 import org.firstinspires.ftc.teamcode.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.TelemetryMgr.Category;
 
@@ -15,13 +16,15 @@ public class UserDrive implements PartsInterface {
    public boolean useFieldCentricDrive = false;
    public boolean useHeadingHold = true;
    public boolean useHoldPosition = true;
+   public boolean useTargetDirection = false;
    public boolean isDriving = false;
-   boolean useHoldOK = false;
+   public boolean useHoldOK = false;
    public double storedHeading = 0;
    public double deltaHeading = 0;
    public double speedMaximum = 1;
    long idleDelay = System.currentTimeMillis();
    long headingDelay = System.currentTimeMillis();
+   public Position directionTarget;
 
    /* Constructor */
    public UserDrive(Parts parts){
@@ -68,15 +71,22 @@ public class UserDrive implements PartsInterface {
          if (idleDelay <= System.currentTimeMillis()) {
             // no driver input, so let autoDrive take over and do nothing else
             if (useHoldOK) {
-               parts.autoDrive.setTargetToCurrentPosition();
+               if (useHeadingHold) parts.autoDrive.setTargetToCurrentPosition(storedHeading);
+               else parts.autoDrive.setTargetToCurrentPosition();
                useHoldOK = false;
             }
             TelemetryMgr.message(Category.USERDRIVE, "pow: Not Driving");
             return;
          }
       }
-      if (useHeadingHold) {
+      if (useHeadingHold && parts.positionMgr.hasHeading()) {
          // Correct the heading if not currently being controlled
+         // First, check if we should be aiming at the target
+         if (useTargetDirection && directionTarget!=null) {
+            storedHeading = targetAngle();
+            headingDelay = 0;
+         }
+         // Then, apply the storedHeading
          if (headingDelay <= System.currentTimeMillis()) {
 //            this.rotate = parts.autoDrive.getHeadingError(storedHeading) / -15 * (driveSpeed + 0.2);   // base this on speed?
             // start with the same proportional in autodrive
@@ -143,12 +153,18 @@ public class UserDrive implements PartsInterface {
       // by storing the heading delayed 250ms after any rotational input
       // Will use the img heading if position not available //todo: deal with cases where imu not being read
       if (rotate != 0) {
-         storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading;
+//         storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading;
+         storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R :
+                 parts.positionMgr.hasHeading() ? parts.positionMgr.headingOnly.R : 0;
          headingDelay = System.currentTimeMillis() + 250;
+         // disable aiming at target  // todo: is this the best way to handle this?
+         useTargetDirection = false;
       }
       else if (headingDelay > System.currentTimeMillis()) {
          // keep re-reading until delay has passed
-         storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading;
+//         storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading;
+         storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R :
+                 parts.positionMgr.hasHeading() ? parts.positionMgr.headingOnly.R : 0;
       }
    }
 
@@ -163,13 +179,23 @@ public class UserDrive implements PartsInterface {
       return useFieldCentricDrive;
    }
 
+   public boolean toggleUseTargetDirection () {
+      if (parts.positionMgr.noPosition() || directionTarget == null) {
+         useTargetDirection = false;
+      }
+      else useTargetDirection = !useTargetDirection;
+      return useTargetDirection;
+   }
+
    public boolean toggleHeadingHold() {
-      if (parts.positionMgr.noPosition()) {
+//      if (parts.positionMgr.noPosition()) {
+      if (!parts.positionMgr.hasHeading()) {
          useHeadingHold = false;
          return useHeadingHold;
       }
       useHeadingHold = !useHeadingHold;
-      storedHeading = parts.positionMgr.robotPosition.R;
+//      storedHeading = parts.positionMgr.robotPosition.R;
+      storedHeading = parts.positionMgr.headingOnly.R;
       return useHeadingHold;
    }
 
@@ -183,4 +209,10 @@ public class UserDrive implements PartsInterface {
       return useHoldPosition;
    }
 
+   public double targetAngle() {
+      if (directionTarget==null || parts.positionMgr.noPosition()) return 0;
+      double x = directionTarget.X - parts.positionMgr.robotPosition.X;
+      double y = directionTarget.Y - parts.positionMgr.robotPosition.Y;
+      return Math.toDegrees(Math.atan2(y,x));
+   }
 }

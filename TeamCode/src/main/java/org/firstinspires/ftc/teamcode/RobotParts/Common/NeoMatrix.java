@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.RobotParts.Common;
 
 import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.teamcode.Tools.i2c.AdafruitNeoDriver;
-
 import java.util.Arrays;
 
 public class NeoMatrix {
@@ -26,6 +23,7 @@ public class NeoMatrix {
    private int updatePosition = 0;
    private int ledRows = 8;
    private int ledCols = 32;
+   private AdafruitNeoDriver.ColorOrder colorOrder = AdafruitNeoDriver.ColorOrder.GRB;
 
    public int dimMax = 255;     // for initial debugging, let's not change the max
    public boolean flipVert = false;
@@ -41,24 +39,43 @@ public class NeoMatrix {
    public NeoMatrix(LinearOpMode opMode, String deviceName){
       construct(opMode, deviceName);
    }
+   public NeoMatrix(LinearOpMode opMode, String deviceName, AdafruitNeoDriver.ColorOrder colorOrder){
+      construct(opMode, deviceName, colorOrder);
+   }
    public NeoMatrix(LinearOpMode opMode, String deviceName, int ledRows, int ledCols){
       construct(opMode, deviceName, ledRows, ledCols);
+   }
+   public NeoMatrix(LinearOpMode opMode, String deviceName, int ledRows, int ledCols, AdafruitNeoDriver.ColorOrder colorOrder){
+      construct(opMode, deviceName, ledRows, ledCols, colorOrder);
    }
 
    void construct(LinearOpMode opMode, String deviceName){
       construct(opMode, deviceName, ledRows, ledCols);
    }
+   void construct(LinearOpMode opMode, String deviceName, AdafruitNeoDriver.ColorOrder colorOrder){
+      construct(opMode, deviceName, ledRows, ledCols, colorOrder);
+   }
    void construct(LinearOpMode opMode, String deviceName, int ledRows, int ledCols){
+      construct(opMode, deviceName, ledRows, ledCols, colorOrder);
+//      this.opMode = opMode;
+//      this.deviceName = deviceName;
+//      this.hardwareMap = opMode.hardwareMap;
+//      this.ledRows = ledRows;
+//      this.ledCols = ledCols;
+   }
+   void construct(LinearOpMode opMode, String deviceName, int ledRows, int ledCols, AdafruitNeoDriver.ColorOrder colorOrder){
       this.opMode = opMode;
       this.deviceName = deviceName;
       this.hardwareMap = opMode.hardwareMap;
       this.ledRows = ledRows;
       this.ledCols = ledCols;
+      this.colorOrder = colorOrder;
    }
 
    public void initialize() {
       ledMatrix = hardwareMap.get(AdafruitNeoDriver.class, deviceName);
       updateMatrixSize(ledRows, ledCols);
+      ledMatrix.setColorOrder(colorOrder);
    }
 
    public boolean updateMatrixSize(int rows, int columns) {

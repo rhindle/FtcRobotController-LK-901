@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.RobotParts.Common;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.Tools.Functions;
 import org.firstinspires.ftc.teamcode.Tools.PartsInterface;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
@@ -41,6 +42,7 @@ public class Odometry implements PartsInterface {
 
    public void initialize() {
 //      odoRobotPosition = odoFieldStart.clone();  //TODO: deal with odoFieldStart set to null
+      odoData = new OdoData();
       if (!use3encoders) useFusedHeading = false;
       if (odoFieldStart!=null) odoRobotPosition = odoFieldStart.clone();
       else odoRobotPosition = new Position ();
@@ -56,7 +58,8 @@ public class Odometry implements PartsInterface {
       odoData.encoderXL = odoEncXL.encoderPort.getCurrentPosition() * (long)odoEncXL.direction;
       if (use3encoders) odoData.encoderXR = odoEncXR.encoderPort.getCurrentPosition() * (long)odoEncXR.direction;
       odoData.encoderY = odoEncY.encoderPort.getCurrentPosition() * (long)odoEncY.direction;
-      odoData.imuHeading = parts.imuMgr.returnImuHeadingRaw(true);
+//      if (parts.useIMU) odoData.imuHeading = parts.imuMgr.returnImuHeadingRaw(true);
+      if (parts.positionMgr.hasImusHeading()) odoData.imuHeading = parts.positionMgr.imusHeadingOnly.R;
       if (use3encoders) odoData.odoHeading = getOdoHeading();
       odoData.globalHeading = odoData.imuHeading;
       odoData0 = odoData.clone();
@@ -83,7 +86,11 @@ public class Odometry implements PartsInterface {
       odoData.encoderY = odoEncY.encoderPort.getCurrentPosition() * (long)odoEncY.direction;
 
       /* Update heading */
-      odoData.imuHeading = parts.imuMgr.returnImuHeadingRaw();
+//      if (parts.useIMU) odoData.imuHeading = parts.imuMgr.returnImuHeadingRaw();
+      if (parts.positionMgr.hasImusHeading()) {
+         odoData.imuHeading = parts.positionMgr.imusHeadingOnly.R;                  // todo: This isn't raw... Now what?
+         odoFieldOffset.R = 0;  // if using final IMU heading, no need for offset?  // todo: OK?  this will mess up odoHeading absolute
+      }
       if (use3encoders) odoData.odoHeading = getOdoHeading();
       odoData.globalHeading = fusedHeading();
 
@@ -103,6 +110,8 @@ public class Odometry implements PartsInterface {
    }
 
    private double fusedHeading() {
+      /* If there is no IMU data available, need to use odoHeading only regardless of fused heading */
+      if (!parts.positionMgr.hasImusHeading()) return odoData.odoHeading;
       /* Don't fuse if the flag isn't set */
       if (!useFusedHeading || !use3encoders) return odoData.imuHeading;
       /* Use imuHeading only if it's settled */
@@ -150,7 +159,7 @@ public class Odometry implements PartsInterface {
 
       /* Calculate average heading from previous loop to this (movement did not only at the end of the loop!) */
       myHeading = getAvgHeading(odoData0.globalHeading, odoData.globalHeading);
-      TelemetryMgr.message(Category.ODOMETRY,"My Average Heading", myHeading);
+      TelemetryMgr.message(Category.ODOMETRY,"My Average Heading (raw)", JavaUtil.formatNumber(myHeading, 2));
 
       /* Calculate the new x and y positions */
       xPos = xPos + changeX * Math.cos(Math.toRadians(myHeading));
@@ -259,6 +268,7 @@ public class Odometry implements PartsInterface {
          this.imuHeading = imuHeading;
          this.globalHeading = globalHeading;
       }
+      public OdoData() {}
       @NonNull
       public OdoData clone() {
          return new OdoData(encoderXL, encoderXR, encoderY, odoHeading, imuHeading, globalHeading);

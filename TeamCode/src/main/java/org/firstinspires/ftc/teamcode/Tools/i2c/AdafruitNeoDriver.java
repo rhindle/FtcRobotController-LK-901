@@ -205,6 +205,11 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         this.deviceClient.setI2cAddress(newAddress);
     }
 
+    // LK Not sure why this doesn't initialize with parameters (not currently public?), but I don't want to break anything
+    public void setColorOrder (ColorOrder colorOrder) {
+        this.parameters.colorOrder = colorOrder;
+    }
+
     /**
      * Sets the number of pixels that are available in the strand
      * @param numPixels
@@ -392,7 +397,7 @@ public class AdafruitNeoDriver extends I2cDeviceSynchDeviceWithParameters<I2cDev
         return builder.toString();
     }
 
-    enum ColorOrder {
+    public enum ColorOrder {
         RGB(0, 1, 2),
         RBG(0, 2, 1),
         GRB(1, 0, 2),

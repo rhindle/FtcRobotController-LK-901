@@ -84,6 +84,9 @@ public class DSLed implements PartsInterface {
          case 3:
             msgColor = Color.rgb(40,0,0);
             break;
+         case 4:
+            msgColor = Color.rgb(0,0,40);
+            break;
          case 1:
          default:
             msgColor = Color.rgb(20,20,20);

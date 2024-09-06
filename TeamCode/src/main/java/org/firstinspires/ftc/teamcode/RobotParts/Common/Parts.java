@@ -36,6 +36,7 @@ public class Parts implements PartsInterface {
    public boolean useSlamra = false;
    public boolean useAprilTag = false;
    public boolean useNeoMatrix = false;
+   public boolean useIMU = true;   // todo: make everything work when this is disabled; odometry requires heading for example.
    public boolean useForzaControls = false;
    public Position robotPosition = new Position();
    public Position fieldStartPosition;

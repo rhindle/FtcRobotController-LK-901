@@ -6,11 +6,15 @@ class FullAuto {
 
     private static int state = 0;
     private static boolean complete = false;
+    private static long cancelTimer;
+    private static final long timeLimit = 20000;
+
 
     //----State Machine Start-----
     public static void stateMachine() {
         if (complete) state = 0;
         if (state < 1) return;  // not running
+        if  (System.currentTimeMillis() >= cancelTimer) stop();
 
         if (!DSShooter.parts.positionMgr.hasPosition()) stop();    // cancel running if no navigation
 
@@ -53,6 +57,7 @@ class FullAuto {
     public static void start() {
         complete = false;
         state = 1;
+        cancelTimer = System.currentTimeMillis() + timeLimit;
     }
 
     public static void stop() {

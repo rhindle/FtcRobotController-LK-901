@@ -13,8 +13,13 @@ public class PositionMgr implements PartsInterface {
    public Position slamraPosition;
    public Position tagPosition;
    public Position imuHeading;
+   public Position headingOnly;
+   public Position imusHeadingOnly;
+   public Position slamraHeading;
 
    public PosSource[] priorityList = {PosSource.ODO, PosSource.SLAMRA, PosSource.TAG};
+   public PosSource[] headingOnlyPriority = {PosSource.IMU, PosSource.SLAMRA_R, PosSource.ODO, PosSource.TAG};
+   public PosSource[] imusOnlyPriority = {PosSource.IMU, PosSource.SLAMRA_R};
    public Boolean prioritizeSlamraRforODO = false;      // use Slamra R instead of IMU for ODO
    public Boolean prioritizeIMUforSLAMRA = false;       // use IMU instead of Slarma R for SLAMRA
    public PosSource posSource;
@@ -51,17 +56,24 @@ public class PositionMgr implements PartsInterface {
       }
       if (parts.useSlamra) {
          slamraPosition = parts.slamra.isSlamraPositionGood() ? parts.slamra.slamraRobotPosition : null;
+         slamraHeading = parts.slamra.slamraRobotPosition;
       }
       if (parts.useAprilTag) {
          tagPosition = parts.dsApriltag.tagRobotPosition;
       }
-      imuHeading = parts.imuMgr.returnImuRobotHeadingAsPosition();
+      if (parts.useIMU) {
+         imuHeading = parts.imuMgr.returnImuRobotHeadingAsPosition();
+      }
       TelemetryMgr.message(Category.POSITION, "odo", (odoPosition==null) ? "(null)" : odoPosition.toString(2));
       TelemetryMgr.message(Category.POSITION, "slm", (slamraPosition==null) ? "(null)" : slamraPosition.toString(2));
       TelemetryMgr.message(Category.POSITION, "tag", (tagPosition==null) ? "(null)" : tagPosition.toString(2));
-      TelemetryMgr.message(Category.POSITION, "imu", (tagPosition==null) ? "(null)" : imuHeading.toString(2));
+      TelemetryMgr.message(Category.POSITION, "imu", (imuHeading==null) ? "(null)" : imuHeading.toString(2));
+      imusHeadingOnly = headingOnlyUpdate(imusOnlyPriority);
+      headingOnly = headingOnlyUpdate(headingOnlyPriority);
       robotPosition = normalUpdate();
       TelemetryMgr.message(Category.POSITION, "fnl", (robotPosition==null) ? "(null)" : robotPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "ims", (imusHeadingOnly==null) ? "(null)" : imusHeadingOnly.toString(2));
+      TelemetryMgr.message(Category.POSITION, "hed", (headingOnly==null) ? "(null)" : headingOnly.toString(2));
    }
 
    public void stop() {
@@ -73,9 +85,15 @@ public class PositionMgr implements PartsInterface {
    public Boolean noPosition () {
       return (robotPosition==null);
    }
+   public Boolean hasHeading() {
+      return (headingOnly!=null);
+   }
+   public Boolean hasImusHeading() {
+      return (imusHeadingOnly!=null);
+   }
 
    Position normalUpdate() {
-      posSource = returnPrioritySource();
+      posSource = returnPrioritySource(priorityList);
       switch (posSource) {
          case ODO:
             if (prioritizeSlamraRforODO && slamraPosition!=null) {
@@ -96,8 +114,39 @@ public class PositionMgr implements PartsInterface {
       }
    }
 
-   PosSource returnPrioritySource() {
-      for (PosSource source : priorityList) {
+   Position headingOnlyUpdate(PosSource[] list) {
+      posSource = returnPrioritySource(list);
+      switch (posSource) {
+         case IMU:
+            return new Position().withR(imuHeading.R);
+         case ODO:
+            return new Position().withR(odoPosition.R);
+         case SLAMRA:
+         case SLAMRA_R:
+            return new Position().withR(slamraHeading.R);
+         case TAG:
+            return new Position().withR(tagPosition.R);
+         case NONE:
+         default:
+            return null;
+      }
+   }
+
+//   Position imusOnlyUpdate(PosSource[] list) {
+//      posSource = returnPrioritySource(list);
+//      switch (posSource) {
+//         case IMU:
+//            return new Position().withR(imuHeading.R);
+//         case SLAMRA_R:
+//            return new Position().withR(slamraHeading.R);
+//         case NONE:
+//         default:
+//            return null;
+//      }
+//   }
+
+   PosSource returnPrioritySource(PosSource[] list) {
+      for (PosSource source : list) {
          switch (source) {
             case ODO:
                if (odoPosition!=null) return PosSource.ODO;
@@ -107,6 +156,12 @@ public class PositionMgr implements PartsInterface {
                break;
             case TAG:
                if (tagPosition!=null) return PosSource.TAG;
+               break;
+            case IMU:
+               if (imuHeading!=null) return PosSource.IMU;   // only valid for heading only
+               break;
+            case SLAMRA_R:
+               if (slamraHeading!=null) return PosSource.SLAMRA_R;   // only valid for heading only
                break;
             default:
          }
@@ -119,7 +174,9 @@ public class PositionMgr implements PartsInterface {
       ODO,
       SLAMRA,
       TAG,
-      ENCODER
+      ENCODER,
+      IMU,
+      SLAMRA_R
    }
 
 }

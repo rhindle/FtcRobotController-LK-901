@@ -4,6 +4,7 @@ public class Pusher {
 
     private static int state = 0;
     private static boolean complete = false;
+//    public static long cancelTimer = System.currentTimeMillis();
 
     //----State Machine Start-----
     public static void stateMachine() {

@@ -1,21 +1,18 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.annotation.SuppressLint;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
+
 import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.Parts;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.TelemetryMgr;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.TelemetryMgr.Category;
 import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.PartsDS;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
-import org.firstinspires.ftc.teamcode.Tools.Functions;
 
-@TeleOp(name = "AA_MentorTest_DS01", group = "")
+@TeleOp(name = "AA_MentorTest_DS01a", group = "")
 //@Disabled
-public class MentorTestDS01 extends LinearOpMode {
+public class MentorTestDS01a extends LinearOpMode {
 
    public Parts parts;
 
@@ -26,9 +23,9 @@ public class MentorTestDS01 extends LinearOpMode {
 
       parts.useODO = false;
       parts.useIMU = true;   //!!!
-      parts.useSlamra = true;  //!!!
+      parts.useSlamra = false;  //!!!
       parts.useNeoMatrix = true;
-      parts.useAprilTag = true;
+      parts.useAprilTag = false;
       parts.useDrivetrainEncoders = true;
       parts.reverseDrive = false;
       parts.useDistanceSensors = false;

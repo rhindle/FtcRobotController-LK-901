@@ -5,11 +5,14 @@ class Shoot3 {
     private static int state = 0;
     private static int cycleCount = 0;
     private static boolean complete = false;
+    private static long cancelTimer;
+    private static final long timeLimit = 10000;
 
     //----State Machine Start-----
     public static void stateMachine() {
         if (complete) state = 0;
         if (state < 1) return;  // not running
+        if  (System.currentTimeMillis() >= cancelTimer) stop();
 
         if (state == 1) {                                       // cancel other state machines if needed
             if (Shoot1.isRunning()) {
@@ -51,6 +54,7 @@ class Shoot3 {
     public static void start() {
         complete = false;
         state = 1;
+        cancelTimer = System.currentTimeMillis() + timeLimit;
     }
 
     public static void stop() {

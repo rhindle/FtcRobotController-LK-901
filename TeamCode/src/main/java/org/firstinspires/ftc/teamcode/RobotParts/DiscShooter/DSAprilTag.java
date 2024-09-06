@@ -31,35 +31,37 @@ public class DSAprilTag implements PartsInterface {
     public Position instantTagRobotPosition;
     public Position tagRobotPosition;
     Position[] lastPositions = new Position[10];
-    int lastPositionPointer=0;
-    public Position acceptableStDev = new Position(0.2,0.2,0.2);
+    int lastPositionPointer = 0;
+    public Position acceptableStDev = new Position(0.2, 0.2, 0.2);
     public boolean strongLocked = false;
     public double strongLockMaxAngle = 10.0;
-    public Position camOffset = new Position(-1,3,0);
+    public Position camOffset = new Position(-1, 3, 0);
 
     /* Constructor */
-    public DSAprilTag(Parts parts){
+    public DSAprilTag(Parts parts) {
         construct(parts);
     }
 
-    void construct(Parts parts){
+    void construct(Parts parts) {
         this.parts = parts;
     }
 
     public void initialize() {
         lkAprilTag();
-        for (int i=0; i<lastPositions.length; i++) {
-            lastPositions[i]=new Position();
+        for (int i = 0; i < lastPositions.length; i++) {
+            lastPositions[i] = new Position();
         }
     }
 
-    public void preInit() {}
+    public void preInit() {
+    }
 
     public void initLoop() {
         updateAprilTag();
     }
 
-    public void preRun() {}
+    public void preRun() {
+    }
 
     public void runLoop() {
         updateAprilTag();
@@ -69,7 +71,7 @@ public class DSAprilTag implements PartsInterface {
         visionPortal.close();
     }
 
-    public void enableStreaming (boolean streamBoo) {
+    public void enableStreaming(boolean streamBoo) {
         if (streamBoo) {
             visionPortal.resumeStreaming();
         } else {
@@ -158,70 +160,70 @@ public class DSAprilTag implements PartsInterface {
         tagRobotPosition = null;
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        TelemetryMgr.message(Category.APRILTAG,"# AprilTags Detected", currentDetections.size());
+        TelemetryMgr.message(Category.APRILTAG, "# AprilTags Detected", currentDetections.size());
 
         // Add "key" information to telemetry
-        TelemetryMgr.message(Category.APRILTAG_EXT,"XYZ = X (Right), Y (Forward), Z (Up) dist.");
-        TelemetryMgr.message(Category.APRILTAG_EXT,"PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-        TelemetryMgr.message(Category.APRILTAG_EXT,"RBE = Range, Bearing & Elevation");
+        TelemetryMgr.message(Category.APRILTAG_EXT, "XYZ = X (Right), Y (Forward), Z (Up) dist.");
+        TelemetryMgr.message(Category.APRILTAG_EXT, "PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+        TelemetryMgr.message(Category.APRILTAG_EXT, "RBE = Range, Bearing & Elevation");
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
-                TelemetryMgr.message(Category.APRILTAG,String.format("=== (ID %d) %s", detection.id, detection.metadata.name));
-                TelemetryMgr.message(Category.APRILTAG,String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                TelemetryMgr.message(Category.APRILTAG,String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-                TelemetryMgr.message(Category.APRILTAG_EXT,String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+                TelemetryMgr.message(Category.APRILTAG, String.format("=== (ID %d) %s", detection.id, detection.metadata.name));
+                TelemetryMgr.message(Category.APRILTAG, String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                TelemetryMgr.message(Category.APRILTAG, String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                TelemetryMgr.message(Category.APRILTAG_EXT, String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
 
                 // todo: clean up AprilTag work
                 // raw camera values (ftcPose in it's native coordinate system) of XY
                 Position camRaw = new Position(detection.ftcPose.x, detection.ftcPose.y, 0);
-                TelemetryMgr.message(Category.APRILTAG_EXT,String.format("camRaw   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camRaw.X, camRaw.Y, camRaw.R));
+                TelemetryMgr.message(Category.APRILTAG_EXT, String.format("camRaw   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camRaw.X, camRaw.Y, camRaw.R));
 
                 // transform the camera raw position using the yaw to align with field
                 Position camTrans = transPos(new Position(0, 0, -detection.ftcPose.yaw), camRaw);
-                TelemetryMgr.message(Category.APRILTAG_EXT,String.format("camTrans XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camTrans.X, camTrans.Y, camTrans.R));
+                TelemetryMgr.message(Category.APRILTAG_EXT, String.format("camTrans XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camTrans.X, camTrans.Y, camTrans.R));
 
                 // rotate the camera XY 90deg to match the field by switching axes
                 Position camRot = new Position(-camTrans.Y, camTrans.X, camTrans.R);
-                TelemetryMgr.message(Category.APRILTAG_EXT,String.format("camRot   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camRot.X, camRot.Y, camRot.R));
+                TelemetryMgr.message(Category.APRILTAG_EXT, String.format("camRot   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camRot.X, camRot.Y, camRot.R));
 
                 // Do everything in one step: Switch ftcPose to field XY and transform by yaw to align with field
-                Position camTry2 = transPos(new Position(0,0, -detection.ftcPose.yaw),
-                        new Position(-detection.ftcPose.y, detection.ftcPose.x, 0 ));
-                TelemetryMgr.message(Category.APRILTAG,String.format("camTry2  XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camTry2.X, camTry2.Y, camTry2.R));
+                Position camTry2 = transPos(new Position(0, 0, -detection.ftcPose.yaw),
+                        new Position(-detection.ftcPose.y, detection.ftcPose.x, 0));
+                TelemetryMgr.message(Category.APRILTAG, String.format("camTry2  XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camTry2.X, camTry2.Y, camTry2.R));
 
                 // Switch ftcPose to field XY relative to tag, add robot offset, and transform by yaw to align with field
-                Position camPos = transPos(new Position(0,0, -detection.ftcPose.yaw),
-                        new Position(-detection.ftcPose.y + camOffset.X, detection.ftcPose.x + camOffset.Y, 0 ));
-                TelemetryMgr.message(Category.APRILTAG,String.format("camPos   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camPos.X, camPos.Y, camPos.R));
+                Position camPos = transPos(new Position(0, 0, -detection.ftcPose.yaw),
+                        new Position(-detection.ftcPose.y + camOffset.X, detection.ftcPose.x + camOffset.Y, 0));
+                TelemetryMgr.message(Category.APRILTAG, String.format("camPos   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", camPos.X, camPos.Y, camPos.R));
 
                 // Get the tag's field position
                 // the library has bad x values!  60.3, but in reality it's 63.5.  So let's add 3.2 inches.
                 double adjustment = 0; //3.2;
                 float[] fieldPos = detection.metadata.fieldPosition.getData();
-                TelemetryMgr.message(Category.APRILTAG_EXT,String.format("field XYR %6.1f %6.1f %6.1f  (inch)", fieldPos[0], fieldPos[1], fieldPos[2]));
-                Position tagPos = new Position(detection.metadata.fieldPosition.get(0)+adjustment, detection.metadata.fieldPosition.get(1),0);
-                TelemetryMgr.message(Category.APRILTAG_EXT,String.format("tagPos   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", tagPos.X, tagPos.Y, tagPos.R));
+                TelemetryMgr.message(Category.APRILTAG_EXT, String.format("field XYR %6.1f %6.1f %6.1f  (inch)", fieldPos[0], fieldPos[1], fieldPos[2]));
+                Position tagPos = new Position(detection.metadata.fieldPosition.get(0) + adjustment, detection.metadata.fieldPosition.get(1), 0);
+                TelemetryMgr.message(Category.APRILTAG_EXT, String.format("tagPos   XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", tagPos.X, tagPos.Y, tagPos.R));
 
                 // Calculate the robot position based on camera position and tag position
-                Position robotPos = new Position(tagPos.X+camPos.X, tagPos.Y+camPos.Y, camPos.R);
-                TelemetryMgr.message(Category.APRILTAG,String.format("robotPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", robotPos.X, robotPos.Y, robotPos.R));
+                Position robotPos = new Position(tagPos.X + camPos.X, tagPos.Y + camPos.Y, camPos.R);
+                TelemetryMgr.message(Category.APRILTAG, String.format("robotPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", robotPos.X, robotPos.Y, robotPos.R));
                 instantTagRobotPosition = robotPos;
 
             } else {
-                TelemetryMgr.message(Category.APRILTAG,String.format("\n==== (ID %d) Unknown", detection.id));
-                TelemetryMgr.message(Category.APRILTAG,String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+                TelemetryMgr.message(Category.APRILTAG, String.format("\n==== (ID %d) Unknown", detection.id));
+                TelemetryMgr.message(Category.APRILTAG, String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
             processTagPosition();
         }   // end for() loop
 
         if (currentDetections.size() == 0) {
-            for (int j=0; j<8; j++) {
-                TelemetryMgr.message(Category.APRILTAG,"X");
+            for (int j = 0; j < 8; j++) {
+                TelemetryMgr.message(Category.APRILTAG, "X");
             }
-            for (int j=0; j<6; j++) {
-                TelemetryMgr.message(Category.APRILTAG_EXT,"X");
+            for (int j = 0; j < 6; j++) {
+                TelemetryMgr.message(Category.APRILTAG_EXT, "X");
             }
         }
 
@@ -229,26 +231,27 @@ public class DSAprilTag implements PartsInterface {
 
     @SuppressLint("DefaultLocale")
     void processTagPosition() {
-        int length=lastPositions.length;
+        int length = lastPositions.length;
 
         lastPositions[lastPositionPointer] = instantTagRobotPosition;
         lastPositionPointer++;
-        if (lastPositionPointer >= length) lastPositionPointer=0;
+        if (lastPositionPointer >= length) lastPositionPointer = 0;
 
         // get the mean of array
         Position meanPosition = new Position();
         for (Position i : lastPositions) {
-            if (i==null) i=new Position();
+            if (i == null) i = new Position();
             meanPosition.X += i.X / length;
             meanPosition.Y += i.Y / length;
             meanPosition.R += i.R / length;
         }
-        TelemetryMgr.message(Category.APRILTAG,String.format("meanPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", meanPosition.X, meanPosition.Y, meanPosition.R));
+        TelemetryMgr.message(Category.APRILTAG, String.format("meanPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", meanPosition.X, meanPosition.Y, meanPosition.R));
 
         // calculate the standard deviation
         Position stdevPosition = new Position();
         for (Position i : lastPositions) {
-            if (i==null) i=new Position();   // got a null reference after running for a while; whould track this down
+            if (i == null)
+                i = new Position();   // got a null reference after running for a while; should track this down
             stdevPosition.X += Math.pow(i.X - meanPosition.X, 2);
             stdevPosition.Y += Math.pow(i.Y - meanPosition.Y, 2);
             stdevPosition.R += Math.pow(i.R - meanPosition.R, 2);
@@ -256,7 +259,7 @@ public class DSAprilTag implements PartsInterface {
         stdevPosition.X = Math.sqrt(stdevPosition.X / length);
         stdevPosition.Y = Math.sqrt(stdevPosition.Y / length);
         stdevPosition.R = Math.sqrt(stdevPosition.R / length);
-        TelemetryMgr.message(Category.APRILTAG,String.format("stdvPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", stdevPosition.X, stdevPosition.Y, stdevPosition.R));
+        TelemetryMgr.message(Category.APRILTAG, String.format("stdvPos XYR %6.1f %6.1f %6.1f  (inch, inch, deg)", stdevPosition.X, stdevPosition.Y, stdevPosition.R));
 
         if (stdevPosition.X <= acceptableStDev.X && stdevPosition.Y <= acceptableStDev.Y && stdevPosition.R <= acceptableStDev.R) {
             if (Math.abs(meanPosition.R) <= strongLockMaxAngle) {

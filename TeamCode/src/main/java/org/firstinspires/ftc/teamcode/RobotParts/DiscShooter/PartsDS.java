@@ -1,18 +1,23 @@
 package org.firstinspires.ftc.teamcode.RobotParts.DiscShooter;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.ButtonMgr;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.ImuMgr;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.NeoMatrix;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.Parts;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.PositionMgr;
 import org.firstinspires.ftc.teamcode.RobotParts.Common.Slamra;
+import org.firstinspires.ftc.teamcode.RobotParts.Common.TelemetryMgr;
 import org.firstinspires.ftc.teamcode.RobotParts.DiscShooter.Shooter.DSShooter;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.NavigationTarget;
 import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
+import org.firstinspires.ftc.teamcode.Tools.Functions;
+import org.firstinspires.ftc.teamcode.Tools.i2c.AdafruitNeoDriver;
 
 public class PartsDS extends Parts {
     public PartsDS(LinearOpMode opMode) {
@@ -35,7 +40,7 @@ public class PartsDS extends Parts {
         controls = new ControlsDS(this);
         drivetrain = new DrivetrainDS(this);
 
-        imuMgr = new ImuMgr(this);
+        if (useIMU) imuMgr = new ImuMgr(this);  //todo: update all IMU stuff to be disable-able
         positionMgr = new PositionMgr(this);
         autoDrive = new AutoDriveDS(this);
         userDrive = new UserDriveDS(this);
@@ -56,13 +61,13 @@ public class PartsDS extends Parts {
             slamra.slamraRobotOffset = slamraRobotOffset;
         }
 
-        if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 16);
+        if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 16, AdafruitNeoDriver.ColorOrder.GRB);  //RGB for fairy string
     }
 
     @Override
     public void preInit() {
         robot.initialize();
-        imuMgr.initialize();
+        if (useIMU) imuMgr.initialize();
         positionMgr.initialize();
         dsShooter.initialize();
         if (useSlamra) slamra.initialize();
@@ -72,19 +77,20 @@ public class PartsDS extends Parts {
 
     @Override
     public void initLoop() {
-        imuMgr.runLoop();
+        if (useIMU) imuMgr.runLoop();
         buttonMgr.runLoop();
         if (useSlamra) slamra.initLoop();
         if (useAprilTag) dsApriltag.initLoop();
         positionMgr.initLoop();
         if (useNeoMatrix) dsLed.initLoop();
         dsShooter.initLoop();
+        TelemetryMgr.Update();
     }
 
     @Override
     public void preRun() {
         drivetrain.initialize();
-        imuMgr.runLoop();
+        if (useIMU) imuMgr.runLoop();
         if (useODO) odometry.initialize();
         userDrive.initialize();
         autoDrive.initialize();
@@ -100,8 +106,9 @@ public class PartsDS extends Parts {
 
     @Override
     public void runLoop() {
+        addTelemetryLoopStart();
         robot.runLoop();
-        imuMgr.runLoop();
+        if (useIMU) imuMgr.runLoop();
         buttonMgr.runLoop();
         if (useODO) odometry.runLoop();
         if (useSlamra) slamra.runLoop();
@@ -113,15 +120,28 @@ public class PartsDS extends Parts {
         autoDrive.runLoop();
         drivetrain.runLoop();
         dsShooter.runLoop();
+        tagPositionAndLEDs();
         if (useNeoMatrix) dsLed.runLoop();
+        addTelemetryLoopEnd();
+        TelemetryMgr.Update();
+    }
 
-        /* AprilTag experiment follows, to be moved elsewhere eventually */   //todo:move this (including firstlock variable)
+    @Override
+    public void stop() {
+        if (useSlamra) slamra.stop();
+        if (useAprilTag) dsApriltag.stop();
+        dsShooter.stop();
+        drivetrain.stop();
+    }
+
+    public void tagPositionAndLEDs () {
+        /* AprilTag experiment follows, to be moved elsewhere eventually? */   //todo:move this (including firstlock variable)
         if (useAprilTag) {
             Position roboTagPosition = dsApriltag.getTagRobotPosition();
             if (roboTagPosition != null) {
                 if (useSlamra) slamra.setupFieldOffset(roboTagPosition);
                 if (useODO) odometry.setupFieldOffset(roboTagPosition);
-                imuMgr.setupFieldOffset(roboTagPosition);
+                if (useIMU) imuMgr.setupFieldOffset(roboTagPosition);
                 //  autoDrive.modifyHeading = robot.returnImuHeading() - roboTagPosition.R; // saving for reference
             }
             if (dsApriltag.tagRobotPosition!=null){
@@ -145,15 +165,31 @@ public class PartsDS extends Parts {
             }
         } else {
             dsLed.updateGraphic('2', Color.rgb(20,0,0));
-            dsApriltag.strongLocked=false;  // if all is lost, allow a weak lock again
+            if (useAprilTag) dsApriltag.strongLocked=false;  // if all is lost, allow a weak lock again
         }
     }
 
-    @Override
-    public void stop() {
-        if (useSlamra) slamra.stop();
-        if (useAprilTag) dsApriltag.stop();
-        dsShooter.stop();
-        drivetrain.stop();
+    private void addTelemetryLoopStart() {
+        TelemetryMgr.message(TelemetryMgr.Category.BASIC, "Loop time (ms)", JavaUtil.formatNumber(Functions.calculateLoopTime(), 0));
+//        TelemetryMgr.message(TelemetryMgr.Category.BASIC, "IMU raw heading", JavaUtil.formatNumber(imuMgr.returnImuHeadingRaw(),2));
+        TelemetryMgr.message(TelemetryMgr.Category.BASIC, "IMU raw heading", useIMU ? JavaUtil.formatNumber(imuMgr.returnImuHeadingRaw(),2) : "(not used)");
+        if (useODO) odometry.addTeleOpTelemetry();
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void addTelemetryLoopEnd() {
+        TelemetryMgr.message(TelemetryMgr.Category.CONTROLS, "speed ", JavaUtil.formatNumber(controls.driveData.driveSpeed, 2));
+        TelemetryMgr.message(TelemetryMgr.Category.CONTROLS, "angle ", JavaUtil.formatNumber(controls.driveData.driveAngle, 2));
+        TelemetryMgr.message(TelemetryMgr.Category.CONTROLS, "rotate", JavaUtil.formatNumber(controls.driveData.rotate, 2));
+        TelemetryMgr.message(TelemetryMgr.Category.USERDRIVE, "storedHeading", JavaUtil.formatNumber(userDrive.storedHeading, 2));
+        TelemetryMgr.message(TelemetryMgr.Category.USERDRIVE, "deltaHeading", JavaUtil.formatNumber(userDrive.deltaHeading, 2));
+//        TelemetryMgr.message(TelemetryMgr.Category.IMU, "IMU-Modified", JavaUtil.formatNumber(imuMgr.returnImuRobotHeading(),2));
+        TelemetryMgr.message(TelemetryMgr.Category.IMU, "IMU-Modified", useIMU ? JavaUtil.formatNumber(imuMgr.returnImuRobotHeading(),2) : "(not used)");
+        if (useAprilTag) {
+            Position robo = dsApriltag.getTagRobotPosition();
+            if (robo != null)
+                TelemetryMgr.message(TelemetryMgr.Category.APRILTAG, String.format("robotPos XYZ %6.1f %6.1f %6.1f  (inch, inch, deg)", robo.X, robo.Y, robo.R));
+            else TelemetryMgr.message(TelemetryMgr.Category.APRILTAG, "robotpos - no tag position");
+        }
     }
 }
