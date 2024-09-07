@@ -43,9 +43,11 @@ public class ImuMgr implements PartsInterface {
    }
 
    public void initLoop() {
+      runLoop();
    }
 
    public void preRun() {
+      runLoop();
    }
 
    public void runLoop() {

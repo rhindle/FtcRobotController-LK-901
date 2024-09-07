@@ -42,7 +42,6 @@ class FullAuto {
             }
         }
         if (state == 4) {
-//            if (Shoot3.isComplete() && Push.isComplete()) {
             if (Shoot3.isComplete()) {
                 DSShooter.parts.autoDrive.setAutoDrive(false);
                 DSShooter.closeGate();

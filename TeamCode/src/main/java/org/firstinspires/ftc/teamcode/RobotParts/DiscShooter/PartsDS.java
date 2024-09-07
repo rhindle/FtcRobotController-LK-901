@@ -77,8 +77,8 @@ public class PartsDS extends Parts {
 
     @Override
     public void initLoop() {
-        if (useIMU) imuMgr.runLoop();
-        buttonMgr.runLoop();
+        buttonMgr.initLoop();
+        if (useIMU) imuMgr.initLoop();
         if (useSlamra) slamra.initLoop();
         if (useAprilTag) dsApriltag.initLoop();
         positionMgr.initLoop();
@@ -90,7 +90,7 @@ public class PartsDS extends Parts {
     @Override
     public void preRun() {
         drivetrain.initialize();
-        if (useIMU) imuMgr.runLoop();
+        if (useIMU) imuMgr.preRun();
         if (useODO) odometry.initialize();
         userDrive.initialize();
         autoDrive.initialize();
@@ -107,11 +107,12 @@ public class PartsDS extends Parts {
     @Override
     public void runLoop() {
         addTelemetryLoopStart();
+
         robot.runLoop();
-        if (useIMU) imuMgr.runLoop();
         buttonMgr.runLoop();
-        if (useODO) odometry.runLoop();
+        if (useIMU) imuMgr.runLoop();
         if (useSlamra) slamra.runLoop();
+        if (useODO) odometry.runLoop();   // run odometry after IMU and slamra so it has up to date headings available
         if (useAprilTag) dsApriltag.runLoop();
         positionMgr.runLoop();
         controls.runLoop();
@@ -122,6 +123,7 @@ public class PartsDS extends Parts {
         dsShooter.runLoop();
         tagPositionAndLEDs();
         if (useNeoMatrix) dsLed.runLoop();
+
         addTelemetryLoopEnd();
         TelemetryMgr.Update();
     }
@@ -171,7 +173,6 @@ public class PartsDS extends Parts {
 
     private void addTelemetryLoopStart() {
         TelemetryMgr.message(TelemetryMgr.Category.BASIC, "Loop time (ms)", JavaUtil.formatNumber(Functions.calculateLoopTime(), 0));
-//        TelemetryMgr.message(TelemetryMgr.Category.BASIC, "IMU raw heading", JavaUtil.formatNumber(imuMgr.returnImuHeadingRaw(),2));
         TelemetryMgr.message(TelemetryMgr.Category.BASIC, "IMU raw heading", useIMU ? JavaUtil.formatNumber(imuMgr.returnImuHeadingRaw(),2) : "(not used)");
         if (useODO) odometry.addTeleOpTelemetry();
     }
@@ -183,7 +184,6 @@ public class PartsDS extends Parts {
         TelemetryMgr.message(TelemetryMgr.Category.CONTROLS, "rotate", JavaUtil.formatNumber(controls.driveData.rotate, 2));
         TelemetryMgr.message(TelemetryMgr.Category.USERDRIVE, "storedHeading", JavaUtil.formatNumber(userDrive.storedHeading, 2));
         TelemetryMgr.message(TelemetryMgr.Category.USERDRIVE, "deltaHeading", JavaUtil.formatNumber(userDrive.deltaHeading, 2));
-//        TelemetryMgr.message(TelemetryMgr.Category.IMU, "IMU-Modified", JavaUtil.formatNumber(imuMgr.returnImuRobotHeading(),2));
         TelemetryMgr.message(TelemetryMgr.Category.IMU, "IMU-Modified", useIMU ? JavaUtil.formatNumber(imuMgr.returnImuRobotHeading(),2) : "(not used)");
         if (useAprilTag) {
             Position robo = dsApriltag.getTagRobotPosition();

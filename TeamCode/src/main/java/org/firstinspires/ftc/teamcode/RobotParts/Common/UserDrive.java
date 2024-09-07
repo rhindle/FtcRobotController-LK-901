@@ -18,13 +18,14 @@ public class UserDrive implements PartsInterface {
    public boolean useHoldPosition = true;
    public boolean useTargetDirection = false;
    public boolean isDriving = false;
-   boolean useHoldOK = false;
    public double storedHeading = 0;
    public double deltaHeading = 0;
    public double speedMaximum = 1;
+   public Position directionTarget;
+
+   boolean useHoldOK = false;
    long idleDelay = System.currentTimeMillis();
    long headingDelay = System.currentTimeMillis();
-   public Position directionTarget;
 
    /* Constructor */
    public UserDrive(Parts parts){
@@ -92,7 +93,7 @@ public class UserDrive implements PartsInterface {
          }
          // Then, apply the storedHeading
          if (headingDelay <= System.currentTimeMillis()) {
-//            this.rotate = parts.autoDrive.getHeadingError(storedHeading) / -15 * (driveSpeed + 0.2);   // base this on speed?
+            // this.rotate = parts.autoDrive.getHeadingError(storedHeading) / -15 * (driveSpeed + 0.2);   // base this on speed?
             // start with the same proportional in autodrive
             this.rotate = parts.autoDrive.PIDrotate.p * parts.autoDrive.getHeadingError(storedHeading);
             // and then scale it (determined experimentally, scaled like old code)
@@ -147,9 +148,6 @@ public class UserDrive implements PartsInterface {
          idleDelay = System.currentTimeMillis() + 500;  //was 250 to match rotate?
          useHoldOK = true;
       }
-      //      if (parts.positionMgr.noPosition()) return;
-      //      if (idleDelay < System.currentTimeMillis() && useHoldPosition) {
-      //      }
    }
 
    public void handleRotateIdle() { //(double rotate) {
@@ -157,7 +155,6 @@ public class UserDrive implements PartsInterface {
       // by storing the heading delayed 250ms after any rotational input
       // Will use the img heading if position not available //todo: deal with cases where imu not being read
       if (rotate != 0) {
-//         storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading;
          storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R :
                  parts.positionMgr.hasHeading() ? parts.positionMgr.headingOnly.R : 0;
          headingDelay = System.currentTimeMillis() + 250;
@@ -166,7 +163,6 @@ public class UserDrive implements PartsInterface {
       }
       else if (headingDelay > System.currentTimeMillis()) {
          // keep re-reading until delay has passed
-//         storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading;
          storedHeading = parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R :
                  parts.positionMgr.hasHeading() ? parts.positionMgr.headingOnly.R : 0;
       }
@@ -192,13 +188,11 @@ public class UserDrive implements PartsInterface {
    }
 
    public boolean toggleHeadingHold() {
-//      if (parts.positionMgr.noPosition()) {
       if (!parts.positionMgr.hasHeading()) {
          useHeadingHold = false;
          return useHeadingHold;
       }
       useHeadingHold = !useHeadingHold;
-//      storedHeading = parts.positionMgr.robotPosition.R;
       storedHeading = parts.positionMgr.headingOnly.R;
       return useHeadingHold;
    }

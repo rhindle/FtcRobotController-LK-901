@@ -21,13 +21,10 @@ class Shoot3 {
             }
             if (System.currentTimeMillis() >= DSShooter.cancelTimer) state++;
         }
-        if (state == 2) {                 // open gate, start spinner
+        if (state == 2) {                 // open gate, start spinner    // todo: there's no "if" here, so these tasks could move to state==1
             Pusher.stop();   // cancel any ongoing pusher movement
             cycleCount = 0;
             DSShooter.armShooter();
-//            DSShooter.openGate();
-//            DSShooter.spinnerOn();
-//            DSShooter.retractPusher();
             state++;
         }
         if (state == 3) {                 // wait for gate up, spinner at rpm
@@ -46,7 +43,6 @@ class Shoot3 {
                 }
             }
             else if (!Pusher.isRunning()) stop();   //cancel if problem
-//            if (cycleCount == DSShooter.pusherAutoCycles) complete = true;  //note:push is still running at this moment
         }
     }
     //----State Machine End-----

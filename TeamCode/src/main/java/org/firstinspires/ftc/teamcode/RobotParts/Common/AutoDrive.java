@@ -215,7 +215,6 @@ public class AutoDrive implements PartsInterface {
    public double getHeadingError(double targetAngle) {
 //      if (parts.positionMgr.noPosition()) return 0;
       double robotError;
-//      robotError = targetAngle - (parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.imuMgr.imuRobotHeading);
       robotError = targetAngle - (parts.positionMgr.hasPosition() ? parts.positionMgr.robotPosition.R : parts.positionMgr.headingOnly.R);
       return Functions.normalizeAngle(robotError);
    }
@@ -242,19 +241,6 @@ public class AutoDrive implements PartsInterface {
          return;
       }
       setTargetToCurrentPosition(parts.positionMgr.robotPosition.R);
-//      if (parts.positionMgr.noPosition()) {
-//         cancelNavigation();
-//         status = Status.LOST;
-//         return;
-//      }
-//      navTarget = new NavigationTarget(new Position (
-//              Math.round(parts.positionMgr.robotPosition.X),
-//              Math.round(parts.positionMgr.robotPosition.Y),
-//              Math.round(parts.positionMgr.robotPosition.R)
-//            ));
-//      isNavigating = false;
-//      isHolding = true;
-//      resetPID();
    }
 
    public void setNavTarget(NavigationTarget navTarget) {
@@ -269,7 +255,6 @@ public class AutoDrive implements PartsInterface {
       isHolding = hold;
       resetPID();
       onTargetByAccuracy = false;  //todo: does setting this to false cause any problems?  Needed for shooter state machines.
-      //onTargetByAccuracy = navTarget.inToleranceByTime(parts.positionMgr.robotPosition);
    }
 
    // included for legacy reasons, but should be phased out

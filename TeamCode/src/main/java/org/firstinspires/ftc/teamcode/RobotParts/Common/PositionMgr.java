@@ -64,16 +64,17 @@ public class PositionMgr implements PartsInterface {
       if (parts.useIMU) {
          imuHeading = parts.imuMgr.returnImuRobotHeadingAsPosition();
       }
-      TelemetryMgr.message(Category.POSITION, "odo", (odoPosition==null) ? "(null)" : odoPosition.toString(2));
-      TelemetryMgr.message(Category.POSITION, "slm", (slamraPosition==null) ? "(null)" : slamraPosition.toString(2));
-      TelemetryMgr.message(Category.POSITION, "tag", (tagPosition==null) ? "(null)" : tagPosition.toString(2));
-      TelemetryMgr.message(Category.POSITION, "imu", (imuHeading==null) ? "(null)" : imuHeading.toString(2));
       imusHeadingOnly = headingOnlyUpdate(imusOnlyPriority);
       headingOnly = headingOnlyUpdate(headingOnlyPriority);
       robotPosition = normalUpdate();
-      TelemetryMgr.message(Category.POSITION, "fnl", (robotPosition==null) ? "(null)" : robotPosition.toString(2));
-      TelemetryMgr.message(Category.POSITION, "ims", (imusHeadingOnly==null) ? "(null)" : imusHeadingOnly.toString(2));
-      TelemetryMgr.message(Category.POSITION, "hed", (headingOnly==null) ? "(null)" : headingOnly.toString(2));
+
+      TelemetryMgr.message(Category.POSITION, "odo__", (odoPosition==null) ? "(null)" : odoPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "slmra", (slamraPosition==null) ? "(null)" : slamraPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "tag__", (tagPosition==null) ? "(null)" : tagPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "imu__", (imuHeading==null) ? "(null)" : imuHeading.toString(2));
+      TelemetryMgr.message(Category.POSITION, "final", (robotPosition==null) ? "(null)" : robotPosition.toString(2));
+      TelemetryMgr.message(Category.POSITION, "imus_", (imusHeadingOnly==null) ? "(null)" : imusHeadingOnly.toString(2));
+      TelemetryMgr.message(Category.POSITION, "head_", (headingOnly==null) ? "(null)" : headingOnly.toString(2));
    }
 
    public void stop() {
@@ -132,19 +133,6 @@ public class PositionMgr implements PartsInterface {
       }
    }
 
-//   Position imusOnlyUpdate(PosSource[] list) {
-//      posSource = returnPrioritySource(list);
-//      switch (posSource) {
-//         case IMU:
-//            return new Position().withR(imuHeading.R);
-//         case SLAMRA_R:
-//            return new Position().withR(slamraHeading.R);
-//         case NONE:
-//         default:
-//            return null;
-//      }
-//   }
-
    PosSource returnPrioritySource(PosSource[] list) {
       for (PosSource source : list) {
          switch (source) {
@@ -178,5 +166,4 @@ public class PositionMgr implements PartsInterface {
       IMU,
       SLAMRA_R
    }
-
 }

@@ -143,16 +143,13 @@ public class DSShooter implements PartsInterface {
    public void eStop() {
       stopMotors();
       cancelStateMachines();
-//      retractPusher();
-//      openGate();
       parts.robot.disableServo(servoPusher);
       parts.robot.disableServo(servoGate);
       isArmed = false;
    }
 
    static boolean isSpinnerInTolerance() {
-      //!!!!!!
-//      return true;
+      //return true;  // for testing without spin motor
       return isSpinnerInTolerance(spinRPMset, spinnerTolerance);
    }
    static boolean isSpinnerInTolerance(double targetRPM, double tolerance) {

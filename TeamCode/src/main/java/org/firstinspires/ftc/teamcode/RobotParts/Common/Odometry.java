@@ -58,7 +58,7 @@ public class Odometry implements PartsInterface {
       odoData.encoderXL = odoEncXL.encoderPort.getCurrentPosition() * (long)odoEncXL.direction;
       if (use3encoders) odoData.encoderXR = odoEncXR.encoderPort.getCurrentPosition() * (long)odoEncXR.direction;
       odoData.encoderY = odoEncY.encoderPort.getCurrentPosition() * (long)odoEncY.direction;
-//      if (parts.useIMU) odoData.imuHeading = parts.imuMgr.returnImuHeadingRaw(true);
+      //if (parts.useIMU) odoData.imuHeading = parts.imuMgr.returnImuHeadingRaw(true);
       if (parts.positionMgr.hasImusHeading()) odoData.imuHeading = parts.positionMgr.imusHeadingOnly.R;
       if (use3encoders) odoData.odoHeading = getOdoHeading();
       odoData.globalHeading = odoData.imuHeading;
@@ -86,7 +86,7 @@ public class Odometry implements PartsInterface {
       odoData.encoderY = odoEncY.encoderPort.getCurrentPosition() * (long)odoEncY.direction;
 
       /* Update heading */
-//      if (parts.useIMU) odoData.imuHeading = parts.imuMgr.returnImuHeadingRaw();
+      //if (parts.useIMU) odoData.imuHeading = parts.imuMgr.returnImuHeadingRaw();
       if (parts.positionMgr.hasImusHeading()) {
          odoData.imuHeading = parts.positionMgr.imusHeadingOnly.R;                  // todo: This isn't raw... Now what?
          odoFieldOffset.R = 0;  // if using final IMU heading, no need for offset?  // todo: OK?  this will mess up odoHeading absolute
@@ -171,7 +171,7 @@ public class Odometry implements PartsInterface {
    }
 
    /* Calculate average of two headings */
-   public double getAvgHeading (double firstHeading, double secondHeading) {
+   public static double getAvgHeading (double firstHeading, double secondHeading) {
       double robotHeading;
       /* Find the difference between them; based on sampling rate, assume large values wrapped */
       robotHeading = Functions.normalizeAngle(secondHeading - firstHeading);

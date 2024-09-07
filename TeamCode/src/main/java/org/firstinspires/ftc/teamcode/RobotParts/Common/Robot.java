@@ -45,8 +45,8 @@ public class Robot implements PartsInterface {
     public Servo    servo4B   = null;
     public Servo    servo5B   = null;
 
+    // todo: May want to divvy up robot-unique variables like done in Parts class?
     public ColorSensor sensorColor    = null;
-
     public DistanceSensor sensor2MLeft = null;
     public DistanceSensor sensor2MMiddle = null;
     public DistanceSensor sensor2MRight = null;
@@ -291,18 +291,18 @@ public class Robot implements PartsInterface {
     public void initOptions() {
         /* Following left as examples for subclass @override method */
 
-//        ultraSensor = hardwareMap.get(DFR304Range.class, "uSensor");
-//        DFR304Range.Parameters uParameters = new DFR304Range.Parameters();
-//        uParameters.maxRange = DFR304Range.MaxRange.CM500;
-//        uParameters.measureMode = DFR304Range.MeasureMode.PASSIVE;
-//        ultraSensor.initialize(uParameters);
+        //        ultraSensor = hardwareMap.get(DFR304Range.class, "uSensor");
+        //        DFR304Range.Parameters uParameters = new DFR304Range.Parameters();
+        //        uParameters.maxRange = DFR304Range.MaxRange.CM500;
+        //        uParameters.measureMode = DFR304Range.MeasureMode.PASSIVE;
+        //        ultraSensor.initialize(uParameters);
 
-        //i2c sensors
-//        sensorColor = hwMap.get(ColorSensor.class, "sensorColorRange");
-//        sensorDistance = hwMap.get(DistanceSensor.class, "sensorColorRange");
-//        sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
-//        sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
-//        sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
-//        qled = hardwareMap.get(QwiicLEDStick.class, "led");
+                //i2c sensors
+        //        sensorColor = hwMap.get(ColorSensor.class, "sensorColorRange");
+        //        sensorDistance = hwMap.get(DistanceSensor.class, "sensorColorRange");
+        //        sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
+        //        sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
+        //        sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
+        //        qled = hardwareMap.get(QwiicLEDStick.class, "led");
     }
 }

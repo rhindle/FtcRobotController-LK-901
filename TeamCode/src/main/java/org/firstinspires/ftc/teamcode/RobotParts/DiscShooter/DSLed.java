@@ -52,7 +52,6 @@ public class DSLed implements PartsInterface {
 
    public void preRun() {
       parts.neo.clearMatrix();
-//      normalMatrix = parts.neo.newPixelMapSameSize(normalMatrix);
       normalMatrix = new int[cols][rows];
       updateGraphic('4', Color.rgb(2,2,2));
       parts.neo.applyPixelMapToBuffer(finalMatrix,0,15,0, true);
@@ -98,7 +97,6 @@ public class DSLed implements PartsInterface {
             msgColor = Color.rgb(20,20,20);
       }
       textMatrix = parts.neo.buildPixelMapFromString(String.valueOf(msgChar), parts.neo.bigLetters, msgColor);
-//      messageMatrix = parts.neo.newPixelMapSameSize(messageMatrix);
       messageMatrix = new int[cols][rows];
       messageMatrix = parts.neo.overlayPixelMap(textMatrix, messageMatrix, 2);
       messageMatrix = parts.neo.overlayPixelMap(textMatrix, messageMatrix, 10);

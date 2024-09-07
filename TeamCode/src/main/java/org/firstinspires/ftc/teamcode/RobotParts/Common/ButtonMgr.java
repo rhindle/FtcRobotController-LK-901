@@ -29,6 +29,10 @@ public class ButtonMgr {
         }
     }
 
+    public void initLoop() {
+        runLoop();
+    }
+
     public void runLoop() {
         updateAll();
     }
