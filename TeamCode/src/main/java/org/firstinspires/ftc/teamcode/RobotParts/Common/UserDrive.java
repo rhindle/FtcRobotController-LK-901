@@ -18,7 +18,7 @@ public class UserDrive implements PartsInterface {
    public boolean useHoldPosition = true;
    public boolean useTargetDirection = false;
    public boolean isDriving = false;
-   public boolean useHoldOK = false;
+   boolean useHoldOK = false;
    public double storedHeading = 0;
    public double deltaHeading = 0;
    public double speedMaximum = 1;
@@ -53,6 +53,10 @@ public class UserDrive implements PartsInterface {
    }
 
    public void stop() {
+   }
+
+   public void eStop() {
+      useHoldOK = false;   // prevents the delayed activation of position holding
    }
 
    // Determine motor speeds when under driver control

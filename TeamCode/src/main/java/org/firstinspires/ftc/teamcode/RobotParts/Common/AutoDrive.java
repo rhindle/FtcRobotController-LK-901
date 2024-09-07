@@ -84,6 +84,10 @@ public class AutoDrive implements PartsInterface {
       cancelNavigation();
    }
 
+   public void eStop() {
+      cancelNavigation();
+   }
+
    public void dummyTelemetry() {
       //placeholder telemetry so it won't bounce around
       TelemetryMgr.message(Category.AUTODRIVE, "DeltaX");

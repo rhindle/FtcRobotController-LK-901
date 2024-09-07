@@ -198,11 +198,12 @@ public class ControlsDS extends Controls {
 
    public void stopEverything() {
       if (!isStopped) {
-         // note: drivedata is already zeroed in the runloop
-         parts.drivetrain.stopDriveMotors(true);
+         // stop parts that cause motion
+         parts.drivetrain.eStop();  // note: drivedata is already zeroed in the runloop
          parts.dsShooter.eStop();
-         parts.autoDrive.cancelNavigation();
-         parts.userDrive.useHoldOK = false;
+         parts.autoDrive.eStop();
+         parts.userDrive.eStop();
+         // set internal variables
          toggleIntake = false;
          isStopped = true;
       }

@@ -48,6 +48,9 @@ public class Drivetrain {
         stopDriveMotors(true);
     }
 
+    public void eStop() {
+        stopDriveMotors(true);
+    }
 
     public void applyDrivePowers() {
         applyDrivePowers(true);
