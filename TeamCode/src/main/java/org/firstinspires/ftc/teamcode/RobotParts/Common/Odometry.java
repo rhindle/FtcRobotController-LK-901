@@ -188,7 +188,7 @@ public class Odometry implements PartsInterface {
    Position getOdoFinalPose() {
       //pos1 = odoFieldOffset, pos2 = odoRobotPose
       Position odoFinal;
-      odoFinal = transformPosition(odoFieldOffset, odoRobotPose);
+      odoFinal = transformPosition(odoFieldOffset, odoRobotPose);  //todo: get this reversed to be more intuitive; field offset will have to be calculated differently
       odoFinal.normalize();
       return odoFinal;
    }
@@ -212,7 +212,7 @@ public class Odometry implements PartsInterface {
       // if the field offset is 0,0,0, it can be known that it was not properly offset
    }
 
-   Position getOdoFieldOffset(Position robotPose, Position fieldPose) {
+   Position getOdoFieldOffset(Position robotPose, Position fieldPose) {  //todo: maybe this should be inverted somehow?
       double offsetR = fieldPose.R - robotPose.R;
       return new Position (
               fieldPose.X - (robotPose.X*Math.cos(Math.toRadians(offsetR)) - robotPose.Y*Math.sin(Math.toRadians(offsetR))),
@@ -221,7 +221,7 @@ public class Odometry implements PartsInterface {
       );
    }
 
-   Position transformPosition(Position pos1, Position pos2) {
+   Position transformPosition(Position pos1, Position pos2) {  //todo: figure out how to move this (both odometry and slamra) to Position methods
       return new Position(
               pos1.X + (pos2.X*Math.cos(Math.toRadians(pos1.R)) - pos2.Y*Math.sin(Math.toRadians(pos1.R))),
               pos1.Y + (pos2.X*Math.sin(Math.toRadians(pos1.R)) + pos2.Y*Math.cos(Math.toRadians(pos1.R))),

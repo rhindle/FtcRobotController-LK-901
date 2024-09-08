@@ -14,13 +14,13 @@ import org.firstinspires.ftc.teamcode.Tools.DataTypes.Position;
 public class DSShooter implements PartsInterface {
 
    /* Settings */
-   static final double pusherRetracted                 = 0;
-   static final double pusherExtended                  = 0.8;
+   static final double pusherRetracted                 = 0.362; //0;
+   static final double pusherExtended                  = 0.660; //0.8;
    static final int pusherSweepTime                    = 200;
    static final int pusherAutoCycles                   = 5;   // 3 rings, but extra pushes in case miss
 
-   static final double gateOpen                        = 1;
-   static final double gateClosed                      = 0;
+   static final double gateOpen                        = 0.352; //1;
+   static final double gateClosed                      = 0.015; //0;
    static final int gateSweepTime                      = 325;
 
    static final double spinnerRPM                      = 3600;
@@ -28,8 +28,10 @@ public class DSShooter implements PartsInterface {
    public static PIDFCoefficients spinnerPID           = new PIDFCoefficients(100,0,0,12.4);
 
    static final double ingesterPower                   = 1;
+   static final int disarmTime                         = 10000;
+   static final int disarmTimeAfterFire                = 5000;
 
-   static Position autoLaunchPos                       = new Position(-24, 0, 0);  // must be updated!!
+   public static final Position autoLaunchPos          = new Position(-24, 0, 0);  // must be updated!!
 
    /* Internal use */
    private static DcMotorEx motorSpinner;
@@ -41,6 +43,7 @@ public class DSShooter implements PartsInterface {
    private static long pusherTimer = System.currentTimeMillis();
    private static final double spinMultiplier = 60.0 / 28.0 * 1.0;  // ticksPerRev * gearRatio;;
    public static long cancelTimer = System.currentTimeMillis();
+   public static long disarmTimer = System.currentTimeMillis();// + 10000000; // unattainable future
    public static boolean isArmed = false;
 
    /* Public OpMode members. */
@@ -76,6 +79,7 @@ public class DSShooter implements PartsInterface {
       Shoot1.stateMachine();
       Shoot3.stateMachine();
       FullAuto.stateMachine();
+      if (isArmed && System.currentTimeMillis() >= disarmTimer) disarmShooter();
       TelemetryMgr.message(TelemetryMgr.Category.DISCSHOOTER,
               "States: " +
                       "PU: " + String.format("%02d", Pusher.getState()) +
@@ -92,7 +96,7 @@ public class DSShooter implements PartsInterface {
       motorSpinner = parts.robot.motor0B;
       motorIngester = parts.robot.motor1B;
       servoGate = parts.robot.servo4B;
-      servoPusher = parts.robot.servo0B;
+      servoPusher = parts.robot.servo1B;
 
       stopMotors();
 
@@ -119,8 +123,7 @@ public class DSShooter implements PartsInterface {
    public void startShoot3 () {
       Shoot3.start();
    }
-   public void startFullAuto () {
-      FullAuto.start();
+   public void startFullAuto () { FullAuto.start();
    }
    public void startPushIfArmed () {
       if (isArmed) Pusher.start();
@@ -186,12 +189,14 @@ public class DSShooter implements PartsInterface {
       openGate();
       spinnerOn();
       isArmed = true;
+      disarmTimer = System.currentTimeMillis() + disarmTime;
    }
    public static void disarmShooter() {
       retractPusher();
       closeGate();
       spinnerOff();
       isArmed = false;
+      //disarmTimer = System.currentTimeMillis() + 10000000; // unattainable future
    }
 
    public static void openGate() {

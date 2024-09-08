@@ -36,7 +36,10 @@ class Shoot3 {
         }
         if (state == 4) {                 // wait for pusher machine to complete
             if (Pusher.isComplete()) {
-                if (cycleCount == DSShooter.pusherAutoCycles) complete = true;
+                if (cycleCount == DSShooter.pusherAutoCycles) {
+                    complete = true;
+                    DSShooter.disarmTimer = System.currentTimeMillis() + DSShooter.disarmTimeAfterFire;
+                }
                 else if (DSShooter.isSpinnerInTolerance()) {
                     cycleCount++;
                     Pusher.start();      //restart pusher
@@ -51,6 +54,7 @@ class Shoot3 {
         complete = false;
         state = 1;
         cancelTimer = System.currentTimeMillis() + timeLimit;
+        DSShooter.disarmTimer = System.currentTimeMillis() + timeLimit + DSShooter.disarmTimeAfterFire;
     }
 
     public static void stop() {

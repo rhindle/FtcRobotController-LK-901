@@ -61,7 +61,7 @@ public class PartsDS extends Parts {
             slamra.slamraRobotOffset = slamraRobotOffset;
         }
 
-        if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 18, AdafruitNeoDriver.ColorOrder.GRB);  //RGB for fairy string
+        if (useNeoMatrix) neo = new NeoMatrix(opMode, "neo", 8, 8, AdafruitNeoDriver.ColorOrder.GRB);  //RGB for fairy string
     }
 
     @Override
@@ -72,7 +72,8 @@ public class PartsDS extends Parts {
         dsShooter.initialize();
         if (useSlamra) slamra.initialize();
         if (useAprilTag) dsApriltag.initialize();
-        if (useNeoMatrix) dsLed.initialize();
+        //if (useNeoMatrix) dsLed.initialize();
+        dsLed.initialize();
     }
 
     @Override
@@ -82,7 +83,8 @@ public class PartsDS extends Parts {
         if (useSlamra) slamra.initLoop();
         if (useAprilTag) dsApriltag.initLoop();
         positionMgr.initLoop();
-        if (useNeoMatrix) dsLed.initLoop();
+        //if (useNeoMatrix) dsLed.initLoop();
+        dsLed.initLoop();
         dsShooter.initLoop();
         TelemetryMgr.Update();
     }
@@ -100,7 +102,8 @@ public class PartsDS extends Parts {
         autoDrive.runLoop();
 
         if (useSlamra) slamra.preRun();
-        if (useNeoMatrix) dsLed.preRun();
+        //if (useNeoMatrix) dsLed.preRun();
+        dsLed.preRun();
         dsShooter.preRun();
     }
 
@@ -122,7 +125,8 @@ public class PartsDS extends Parts {
         drivetrain.runLoop();
         dsShooter.runLoop();
         tagPositionAndLEDs();
-        if (useNeoMatrix) dsLed.runLoop();
+        //if (useNeoMatrix) dsLed.runLoop();
+        dsLed.runLoop();
 
         addTelemetryLoopEnd();
         TelemetryMgr.Update();

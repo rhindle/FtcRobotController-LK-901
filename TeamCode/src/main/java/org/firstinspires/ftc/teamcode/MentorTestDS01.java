@@ -27,13 +27,13 @@ public class MentorTestDS01 extends LinearOpMode {
       parts.useODO = false;
       parts.useIMU = true;   //!!!
       parts.useSlamra = true;  //!!!
-      parts.useNeoMatrix = true;
+      parts.useNeoMatrix = true; //true;
       parts.useAprilTag = true;
       parts.useDrivetrainEncoders = true;
       parts.reverseDrive = false;
       parts.useDistanceSensors = false;
       parts.odoRobotOffset = new Position (2.25,0,0);  // if this is inherent to the robot, should it be in PartsDS?
-      parts.slamraRobotOffset = new Position(-8,-1,0);
+      parts.slamraRobotOffset = new Position(-8,-0.75,0); //new Position(-8,-1,0);
       parts.speedMaximum = 1;
 
       parts.setup();

@@ -17,7 +17,7 @@ public class ControlsDS extends Controls {
    boolean guestOK, teamOK;
    boolean toggleIntake = false;
 
-   Position shootPosition = new Position (-20, 0, 0);
+//   Position shootPosition = new Position (-20, 0, 0);
    Position aimPosition = new Position (0, 0, 0);
 
    public ControlsDS(Parts parts) {
@@ -113,6 +113,7 @@ public class ControlsDS extends Controls {
          if (toggleIntake) {
             parts.dsShooter.intakeReverse();
             parts.dsLed.displayMessage('I', 4);
+            DSShooter.disarmShooter();
          }
          else {
             parts.dsShooter.intakeOff();
@@ -125,6 +126,7 @@ public class ControlsDS extends Controls {
          if (toggleIntake) {
             parts.dsShooter.intakeOn();
             parts.dsLed.displayMessage('I', 2);
+            DSShooter.disarmShooter();
          }
          else {
             parts.dsShooter.intakeOff();
@@ -157,7 +159,7 @@ public class ControlsDS extends Controls {
       }
 
       if (eitherGuestOrTeam(Buttons.dpad_up, State.wasHeld)) {
-         parts.autoDrive.setNavTarget(new NavigationTarget(shootPosition, parts.dsMisc.toleranceHigh));
+         parts.autoDrive.setNavTarget(new NavigationTarget(DSShooter.autoLaunchPos, parts.dsMisc.toleranceHigh));
          parts.userDrive.directionTarget = aimPosition;
          parts.userDrive.useTargetDirection = true;
          parts.dsLed.displayMessage('A', 2);

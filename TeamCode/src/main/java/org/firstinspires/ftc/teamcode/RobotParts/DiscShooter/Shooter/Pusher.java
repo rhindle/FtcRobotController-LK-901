@@ -23,6 +23,7 @@ public class Pusher {
         if (state == 3) {                // wait for complete
             if (DSShooter.isPusherRetracted()) {
                 complete = true;
+                DSShooter.disarmTimer = System.currentTimeMillis() + DSShooter.disarmTimeAfterFire;
             }
         }
     }

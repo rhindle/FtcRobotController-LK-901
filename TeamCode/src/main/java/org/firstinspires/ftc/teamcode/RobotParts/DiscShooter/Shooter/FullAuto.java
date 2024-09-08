@@ -44,9 +44,7 @@ class FullAuto {
         if (state == 4) {
             if (Shoot3.isComplete()) {
                 DSShooter.parts.autoDrive.setAutoDrive(false);
-                DSShooter.closeGate();
-                DSShooter.spinnerOff();
-                DSShooter.retractPusher();
+                DSShooter.disarmShooter();
                 complete = true;
             }
         }
@@ -57,6 +55,7 @@ class FullAuto {
         complete = false;
         state = 1;
         cancelTimer = System.currentTimeMillis() + timeLimit;
+        DSShooter.disarmTimer = System.currentTimeMillis() + timeLimit + 5000;
     }
 
     public static void stop() {

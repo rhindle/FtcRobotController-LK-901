@@ -2,6 +2,12 @@ package org.firstinspires.ftc.teamcode.RobotParts.DiscShooter;
 
 import android.graphics.Color;
 
+import com.arcrobotics.ftclib.hardware.ServoEx;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
+
 import org.firstinspires.ftc.teamcode.RobotParts.Common.Parts;
 import org.firstinspires.ftc.teamcode.Tools.PartsInterface;
 
@@ -10,16 +16,20 @@ public class DSLed implements PartsInterface {
    /* Public OpMode members. */
    public Parts parts;
 
-   public int cols = 18;
+   public int cols = 8;  //18,16
    public int rows = 8;
 
    public int attractDelay = 250;
    public long attractTime = 0;
-   int[][] attractMatrix = new int[1][8];
+//   int[][] attractMatrix = new int[1][8];
 
    int[][] messageMatrix = new int[cols][rows];
    int[][] normalMatrix = new int[cols][rows];
    int[][] finalMatrix = new int[cols][rows];
+
+   private static Servo servoBlinkin;
+   //private static ServoImplEx servoBlinkin;
+   int servoBlinkinSetting, servoBlinkinSettingLast;
 
    /* Constructor */
    public DSLed(Parts parts){
@@ -31,40 +41,58 @@ public class DSLed implements PartsInterface {
    }
 
    public void initialize(){
-      parts.neo.initialize();
-      parts.neo.setUpdateLimit(0);
-      parts.neo.setPreventTearing(true);
-      parts.neo.setDimmingValue(64);
-      parts.neo.drawRectangle(0, 7, 0, 7, Color.rgb(10, 10, 0));
-      normalMatrix = parts.neo.buildPixelMapFromString("abcd", marquis, Color.rgb(10,10,0), Color.rgb(0,0,0));
+      if (parts.useNeoMatrix) {
+         parts.neo.initialize();
+         parts.neo.flipVert=true;
+         parts.neo.flipHoriz=true;
+         parts.neo.setUpdateLimit(0);
+         parts.neo.setPreventTearing(true);
+         parts.neo.setDimmingValue(64);
+         parts.neo.drawRectangle(0, 7, 0, 7, Color.rgb(10, 10, 0));
+         normalMatrix = parts.neo.buildPixelMapFromString("abcd", marquis, Color.rgb(10,10,0), Color.rgb(0,0,0));
+      }
+      servoBlinkin = parts.robot.servo2B;
+      ServoImplEx adjust = parts.opMode.hardwareMap.get(ServoImplEx.class,"servo2B");
+      adjust.setPwmRange(new PwmControl.PwmRange(500, 2500));
+      setBlinkinPattern(60);
    }
 
    public void preInit() {
    }
 
    public void initLoop() {
-      parts.neo.applyPixelMapToBuffer(normalMatrix,0,7, 0, true);
-      parts.neo.applyPixelMapToBuffer(parts.neo.reversePixelMap(normalMatrix),8,15, 0, true);
-      normalMatrix = parts.neo.shiftPixelMap(normalMatrix,-8,0,true);
-      clearMessage();
-      parts.neo.runLoop();
+      if (parts.useNeoMatrix) {
+         parts.neo.applyPixelMapToBuffer(normalMatrix, 0, 7, 0, true);
+         //parts.neo.applyPixelMapToBuffer(parts.neo.reversePixelMap(normalMatrix), 8, 15, 0, true);
+         normalMatrix = parts.neo.shiftPixelMap(normalMatrix, -8, 0, true);
+         clearMessage();
+         parts.neo.runLoop();
+      }
    }
 
    public void preRun() {
-      parts.neo.clearMatrix();
-      normalMatrix = new int[cols][rows];
-      updateGraphic('4', Color.rgb(2,2,2));
-      parts.neo.applyPixelMapToBuffer(finalMatrix,0,15,0, true);
-      parts.neo.forceUpdateMatrix();
-      parts.neo.setUpdateLimit(2);
-      attractMatrix[0] = chase;
+      if (parts.useNeoMatrix) {
+         parts.neo.clearMatrix();
+         normalMatrix = new int[cols][rows];
+         updateGraphic('4', Color.rgb(2, 2, 2));
+//         parts.neo.applyPixelMapToBuffer(finalMatrix, 0, 15, 0, true);
+         parts.neo.applyPixelMapToBuffer(finalMatrix, 0, 7, 0, true);
+         parts.neo.forceUpdateMatrix();
+         parts.neo.setUpdateLimit(2);
+//         attractMatrix[0] = chase;
+      }
    }
 
    public void runLoop() {
-      clearMessage();
-      parts.neo.applyPixelMapToBuffer(finalMatrix,0,15,0, true);
-      attract();
-      parts.neo.runLoop();
+      if (parts.useNeoMatrix) {
+         clearMessage();
+//         parts.neo.applyPixelMapToBuffer(finalMatrix, 0, 15, 0, true);
+         parts.neo.applyPixelMapToBuffer(finalMatrix, 0, 7, 0, true);
+
+         //attract();
+         parts.neo.runLoop();
+      }
+      autoSetBlinkin();
    }
 
    public void stop() {
@@ -99,15 +127,16 @@ public class DSLed implements PartsInterface {
       textMatrix = parts.neo.buildPixelMapFromString(String.valueOf(msgChar), parts.neo.bigLetters, msgColor);
       messageMatrix = new int[cols][rows];
       messageMatrix = parts.neo.overlayPixelMap(textMatrix, messageMatrix, 2);
-      messageMatrix = parts.neo.overlayPixelMap(textMatrix, messageMatrix, 10);
+      //messageMatrix = parts.neo.overlayPixelMap(textMatrix, messageMatrix, 10);
       finalMatrix = parts.neo.cloneArray(messageMatrix);
    }
 
    public void updateGraphic (char msgChar, int color) {
+      if (!parts.useNeoMatrix) return;
       int[][] textMatrix;
       textMatrix = parts.neo.buildPixelMapFromString(String.valueOf(msgChar), circles, color);
       normalMatrix = parts.neo.overlayPixelMap(textMatrix, normalMatrix,0);
-      normalMatrix = parts.neo.overlayPixelMap(textMatrix, normalMatrix,8);
+      //normalMatrix = parts.neo.overlayPixelMap(textMatrix, normalMatrix,8);
    }
 
    public void clearMessage () {
@@ -120,12 +149,32 @@ public class DSLed implements PartsInterface {
       }
    }
 
-   public void attract () {
-      if (System.currentTimeMillis() > attractTime) {
-         attractTime = System.currentTimeMillis() + attractDelay;
-         attractMatrix = parts.neo.shiftPixelMap(attractMatrix,0,1,true);
-      }
-      parts.neo.applyPixelMapToBuffer(attractMatrix, 16, 16,0,true);
+//   public void attract () {
+//      if (System.currentTimeMillis() > attractTime) {
+//         attractTime = System.currentTimeMillis() + attractDelay;
+//         attractMatrix = parts.neo.shiftPixelMap(attractMatrix,0,1,true);
+//      }
+//      parts.neo.applyPixelMapToBuffer(attractMatrix, 16, 16,0,true);
+//   }
+
+   public void setBlinkinPattern(int pattern) {
+      if (pattern<1 || pattern>100) return;  //or throw an error
+      int pulseWidth = 995 + 10*pattern;                 // convert pattern number to pulse width between 1000-2000 μs)
+      double setting = (pulseWidth - 500) / 2000.0;      // covert pulse width to 0-1 servo position (based on 500-2500 μs)
+      servoBlinkin.setPosition(setting);
+   }
+
+   public void setBlinkinPattern(RevBlinkinLedDriver.BlinkinPattern pattern) {
+      setBlinkinPattern(pattern.ordinal()+1);            // ordinal starts at 0, so need to add 1
+   }
+
+   public void autoSetBlinkin() {
+      if (parts.dsShooter.isArmed) servoBlinkinSetting = 21;
+      else if (parts.autoDrive.isNavigating) servoBlinkinSetting = 71;
+      else if (parts.userDrive.isDriving) servoBlinkinSetting = 51;
+      else servoBlinkinSetting = 25; //43;
+      if (servoBlinkinSetting != servoBlinkinSettingLast) setBlinkinPattern(servoBlinkinSetting);
+      servoBlinkinSettingLast = servoBlinkinSetting;
    }
 
    public final char[][] marquis = {

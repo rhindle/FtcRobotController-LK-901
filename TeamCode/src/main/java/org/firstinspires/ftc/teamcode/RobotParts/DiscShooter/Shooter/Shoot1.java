@@ -33,7 +33,10 @@ class Shoot1 {
             }
         }
         if (state == 4) {                 // wait for pusher machine to complete
-            if (Pusher.isComplete()) complete = true;
+            if (Pusher.isComplete()) {
+                complete = true;
+                DSShooter.disarmTimer = System.currentTimeMillis() + DSShooter.disarmTimeAfterFire;
+            }
             else if (!Pusher.isRunning()) stop();   //cancel if problem
         }
     }
@@ -43,6 +46,7 @@ class Shoot1 {
         complete = false;
         state = 1;
         cancelTimer = System.currentTimeMillis() + timeLimit;
+        DSShooter.disarmTimer = System.currentTimeMillis() + timeLimit + DSShooter.disarmTimeAfterFire;
     }
 
     public static void stop() {
