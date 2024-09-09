@@ -16,7 +16,7 @@ public class DSShooter implements PartsInterface {
    /* Settings */
    static final double pusherRetracted                 = 0.362; //0;
    static final double pusherExtended                  = 0.660; //0.8;
-   static final int pusherSweepTime                    = 200;
+   static final int pusherSweepTime                    = 225;  //200;
    static final int pusherAutoCycles                   = 5;   // 3 rings, but extra pushes in case miss
 
    static final double gateOpen                        = 0.352; //1;

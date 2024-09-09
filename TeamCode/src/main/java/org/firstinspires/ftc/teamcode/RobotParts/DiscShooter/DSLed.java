@@ -47,7 +47,7 @@ public class DSLed implements PartsInterface {
          parts.neo.flipHoriz=true;
          parts.neo.setUpdateLimit(0);
          parts.neo.setPreventTearing(true);
-         parts.neo.setDimmingValue(64);
+         parts.neo.setDimmingValue(255);
          parts.neo.drawRectangle(0, 7, 0, 7, Color.rgb(10, 10, 0));
          normalMatrix = parts.neo.buildPixelMapFromString("abcd", marquis, Color.rgb(10,10,0), Color.rgb(0,0,0));
       }
